@@ -1,4 +1,4 @@
-"use client";;
+"use client";
 import { DataTable } from "@/components/data-table";
 import { queryKeys } from "@/service/util/query-key";
 import { useQuery } from "@tanstack/react-query";
@@ -7,6 +7,7 @@ import { LoadingOverlay } from "@/components/LoadingOverlay";
 import { getAllHolidays } from "@/service/admin/device.service";
 import { holidayColumns } from "./columns";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { DashboardCard } from "@/components/DashboardCard";
 
 interface Props {
   initPageIndex: number;
@@ -27,7 +28,7 @@ const HolidayClient = ({ initPageIndex, initPageSize }: Props) => {
   });
 
   const holidays = data?.holidays ?? [];
-  const pagination = data?.pagination 
+  const pagination = data?.pagination;
 
   const cols = holidayColumns({
     onEdit: (row) => {},
@@ -55,6 +56,32 @@ const HolidayClient = ({ initPageIndex, initPageSize }: Props) => {
 
   return (
     <div>
+      <div className="grid gap-4 grid-cols-4 mb-4">
+        <DashboardCard
+          title="Total Holiday"
+          value={60}
+          icon="/icons/holidays.png"
+        />
+
+        <DashboardCard
+          title="Public Holiday"
+          value={60}
+          icon="/icons/public.png"
+        />
+
+        <DashboardCard
+          title="Company Holiday"
+          value={60}
+          icon="/icons/company.png"
+        />
+
+        <DashboardCard
+          title="Up Coming"
+          value={60}
+          icon="/icons/upcoming.png"
+        />
+      </div>
+
       <DataTable
         columns={cols}
         data={holidays}
@@ -70,7 +97,4 @@ const HolidayClient = ({ initPageIndex, initPageSize }: Props) => {
   );
 };
 
-
-
 export default HolidayClient;
-

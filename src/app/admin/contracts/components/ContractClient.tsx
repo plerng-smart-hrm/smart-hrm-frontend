@@ -12,6 +12,9 @@ import { useMutateContract } from "@/stores/admin/useMutateContract";
 import { IContract } from "@/types/admin";
 import { getAllContracts } from "@/service/admin/contracts.service";
 import { contractColumns } from "./columns";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import Image from "next/image";
+import { DashboardCard } from "@/components/DashboardCard";
 
 interface Props {
   initPageIndex: number;
@@ -108,6 +111,28 @@ const ContractClient = ({ initPageIndex, initPageSize }: Props) => {
           onConfirm={handleDelete}
         />
       )}
+
+      <div className="grid gap-4 grid-cols-4 mb-4">
+        <DashboardCard
+          title="Contract UDC"
+          value={60}
+          icon="/icons/contract.png"
+        />
+
+        <DashboardCard
+          title="Contract FDC"
+          value={60}
+          icon="/icons/contract.png"
+        />
+
+        <DashboardCard title="Near Expired" value={60} icon="/icons/time.png" />
+
+        <DashboardCard
+          title="Pending Severance"
+          value={60}
+          icon="/icons/pay.png"
+        />
+      </div>
 
       <DataTable
         columns={cols}

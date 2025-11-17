@@ -2,12 +2,9 @@ import { getQueryClient } from "@/lib/query-client";
 import { queryKeys } from "@/service/util/query-key";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { getSearchParams } from "@/utils/searchParams";
-import {
-  getAllContractTypeList,
-  getAllContractTypes,
-} from "@/service/admin/contract-types.service";
-import ContractTypeClient from "./components/ContractClient";
+import { getAllContractTypeList } from "@/service/admin/contract-types.service";
 import { getAllContracts } from "@/service/admin/contracts.service";
+import ContractClient from "./components/ContractClient";
 
 interface Props {
   searchParams: Promise<{
@@ -32,7 +29,7 @@ const page = async ({ searchParams }: Props) => {
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <ContractTypeClient initPageIndex={pageIndex} initPageSize={pageSize} />
+      <ContractClient initPageIndex={pageIndex} initPageSize={pageSize} />
     </HydrationBoundary>
   );
 };
