@@ -26,15 +26,16 @@ const ContractDialog = ({ isOpen, setIsOpen, contractId }: Props) => {
     enabled: isEdit,
   });
 
-  const { data: contractTypeData, isFetching: isContractTypeList } = useQuery({
-    queryKey: queryKeys.contractTypes.list(),
-    queryFn: () => getAllContractTypeList(),
-  });
+  const { data: contractTypeData, isFetching: isFetchingContractType } =
+    useQuery({
+      queryKey: queryKeys.contractTypes.list(),
+      queryFn: () => getAllContractTypeList(),
+    });
 
   const contract = data?.contract ?? undefined;
   const contractTypes = contractTypeData?.contractTypes ?? [];
 
-  if (isFetching) {
+  if (isFetching && isFetchingContractType) {
     return <LoadingOverlay isLoading={isFetching} />;
   }
 

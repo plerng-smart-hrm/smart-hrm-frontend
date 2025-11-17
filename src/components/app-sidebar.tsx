@@ -84,8 +84,8 @@ const data = {
           url: "/admin/leave-types",
         },
         {
-          title: "Leaves",
-          url: "/admin/leaves",
+          title: "Leaves Requests",
+          url: "/admin/leave-requests",
         },
       ],
     },
