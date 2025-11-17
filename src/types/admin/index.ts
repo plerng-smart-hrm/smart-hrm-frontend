@@ -217,8 +217,19 @@ export interface IEmployee {
   position?: string;
   joinedDate?: string;
   status?: string;
-  salary?: string
+  salary?: string;
 
+  createdBy?: number;
+  updatedBy?: number;
+  createdAt?: string;
+  updatedAt?: string;
+  deletedAt?: string;
+}
+export interface IDepartment {
+  id?: number;
+  name?: string;
+  companyId: number;
+  
   createdBy?: number;
   updatedBy?: number;
   createdAt?: string;

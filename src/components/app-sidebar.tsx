@@ -6,6 +6,7 @@ import {
   Bot,
   GalleryVerticalEnd,
   Settings2,
+  SettingsIcon,
   SquareTerminal,
 } from "lucide-react";
 
@@ -91,6 +92,25 @@ const data = {
         {
           title: "Leaves Requests",
           url: "/admin/leave-requests",
+        },
+      ],
+    },
+    {
+      title: "Settings",
+      url: "/admin/leaves",
+      icon: SettingsIcon,
+      items: [
+        {
+          title: "Companies",
+          url: "/admin/companies",
+        },
+        {
+          title: "Departments",
+          url: "/admin/departments",
+        },
+        {
+          title: "Sections",
+          url: "/admin/sections",
         },
       ],
     },
