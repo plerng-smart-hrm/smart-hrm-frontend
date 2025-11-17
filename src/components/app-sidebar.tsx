@@ -2,6 +2,7 @@
 import * as React from "react";
 import {
   BookOpen,
+  BookTextIcon,
   Bot,
   GalleryVerticalEnd,
   Settings2,
@@ -33,8 +34,8 @@ const data = {
   },
   navMain: [
     {
-      title: "Products",
-      url: "/admin/products",
+      title: "Employees",
+      url: "/admin/employees",
       icon: SquareTerminal,
       isActive: true,
       items: [
@@ -49,23 +50,42 @@ const data = {
       ],
     },
     {
-      title: "Customers",
-      url: "/admin/customers",
+      title: "Devices",
+      url: "/admin/devices",
       icon: Bot,
     },
     {
-      title: "Documentation",
-      url: "#",
+      title: "Holidays",
+      url: "/admin/holidays",
       icon: BookOpen,
     },
     {
-      title: "Stock History",
-      url: "#",
-      icon: Settings2,
+      title: "Contract",
+      url: "/admin/contracts",
+      icon: BookTextIcon,
       items: [
         {
-          title: "General",
-          url: "#",
+          title: "Contract Types",
+          url: "/admin/contract-types",
+        },
+        {
+          title: "Contracts",
+          url: "/admin/contracts",
+        },
+      ],
+    },
+    {
+      title: "Leaves",
+      url: "/admin/leaves",
+      icon: BookTextIcon,
+      items: [
+        {
+          title: "Leave Types",
+          url: "/admin/leave-types",
+        },
+        {
+          title: "Leaves",
+          url: "/admin/leaves",
         },
       ],
     },

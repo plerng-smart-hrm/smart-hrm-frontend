@@ -42,3 +42,24 @@ export const contractCache = {
     });
   },
 };
+
+export const leaveTypeCache = {
+  clearAll: (queryClient: QueryClient) => {
+    queryClient.removeQueries({
+      queryKey: queryKeys.leaveTypes.root,
+    });
+  },
+
+  clearList: (queryClient: QueryClient) => {
+    queryClient.removeQueries({
+      queryKey: queryKeys.leaveTypes.list(),
+      exact: false,
+    });
+  },
+
+  clearDetail: (queryClient: QueryClient, id?: number) => {
+    queryClient.removeQueries({
+      queryKey: queryKeys.leaveTypes.detail(id),
+    });
+  },
+};

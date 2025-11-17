@@ -8,28 +8,39 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { IconDotsVertical } from "@tabler/icons-react";
-import { IContractType } from "@/types/admin";
+import { ILeaveType } from "@/types/admin";
 import { createRowNumberColumn } from "@/components/data-table";
 
-export const contractTypeColumns = (opts?: {
-  onEdit?: (row: IContractType) => void;
-  onDelete?: (row: IContractType) => void;
-}): ColumnDef<IContractType>[] => {
+export const leaveTypeColumns = (opts?: {
+  onEdit?: (row: ILeaveType) => void;
+  onDelete?: (row: ILeaveType) => void;
+}): ColumnDef<ILeaveType>[] => {
   const { onDelete, onEdit } = opts ?? {};
 
-  const cols: ColumnDef<IContractType>[] = [
-    createRowNumberColumn<IContractType>(),
+  const cols: ColumnDef<ILeaveType>[] = [
+    createRowNumberColumn<ILeaveType>(),
     {
-      header: "Name",
-      cell: ({ row }) => <div>{row.original.name}</div>,
+      header: "Leave Type",
+      cell: ({ row }) => (
+        <div className="flex flex-col">
+          <p className="text-md">{row.original.name}</p>
+          <span className="text-muted-foreground text-sm">
+            {row.original.nameKh}
+          </span>
+        </div>
+      ),
     },
     {
-      header: "Contract Type",
-      cell: ({ row }) => (
-        <span className="inline-flex items-center gap-x-1.5 py-0.5 px-3 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-800/30 dark:text-blue-500">
-          {row.original.code}
-        </span>
-      ),
+      header: "Description",
+      cell: ({ row }) => <div>{row.original.description}</div>,
+    },
+    {
+      header: "Pay Rate",
+      cell: ({ row }) => <div>{row.original.payRate}</div>,
+    },
+    {
+      header: "Default Days",
+      cell: ({ row }) => <div>{row.original.defaultDays}</div>,
     },
     {
       accessorKey: "createdAt",
@@ -52,7 +63,6 @@ export const contractTypeColumns = (opts?: {
               <span className="sr-only">Open menu</span>
             </Button>
           </DropdownMenuTrigger>
-
           <DropdownMenuContent align="end" className="w-32">
             <DropdownMenuItem onClick={() => onEdit?.(row.original)}>
               Edit

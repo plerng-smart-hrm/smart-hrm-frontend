@@ -157,3 +157,18 @@ export interface IContract {
   updatedAt?: string;
   deletedAt?: string;
 }
+
+export interface ILeaveType {
+  id?: number;
+  name?: string;
+  nameKh?: string;
+  description?: string;
+  defaultDays?: number;
+  payRate?: number;
+
+  createdBy?: number;
+  updatedBy?: number;
+  createdAt?: string;
+  updatedAt?: string;
+  deletedAt?: string;
+}
