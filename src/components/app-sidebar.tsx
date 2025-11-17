@@ -23,14 +23,14 @@ import {
 // This is sample data.
 const data = {
   user: {
-    name: "shadcn",
-    email: "m@example.com",
+    name: "Ratana",
+    email: "ratana.san@example.com",
     avatar: "/avatars/shadcn.jpg",
   },
   teams: {
-    name: "Deluxe",
+    name: "Smart HRM",
     logo: GalleryVerticalEnd,
-    plan: "Deluxe Online Store",
+    plan: "Smart HRM System",
   },
   navMain: [
     {
@@ -48,6 +48,11 @@ const data = {
           url: "/admin/products",
         },
       ],
+    },
+    {
+      title: "Companies",
+      url: "/admin/companies",
+      icon: Bot,
     },
     {
       title: "Devices",

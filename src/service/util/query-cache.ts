@@ -84,3 +84,24 @@ export const leaveRequestCache = {
     });
   },
 };
+
+export const companyCache = {
+  clearAll: (queryClient: QueryClient) => {
+    queryClient.removeQueries({
+      queryKey: queryKeys.companies.root,
+    });
+  },
+
+  clearList: (queryClient: QueryClient) => {
+    queryClient.removeQueries({
+      queryKey: queryKeys.companies.list(),
+      exact: false,
+    });
+  },
+
+  clearDetail: (queryClient: QueryClient, id?: number) => {
+    queryClient.removeQueries({
+      queryKey: queryKeys.companies.detail(id),
+    });
+  },
+};

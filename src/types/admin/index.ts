@@ -192,3 +192,17 @@ export interface ILeaveRequest {
   updatedAt?: string;
   deletedAt?: string;
 }
+
+export interface ICompany {
+  id?: number;
+  name?: string;
+  description?: string;
+  location?: string;
+  logo?: string;
+
+  createdBy?: number;
+  updatedBy?: number;
+  createdAt?: string;
+  updatedAt?: string;
+  deletedAt?: string;
+}

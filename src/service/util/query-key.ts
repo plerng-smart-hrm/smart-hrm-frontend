@@ -56,4 +56,12 @@ export const queryKeys = {
 
     detail: (id?: number) => ["leaveRequests", "detail", id] as const,
   },
+  companies: {
+    root: ["companies"] as const,
+
+    list: (pageIndex?: number, pageSize?: number) =>
+      ["companies", "list", { pageIndex, pageSize }] as const,
+
+    detail: (id?: number) => ["companies", "detail", id] as const,
+  },
 };
