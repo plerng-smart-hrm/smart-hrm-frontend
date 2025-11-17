@@ -11,6 +11,7 @@ import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { ICompany } from "@/types/admin";
 import { getAllCompanies } from "@/service/admin/companies.service";
 import { useMutateCompany } from "@/stores/admin/useMutateCompany";
+import CompanyDialog from "./CompanyDialog";
 
 interface Props {
   initPageIndex: number;

@@ -5,27 +5,27 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import ContractTypeForm from "./CompanyForm";
+import CompanyForm from "./CompanyForm";
 import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "@/service/util/query-key";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
-import { getContractTypeById } from "@/service/admin/contract-types.service";
+import { getCompanyById } from "@/service/admin/companies.service";
 
 interface Props {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
-  contractTypeId?: number;
+  companyId?: number;
 }
-const ContractTypeDialog = ({ isOpen, setIsOpen, contractTypeId }: Props) => {
-  const isEdit = !!contractTypeId;
+const CompanyDialog = ({ isOpen, setIsOpen, companyId }: Props) => {
+  const isEdit = !!companyId;
 
   const { data, isFetching } = useQuery({
-    queryKey: queryKeys.categories.byId(contractTypeId),
-    queryFn: () => getContractTypeById(contractTypeId),
+    queryKey: queryKeys.categories.byId(companyId),
+    queryFn: () => getCompanyById(companyId),
     enabled: isEdit,
   });
 
-  const contractType = data?.contractType ?? undefined;
+  const company = data?.company ?? undefined;
 
   if (isFetching) {
     return <LoadingOverlay isLoading={isFetching} />;
@@ -36,16 +36,13 @@ const ContractTypeDialog = ({ isOpen, setIsOpen, contractTypeId }: Props) => {
       <DialogContent className="">
         <DialogHeader>
           <DialogTitle>
-            {isEdit ? "Edit ContractType" : "Create ContractType"}
+            {isEdit ? "Edit Company" : "Create Company"}
           </DialogTitle>
         </DialogHeader>
-        <ContractTypeForm
-          initialData={contractType}
-          onSuccess={() => setIsOpen(false)}
-        />
+        <CompanyForm initialData={company} onSuccess={() => setIsOpen(false)} />
       </DialogContent>
     </Dialog>
   );
 };
 
-export default ContractTypeDialog;
+export default CompanyDialog;
