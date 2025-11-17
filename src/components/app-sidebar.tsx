@@ -44,10 +44,6 @@ const data = {
           title: "Employees",
           url: "/admin/employees",
         },
-        {
-          title: "Products",
-          url: "/admin/products",
-        },
       ],
     },
     {

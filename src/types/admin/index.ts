@@ -229,7 +229,21 @@ export interface IDepartment {
   id?: number;
   name?: string;
   companyId: number;
-  
+
+  createdBy?: number;
+  updatedBy?: number;
+  createdAt?: string;
+  updatedAt?: string;
+  deletedAt?: string;
+}
+
+export interface ISection {
+  id?: number;
+  name?: string;
+  description?: string;
+  departmentId?: number;
+  department?: IDepartment;
+
   createdBy?: number;
   updatedBy?: number;
   createdAt?: string;
