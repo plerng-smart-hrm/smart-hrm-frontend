@@ -23,6 +23,7 @@ type Props = {
   enableColumnMenu?: boolean;
   onCreateClick?: () => void;
   createLabel?: string;
+  extraAction?: React.ReactNode;
 };
 
 export function DataTableToolbar({
@@ -32,6 +33,7 @@ export function DataTableToolbar({
   enableColumnMenu = false,
   onCreateClick,
   createLabel = "Create",
+  extraAction,
 }: Props) {
   const [value, setValue] = React.useState("");
 
@@ -56,12 +58,19 @@ export function DataTableToolbar({
         )}
       </div>
 
-      {onCreateClick && (
-        <Button onClick={onCreateClick} variant="default" size="sm">
-          <IconPlus className="h-4 w-4" />
-          {createLabel}
-        </Button>
-      )}
+      <div className="flex items-center gap-2">
+        {extraAction}
+        {onCreateClick && (
+          <Button
+            onClick={onCreateClick}
+            variant="default"
+            className="cursor-pointer"
+          >
+            <IconPlus className="h-4 w-4" />
+            {createLabel}
+          </Button>
+        )}
+      </div>
       {enableColumnMenu && (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

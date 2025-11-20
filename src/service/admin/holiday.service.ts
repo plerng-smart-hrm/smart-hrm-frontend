@@ -1,63 +1,67 @@
 "use server";
 
-import { IApiResponse, ICustomer, IDevice, IHoliday, IPagination } from "@/types/admin";
+import { IApiResponse, IHoliday, IPagination } from "@/types/admin";
 import { api } from "../util/api";
 
 export interface IHolidaysRes {
-  devices?: IHoliday[];
+  holidays?: IHoliday[];
   pagination?: IPagination;
 }
 
-export interface ICustomerRes {
-  customer?: ICustomer;
+export interface IHolidayRes {
+  holiday?: IHoliday;
 }
 
-export interface ICreateCustomerRequest {
+export interface ICreateHolidayRequest {
   name: string;
   phone: string;
   email: string;
   address: string;
 }
 
-export interface IUpdateCustomerRequest {
+export interface IUpdateHolidayRequest {
   name: string;
   phone: string;
   email: string;
   address: string;
 }
 
-export const getAllDevices = async (): Promise<IHolidaysRes> => {
-  const data = await api.get<IApiResponse<IHoliday[]>>(`/devices`);
+export const getAllHolidays = async (
+  pageIndex: number,
+  pageSize?: number
+): Promise<IHolidaysRes> => {
+  const page = pageIndex + 1;
+  const data = await api.get<IApiResponse<IHoliday[]>>(
+    `/holidays?page=${page}&limit=${pageSize}`
+  );
   return {
-    devices: data.data,
+    holidays: data.data,
     pagination: data.pagination,
   };
 };
 
-export const getCustomerById = async (
-  customerId?: number
-): Promise<ICustomerRes> => {
-  const data = await api.get<IApiResponse<ICustomer>>(
-    `/customers/${customerId}`
-  );
+export const getHolidayById = async (
+  holidayId?: number
+): Promise<IHolidayRes> => {
+  const data = await api.get<IApiResponse<IHoliday>>(`/holidays/${holidayId}`);
   return {
-    customer: data.data,
+    holiday: data.data,
   };
 };
 
-export const createCustomer = async (
-  request: ICreateCustomerRequest
+export const createHoliday = async (
+  request: ICreateHolidayRequest
 ): Promise<void> => {
-  await api.post<IApiResponse<void>>(`/customers`, request);
+  await api.post<IApiResponse<void>>(`/holidays`, request);
 };
 
-export const updateCustomer = async (
-  customerId?: number,
-  request?: IUpdateCustomerRequest
+export const updateHoliday = async (
+  holidayId?: number,
+  request?: IUpdateHolidayRequest
 ): Promise<void> => {
-  await api.put<IApiResponse<void>>(`/customers/${customerId}`, request);
+  await api.put<IApiResponse<void>>(`/holidays/${holidayId}`, request);
 };
 
-export const deleteCustomer = async (customerId?: number): Promise<void> => {
-  await api.delete<IApiResponse<void>>(`/customers/${customerId}`);
+export const deleteHoliday = async (holidayId?: number): Promise<void> => {
+  await api.delete<IApiResponse<void>>(`/holidays/${holidayId}`);
 };

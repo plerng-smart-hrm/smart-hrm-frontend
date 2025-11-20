@@ -1,6 +1,6 @@
 "use server";
 
-import { IApiResponse, ICustomer, IDevice, IHoliday, IPagination } from "@/types/admin";
+import { IApiResponse, IDevice, IHoliday, IPagination } from "@/types/admin";
 import { api } from "../util/api";
 
 export interface IDevicesRes {
@@ -12,67 +12,52 @@ export interface IHolidaysRes {
   pagination?: IPagination;
 }
 
-export interface ICustomerRes {
-  customer?: ICustomer;
+export interface IDeviceRes {
+  device?: IDevice;
 }
 
-export interface ICreateCustomerRequest {
-  name: string;
-  phone: string;
-  email: string;
-  address: string;
-}
+export interface ICreateDeviceRequest extends IDevice {}
 
-export interface IUpdateCustomerRequest {
-  name: string;
-  phone: string;
-  email: string;
-  address: string;
-}
+export interface IUpdateDeviceRequest {}
 
-export const getAllDevices = async (): Promise<IDevicesRes> => {
-  const data = await api.get<IApiResponse<IDevice[]>>(`/devices`);
+export const getAllDevices = async (
+  pageIndex: number,
+  pageSize?: number
+): Promise<IDevicesRes> => {
+  const page = pageIndex + 1;
+  const data = await api.get<IApiResponse<IDevice[]>>(
+    `/devices?page=${page}&limit=${pageSize}`
+  );
   return {
     devices: data.data,
     pagination: data.pagination,
   };
 };
-export const getAllHolidays = async (pageIndex: number,  pageSize?: number): Promise<IHolidaysRes> => {
-  console.log('pageIndex', pageIndex)
-  console.log('pageSize', pageSize)
-  // Convert 0-based pageIndex to 1-based page for API
-  const page = pageIndex + 1;
-  const data = await api.get<IApiResponse<IHoliday[]>>(`/holidays?page=${page}&limit=${pageSize}`);
+
+export const syncAllDevices = async () => {
+  await api.post<IApiResponse<IDevice[]>>(`/devices/sync-attendance`);
+};
+
+export const getDeviceById = async (deviceId?: number): Promise<IDeviceRes> => {
+  const data = await api.get<IApiResponse<IDevice>>(`/devices/${deviceId}`);
   return {
-    holidays: data.data,
-    pagination: data.pagination,
+    device: data.data,
   };
 };
 
-export const getCustomerById = async (
-  customerId?: number
-): Promise<ICustomerRes> => {
-  const data = await api.get<IApiResponse<ICustomer>>(
-    `/customers/${customerId}`
-  );
-  return {
-    customer: data.data,
-  };
-};
-
-export const createCustomer = async (
-  request: ICreateCustomerRequest
+export const createDevice = async (
+  request: ICreateDeviceRequest
 ): Promise<void> => {
-  await api.post<IApiResponse<void>>(`/customers`, request);
+  await api.post<IApiResponse<void>>(`/devices`, request);
 };
 
-export const updateCustomer = async (
-  customerId?: number,
-  request?: IUpdateCustomerRequest
+export const updateDevice = async (
+  deviceId?: number,
+  request?: IUpdateDeviceRequest
 ): Promise<void> => {
-  await api.put<IApiResponse<void>>(`/customers/${customerId}`, request);
+  await api.patch<IApiResponse<void>>(`/devices/${deviceId}`, request);
 };
 
-export const deleteCustomer = async (customerId?: number): Promise<void> => {
-  await api.delete<IApiResponse<void>>(`/customers/${customerId}`);
+export const deleteDevice = async (deviceId?: number): Promise<void> => {
+  await api.delete<IApiResponse<void>>(`/devices/${deviceId}`);
 };

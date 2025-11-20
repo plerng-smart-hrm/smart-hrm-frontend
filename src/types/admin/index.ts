@@ -101,9 +101,12 @@ export interface IEmployee {
 export interface IDevice {
   id?: number;
   factoryId?: number;
+  name?: string;
   model?: string;
   location?: string;
   ipAddress?: string;
+  port?: number;
+  status?: string;
 
   createdBy?: number;
   updatedBy?: number;

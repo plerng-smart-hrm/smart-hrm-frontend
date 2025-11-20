@@ -12,10 +12,6 @@ export const queryKeys = {
     all: () => ["products", "list"],
     byId: (id?: number) => ["products", "detail", id ?? "new"],
   },
-  devices: {
-    all: () => ["devices", "list"],
-    byId: (id?: number) => ["devices", "detail", id ?? "new"],
-  },
   holidays: {
     all: (pageIndex?: number, pageLimit?: number) => [
       "holidays",
@@ -87,5 +83,13 @@ export const queryKeys = {
       ["sections", "list", { pageIndex, pageSize }] as const,
 
     detail: (id?: number) => ["sections", "detail", id] as const,
+  },
+  devices: {
+    root: ["devices"] as const,
+
+    list: (pageIndex?: number, pageSize?: number) =>
+      ["devices", "list", { pageIndex, pageSize }] as const,
+
+    detail: (id?: number) => ["devices", "detail", id] as const,
   },
 };

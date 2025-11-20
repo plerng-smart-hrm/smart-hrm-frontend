@@ -9,7 +9,7 @@ interface Props {
 
 export function DashboardCard({ title, value, icon }: Props) {
   return (
-    <Card className="p-4">
+    <Card className="p-4 transition-all hover:shadow-md hover:-translate-y-1">
       <div className="grid grid-cols-2 gap-4 items-center">
         {/* Left Side */}
         <div className="space-y-1">

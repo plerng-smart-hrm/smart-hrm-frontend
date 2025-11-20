@@ -4,10 +4,10 @@ import { queryKeys } from "@/service/util/query-key";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
-import { getAllHolidays } from "@/service/admin/device.service";
 import { holidayColumns } from "./columns";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { DashboardCard } from "@/components/DashboardCard";
+import { getAllHolidays } from "@/service/admin/holiday.service";
 
 interface Props {
   initPageIndex: number;
@@ -56,7 +56,7 @@ const HolidayClient = ({ initPageIndex, initPageSize }: Props) => {
 
   return (
     <div>
-      <div className="grid gap-4 grid-cols-4 mb-4">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mb-4">
         <DashboardCard
           title="Total Holiday"
           value={60}

@@ -88,7 +88,7 @@ export type DataTableProps<TData extends WithId> = {
   enableColumnMenu?: boolean;
   createLabel?: string;
   onCreateClick?: () => void;
-
+  extractAction?: React.ReactNode;
   /** Optional – enable dnd row reordering */
   enableRowReordering?: boolean;
   /** Notify parent when rows are reordered (client-only) */
@@ -148,6 +148,7 @@ export function DataTable<TData extends WithId>({
   enableColumnMenu = false,
   createLabel,
   onCreateClick,
+  extractAction,
   onReorder,
   serverMode = false,
   pageCount,
@@ -252,7 +253,8 @@ export function DataTable<TData extends WithId>({
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
     onPaginationChange: (updater) => {
-      const newPagination = typeof updater === 'function' ? updater(pagination) : updater;
+      const newPagination =
+        typeof updater === "function" ? updater(pagination) : updater;
       setPagination(newPagination);
       if (serverMode && onPaginationChange) {
         onPaginationChange(newPagination);
@@ -391,6 +393,7 @@ export function DataTable<TData extends WithId>({
         selectionCount={table.getFilteredSelectedRowModel().rows.length}
         enableColumnMenu={enableColumnMenu}
         createLabel={createLabel}
+        extraAction={extractAction}
         onCreateClick={onCreateClick}
       />
 
