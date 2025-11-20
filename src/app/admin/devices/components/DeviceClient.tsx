@@ -15,7 +15,7 @@ import { IDevice } from "@/types/admin";
 import { useMutateDevice } from "@/stores/admin/useMutateDevice";
 import DeviceDialog from "./DeviceDialog";
 import { DashboardCard } from "@/components/DashboardCard";
-import { DeviceBarChart } from "@/components/DeviceBarChart";
+import { CustomBarChart } from "@/components/CustomBarChart";
 
 const devices = [
   { id: 1, name: "Device A", employeeCount: 122 },
@@ -149,7 +149,7 @@ const DeviceClient = ({ initPageIndex, initPageSize }: Props) => {
         </div>
 
         <div className="md:col-span-3">
-          <DeviceBarChart data={chartData} />
+          <CustomBarChart title="Employees per device" data={chartData} />
         </div>
       </div>
 

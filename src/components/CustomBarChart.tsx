@@ -11,13 +11,14 @@ import {
 } from "recharts";
 
 interface Props {
+  title: string;
   data: { name: string; value: number }[];
 }
 
-export function DeviceBarChart({ data }: Props) {
+export function CustomBarChart({ data, title }: Props) {
   return (
     <div className="w-full h-60 rounded-lg border px-4 py-6 shadow bg-white dark:bg-neutral-900">
-      <h3 className="text-sm font-semibold mb-3">Employees Per Device</h3>
+      <h3 className="text-sm mb-3">{title}</h3>
 
       <ResponsiveContainer width="100%" height="100%">
         <BarChart

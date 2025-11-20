@@ -92,4 +92,12 @@ export const queryKeys = {
 
     detail: (id?: number) => ["holidays", "detail", id] as const,
   },
+  workingShifts: {
+    root: ["workingShifts"] as const,
+
+    list: (pageIndex?: number, pageSize?: number) =>
+      ["workingShifts", "list", { pageIndex, pageSize }] as const,
+
+    detail: (id?: number) => ["workingShifts", "detail", id] as const,
+  },
 };

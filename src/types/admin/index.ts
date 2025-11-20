@@ -253,3 +253,20 @@ export interface ISection {
   updatedAt?: string;
   deletedAt?: string;
 }
+
+export interface IWorkingShift {
+  id?: number;
+  factoryId?: number;
+  name?: string;
+  startTime?: string;
+  endTime?: string;
+  breakMinutes?: number;
+  overtimeStart?: string;
+  overtimeEnd?: string;
+
+  createdBy?: number;
+  updatedBy?: number;
+  createdAt?: string;
+  updatedAt?: string;
+  deletedAt?: string;
+}
