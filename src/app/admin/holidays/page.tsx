@@ -17,7 +17,7 @@ const page = async ({ searchParams }: Props) => {
   const { pageIndex, pageSize } = getSearchParams(await searchParams);
 
   await queryClient.prefetchQuery({
-    queryKey: queryKeys.holidays.all(pageIndex, pageSize),
+    queryKey: queryKeys.holidays.list(pageIndex, pageSize),
     queryFn: () => getAllHolidays(pageIndex, pageSize),
   });
 

@@ -12,19 +12,9 @@ export interface IHolidayRes {
   holiday?: IHoliday;
 }
 
-export interface ICreateHolidayRequest {
-  name: string;
-  phone: string;
-  email: string;
-  address: string;
-}
+export type ICreateHolidayRequest = IHoliday;
 
-export interface IUpdateHolidayRequest {
-  name: string;
-  phone: string;
-  email: string;
-  address: string;
-}
+export type IUpdateHolidayRequest = IHoliday;
 
 export const getAllHolidays = async (
   pageIndex: number,
@@ -32,7 +22,7 @@ export const getAllHolidays = async (
 ): Promise<IHolidaysRes> => {
   const page = pageIndex + 1;
   const data = await api.get<IApiResponse<IHoliday[]>>(
-    `/holidays?page=${page}&limit=${pageSize}`
+    `/holidays?page=${page}&limit=${pageSize}&sortBy=startDate&order=ASC`
   );
   return {
     holidays: data.data,
@@ -59,7 +49,7 @@ export const updateHoliday = async (
   holidayId?: number,
   request?: IUpdateHolidayRequest
 ): Promise<void> => {
-  await api.put<IApiResponse<void>>(`/holidays/${holidayId}`, request);
+  await api.patch<IApiResponse<void>>(`/holidays/${holidayId}`, request);
 };
 
 export const deleteHoliday = async (holidayId?: number): Promise<void> => {

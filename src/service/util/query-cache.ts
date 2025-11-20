@@ -171,7 +171,7 @@ export const sectionCache = {
 export const deviceCache = {
   clearAll: (queryClient: QueryClient) => {
     queryClient.removeQueries({
-      queryKey: queryKeys.devices.root
+      queryKey: queryKeys.devices.root,
     });
   },
 
@@ -184,6 +184,25 @@ export const deviceCache = {
   clearDetail: (queryClient: QueryClient, id?: number) => {
     queryClient.removeQueries({
       queryKey: queryKeys.devices.detail(id),
+    });
+  },
+};
+export const holidayCache = {
+  clearAll: (queryClient: QueryClient) => {
+    queryClient.removeQueries({
+      queryKey: queryKeys.holidays.root,
+    });
+  },
+
+  clearList: (queryClient: QueryClient) => {
+    queryClient.removeQueries({
+      queryKey: queryKeys.holidays.list(),
+    });
+  },
+
+  clearDetail: (queryClient: QueryClient, id?: number) => {
+    queryClient.removeQueries({
+      queryKey: queryKeys.holidays.detail(id),
     });
   },
 };

@@ -15,7 +15,7 @@ export const holidayColumns = (opts?: {
   onEdit?: (row: IHoliday) => void;
   onDelete?: (row: IHoliday) => void;
 }): ColumnDef<IHoliday>[] => {
-  const { onDelete } = opts ?? {};
+  const { onDelete, onEdit } = opts ?? {};
 
   const cols: ColumnDef<IHoliday>[] = [
     createRowNumberColumn<IHoliday>(),
@@ -24,28 +24,21 @@ export const holidayColumns = (opts?: {
       cell: ({ row }) => <div>{row.original.name}</div>,
     },
     {
-      header: "StartDate",
-      cell: ({ row }) => <div>{row.original.startDate}</div>,
-    },
-    {
-      header: "EndDate",
-      cell: ({ row }) => <div>{row.original.endDate}</div>,
-    },
-    {
       header: "Type",
       cell: ({ row }) => <div>{row.original.type}</div>,
     },
-
-    // {
-    //   header: "Phone",
-    //   cell: ({ row }) => (
-    //     <div className="flex flex-col">
-    //       <p>{row.original.phone}</p>
-    //       <p className="text-sm text-muted-foreground">{row.original.email}</p>
-    //     </div>
-    //   ),
-    // },
-
+    {
+      header: "StartDate",
+      cell: ({ row }) => (
+        <div>{new Date(row.original.startDate ?? "").toLocaleDateString()}</div>
+      ),
+    },
+    {
+      header: "EndDate",
+      cell: ({ row }) => (
+        <div>{new Date(row.original.endDate ?? "").toLocaleDateString()}</div>
+      ),
+    },
     {
       accessorKey: "createdAt",
       header: "Created",
@@ -68,6 +61,12 @@ export const holidayColumns = (opts?: {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-32">
+            <DropdownMenuItem
+              className="cursor-pointer"
+              onClick={() => onEdit?.(row.original)}
+            >
+              Edit
+            </DropdownMenuItem>
             <DropdownMenuItem
               variant="destructive"
               onClick={() => onDelete?.(row.original)}
