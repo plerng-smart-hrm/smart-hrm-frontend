@@ -9,6 +9,12 @@ import { SaveIcon } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import EmployeeForm from "./EmployeeForm";
 import { LoadingButton } from "@/components/LoadingButton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import HealthMedicalSection from "./HealthMedical";
+import { getAllHealthCheckByEmployeeId } from "@/service/admin/health-check.service";
+import { getAllMaternityByEmployeeId } from "@/service/admin/maternity.service";
+import { getAllVaccineByEmployeeId } from "@/service/admin/vaccine.service";
+import { getAllWarningByEmployeeId } from "@/service/admin/warning.service";
 
 interface Props {
   employeeId?: string;
@@ -22,8 +28,40 @@ const EmployeeIdClient = ({ employeeId }: Props) => {
     enabled: !!employeeId && employeeId !== "new",
   });
 
+  const { data: dataHealthChecks, isFetching: isFetchingHealthCheck } =
+    useQuery({
+      queryKey: queryKeys.healthChecks.detail(Number(employeeId)),
+      queryFn: () => getAllHealthCheckByEmployeeId(Number(employeeId)),
+      enabled: !!employeeId && employeeId !== "new",
+    });
+
+  const { data: dataMaternities, isFetching: isFetchingMaternities } = useQuery(
+    {
+      queryKey: queryKeys.maternities.detail(Number(employeeId)),
+      queryFn: () => getAllMaternityByEmployeeId(Number(employeeId)),
+      enabled: !!employeeId && employeeId !== "new",
+    }
+  );
+
+  const { data: dataVaccines, isFetching: isFetchingVaccines } = useQuery({
+    queryKey: queryKeys.vaccines.detail(Number(employeeId)),
+    queryFn: () => getAllVaccineByEmployeeId(Number(employeeId)),
+    enabled: !!employeeId && employeeId !== "new",
+  });
+
+  const { data: dataWarnings, isFetching: isFetchingWarnings } = useQuery({
+    queryKey: queryKeys.warnings.detail(Number(employeeId)),
+    queryFn: () => getAllWarningByEmployeeId(Number(employeeId)),
+    enabled: !!employeeId && employeeId !== "new",
+  });
+
   const employee = data?.employee ?? null;
   const formRef = useRef<HTMLFormElement | null>(null);
+
+  const healthChecks = dataHealthChecks?.healthChecks ?? [];
+  const maternities = dataMaternities?.maternities ?? [];
+  const vaccines = dataVaccines?.vaccines ?? [];
+  const warnings = dataWarnings?.warnings ?? [];
 
   const onSave = async () => {
     if (formRef.current) {
@@ -51,11 +89,39 @@ const EmployeeIdClient = ({ employeeId }: Props) => {
         </div>
       </div>
       <Separator />
-      <EmployeeForm
+      {/* <EmployeeForm
         formRef={formRef}
         setIsLoading={setIsLoading}
         initialData={employee}
-      />
+      /> */}
+      <Tabs defaultValue="employee" className="w-full">
+        <TabsList className="grid w-full grid-cols-3 mb-6">
+          <TabsTrigger value="employee">Employee Information</TabsTrigger>
+          <TabsTrigger value="health">Health & Medical</TabsTrigger>
+          <TabsTrigger value="warnings">Warnings</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="employee">
+          <EmployeeForm
+            formRef={formRef}
+            setIsLoading={setIsLoading}
+            initialData={employee}
+          />
+        </TabsContent>
+
+        <TabsContent value="health">
+          <HealthMedicalSection
+            healthChecks={healthChecks}
+            vaccines={vaccines}
+            maternities={maternities}
+            employeeId={Number(employeeId)}
+          />
+        </TabsContent>
+
+        {/* <TabsContent value="warnings">
+        <WarningsSection employeeId={initialData?.id} />
+      </TabsContent> */}
+      </Tabs>
     </>
   );
 };

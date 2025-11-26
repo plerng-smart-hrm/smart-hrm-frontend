@@ -77,27 +77,6 @@ export interface ICategoryOption {
   value?: string;
 }
 
-export interface IEmployee {
-  id?: number;
-  empCode?: string;
-  firstName?: string;
-  lastName?: string;
-  firstNameKh?: string;
-  lastNameKh?: string;
-  gender?: string;
-  position?: string;
-  joinedDate?: string;
-  status?: string;
-  salary?: string;
-  workingShiftId?: number;
-
-  createdBy?: number;
-  updatedBy?: number;
-  createdAt?: string;
-  updatedAt?: string;
-  deletedAt?: string;
-}
-
 export interface IDevice {
   id?: number;
   factoryId?: number;
@@ -212,15 +191,32 @@ export interface ICompany {
 
 export interface IEmployee {
   id?: number;
+  branchId?: number;
   empCode?: string;
   firstName?: string;
   lastName?: string;
   firstNameKh?: string;
+  lastNameKh?: string;
   gender?: string;
+  dateOfBirth?: string;
+  placeOfBirth?: string;
+  nationality?: string;
+  race?: string;
+  maritalStatus?: string;
+  childrenNumber?: number;
+  phone?: string;
+  currentAddress?: string;
+  education?: string;
+  employeeType?: string;
+  workStatus?: string;
+  employeeStatus?: string;
   position?: string;
-  joinedDate?: string;
-  status?: string;
-  salary?: string;
+  startDate?: string;
+  endDate?: string;
+  laborBookNo?: string;
+  idCardNo?: string;
+  nssfReggisterNo?: string;
+  workingShiftId?: number;
 
   createdBy?: number;
   updatedBy?: number;
@@ -263,6 +259,63 @@ export interface IWorkingShift {
   breakMinutes?: number;
   overtimeStart?: string;
   overtimeEnd?: string;
+
+  createdBy?: number;
+  updatedBy?: number;
+  createdAt?: string;
+  updatedAt?: string;
+  deletedAt?: string;
+}
+
+export interface IHealthCheck {
+  id?: number;
+  employeeId?: number;
+  employee?: IEmployee;
+  name?: string;
+  checkDate?: string;
+
+  createdBy?: number;
+  updatedBy?: number;
+  createdAt?: string;
+  updatedAt?: string;
+  deletedAt?: string;
+}
+
+export interface IVaccine {
+  id?: number;
+  employeeId?: number;
+  employee?: IEmployee;
+  name?: string;
+  vaccineNo?: string;
+  vaccineDate?: string;
+
+  createdBy?: number;
+  updatedBy?: number;
+  createdAt?: string;
+  updatedAt?: string;
+  deletedAt?: string;
+}
+
+export interface IWarning {
+  id?: number;
+  employeeId?: number;
+  employee?: IEmployee;
+  type?: string;
+  remark?: string;
+
+  createdBy?: number;
+  updatedBy?: number;
+  createdAt?: string;
+  updatedAt?: string;
+  deletedAt?: string;
+}
+export interface IMaternity {
+  id?: number;
+  employeeId?: number;
+  employee?: IEmployee;
+  pregnancyStatus?: string;
+  startDate?: string;
+  deliveryBabyDate?: string;
 
   createdBy?: number;
   updatedBy?: number;

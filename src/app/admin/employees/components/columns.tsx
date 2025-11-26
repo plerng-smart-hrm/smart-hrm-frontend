@@ -10,6 +10,7 @@ import {
 import { IconDotsVertical } from "@tabler/icons-react";
 import { IEmployee } from "@/types/admin";
 import { createRowNumberColumn } from "@/components/data-table";
+import { formatDate } from "@/utils/format";
 
 export const employeeColumns = (opts?: {
   onEdit?: (row: IEmployee) => void;
@@ -21,7 +22,7 @@ export const employeeColumns = (opts?: {
     createRowNumberColumn<IEmployee>(),
     {
       header: "Code",
-      cell: ({ row }) => <div>EMP-{row.original.empCode}</div>,
+      cell: ({ row }) => <div>{row.original.empCode}</div>,
     },
     {
       header: "Employee",
@@ -46,13 +47,12 @@ export const employeeColumns = (opts?: {
     },
 
     {
-      header: "Joined Date",
-      cell: ({ row }) =>
-        new Date(row.original.joinedDate ?? "").toLocaleDateString(),
+      header: "Start Date",
+      cell: ({ row }) => formatDate(row.original.startDate ?? ""),
     },
     {
-      header: "Status",
-      cell: ({ row }) => <div>{row.original.status}</div>,
+      header: "Work Status",
+      cell: ({ row }) => <div>{row.original.workStatus}</div>,
     },
     {
       header: "Created At",

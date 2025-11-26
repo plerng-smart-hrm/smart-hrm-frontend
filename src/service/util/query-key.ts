@@ -100,4 +100,36 @@ export const queryKeys = {
 
     detail: (id?: number) => ["workingShifts", "detail", id] as const,
   },
+  healthChecks: {
+    root: ["healthChecks"] as const,
+
+    list: (pageIndex?: number, pageSize?: number) =>
+      ["healthChecks", "list", { pageIndex, pageSize }] as const,
+
+    detail: (id?: number) => ["healthChecks", "detail", id] as const,
+  },
+  maternities: {
+    root: ["maternities"] as const,
+
+    list: (pageIndex?: number, pageSize?: number) =>
+      ["maternities", "list", { pageIndex, pageSize }] as const,
+
+    detail: (id?: number) => ["maternities", "detail", id] as const,
+  },
+  vaccines: {
+    root: ["vaccines"] as const,
+
+    list: (pageIndex?: number, pageSize?: number) =>
+      ["vaccines", "list", { pageIndex, pageSize }] as const,
+
+    detail: (id?: number) => ["vaccines", "detail", id] as const,
+  },
+  warnings: {
+    root: ["warnings"] as const,
+
+    list: (pageIndex?: number, pageSize?: number) =>
+      ["warnings", "list", { pageIndex, pageSize }] as const,
+
+    detail: (id?: number) => ["warnings", "detail", id] as const,
+  },
 };

@@ -16,29 +16,9 @@ export interface IEmployeeRes {
   employee?: IEmployee;
 }
 
-export interface ICreateEmployeeRequest {
-  empCode?: string;
-  firstName?: string;
-  lastName?: string;
-  firstNameKh?: string;
-  gender?: string;
-  position?: string;
-  joinedDate?: string;
-  status?: string;
-  salary?: string;
-}
+export type ICreateEmployeeRequest = IEmployee;
 
-export interface IUpdateEmployeeRequest {
-  empCode?: string;
-  firstName?: string;
-  lastName?: string;
-  firstNameKh?: string;
-  gender?: string;
-  position?: string;
-  joinedDate?: string;
-  status?: string;
-  salary?: string;
-}
+export type IUpdateEmployeeRequest = IEmployee;
 
 export const getAllEmployees = async (
   pageIndex: number,

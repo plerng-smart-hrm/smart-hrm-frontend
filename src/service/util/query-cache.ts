@@ -225,3 +225,83 @@ export const workingShiftCache = {
     });
   },
 };
+
+export const healthCheckCache = {
+  clearAll: (queryClient: QueryClient) => {
+    queryClient.removeQueries({
+      queryKey: queryKeys.healthChecks.root,
+    });
+  },
+
+  clearList: (queryClient: QueryClient) => {
+    queryClient.removeQueries({
+      queryKey: queryKeys.healthChecks.list(),
+    });
+  },
+
+  clearDetail: (queryClient: QueryClient, id?: number) => {
+    queryClient.removeQueries({
+      queryKey: queryKeys.healthChecks.detail(id),
+    });
+  },
+};
+
+export const maternityCache = {
+  clearAll: (queryClient: QueryClient) => {
+    queryClient.removeQueries({
+      queryKey: queryKeys.maternities.root,
+    });
+  },
+
+  clearList: (queryClient: QueryClient) => {
+    queryClient.removeQueries({
+      queryKey: queryKeys.maternities.list(),
+    });
+  },
+
+  clearDetail: (queryClient: QueryClient, id?: number) => {
+    queryClient.removeQueries({
+      queryKey: queryKeys.maternities.detail(id),
+    });
+  },
+};
+
+export const vaccineCache = {
+  clearAll: (queryClient: QueryClient) => {
+    queryClient.removeQueries({
+      queryKey: queryKeys.vaccines.root,
+    });
+  },
+
+  clearList: (queryClient: QueryClient) => {
+    queryClient.removeQueries({
+      queryKey: queryKeys.vaccines.list(),
+    });
+  },
+
+  clearDetail: (queryClient: QueryClient, id?: number) => {
+    queryClient.removeQueries({
+      queryKey: queryKeys.vaccines.detail(id),
+    });
+  },
+};
+
+export const warningCache = {
+  clearAll: (queryClient: QueryClient) => {
+    queryClient.removeQueries({
+      queryKey: queryKeys.warnings.root,
+    });
+  },
+
+  clearList: (queryClient: QueryClient) => {
+    queryClient.removeQueries({
+      queryKey: queryKeys.warnings.list(),
+    });
+  },
+
+  clearDetail: (queryClient: QueryClient, id?: number) => {
+    queryClient.removeQueries({
+      queryKey: queryKeys.warnings.detail(id),
+    });
+  },
+};
