@@ -682,11 +682,19 @@ const PayrollsTable: React.FC<PayrollsTableProps> = ({ selectedMonth }) => {
                 {/* Shift - Editable Input */}
                 <TableCell className="text-center border-r p-0 border-black">
                   <Input
-                    type="number"
+                    type="text"
                     value={row.shift}
-                    onChange={(e) =>
-                      handleFieldChange(row.id, "shift", Number(e.target.value))
-                    }
+                    inputMode="numeric"
+                    onChange={(e) => {
+                      const raw = e.target.value;
+
+                      const digitsOnly = raw.replace(/\D/g, "");
+                      handleFieldChange(
+                        row.id,
+                        "shift",
+                        digitsOnly === "" ? 0 : Number(digitsOnly)
+                      );
+                    }}
                     className={`w-16 text-center ${cellInputClass}`}
                   />
                 </TableCell>
