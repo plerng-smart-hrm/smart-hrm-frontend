@@ -5,6 +5,7 @@ import PayrollsTable from "./PayrollsTable";
 import { Label } from "@/components/ui/label";
 import MonthYearPicker from "./MonthYearPicker";
 import { format } from "date-fns";
+import EmployeeSummary from "./EmployeeSummary";
 
 const PayrollClient = () => {
   const [date, setDate] = useState<Date>();
@@ -26,6 +27,7 @@ const PayrollClient = () => {
         <MonthYearPicker value={date} onChange={handleMonthChange} />
       </div>
       <PayrollsTable selectedMonth={selectedMonth} />
+      <EmployeeSummary/>
     </div>
   );
 };
