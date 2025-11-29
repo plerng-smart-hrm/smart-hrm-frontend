@@ -1,6 +1,7 @@
 "use client"
 
-import React, { useState } from "react"
+import type React from "react"
+import { useState, useEffect } from "react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
@@ -241,11 +242,11 @@ const PayrollsTable: React.FC<PayrollsTableProps> = ({ selectedMonth }) => {
     border-0 bg-transparent shadow-none
     focus:ring-0 focus:ring-offset-0 focus:outline-none
     focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:outline-none
-    p-0
+    p-0 h-6
   `
 
   // Update monthRows when selectedMonth changes
-  React.useEffect(() => {
+  useEffect(() => {
     setMonthRows(generateMonthRows())
   }, [selectedMonth, payrollData])
 
@@ -269,16 +270,16 @@ const PayrollsTable: React.FC<PayrollsTableProps> = ({ selectedMonth }) => {
         <Table className={`text-xs ${!selectedMonth ? "blur-sm pointer-events-none select-none" : ""}`}>
           <TableHeader>
             <TableRow className="bg-gray-100">
-              <TableHead className="text-center font-bold border-r p-2" rowSpan={2}>
+              <TableHead className="text-center font-bold border-r p-1" rowSpan={2}>
                 Day
               </TableHead>
-              <TableHead className="text-center font-bold border-r p-2" rowSpan={2}>
+              <TableHead className="text-center font-bold border-r p-1" rowSpan={2}>
                 Day Status
               </TableHead>
-              <TableHead className="text-center font-bold border-r p-2" rowSpan={2}>
+              <TableHead className="text-center font-bold border-r p-1" rowSpan={2}>
                 Work Status
               </TableHead>
-              <TableHead className="text-center font-bold border-r p-2" rowSpan={2}>
+              <TableHead className="text-center font-bold border-r p-1" rowSpan={2}>
                 Shift
               </TableHead>
               <TableHead className="text-center font-bold border-r p-0" colSpan={4}>
@@ -314,7 +315,7 @@ const PayrollsTable: React.FC<PayrollsTableProps> = ({ selectedMonth }) => {
               <TableHead className="text-center font-bold border-r p-0" rowSpan={2}>
                 Lunch (Riels)
               </TableHead>
-              <TableHead className="text-center font-bold border-r p-2" rowSpan={2}>
+              <TableHead className="text-center font-bold border-r p-1" rowSpan={2}>
                 Probation
               </TableHead>
             </TableRow>
@@ -334,18 +335,19 @@ const PayrollsTable: React.FC<PayrollsTableProps> = ({ selectedMonth }) => {
           <TableBody>
             {monthRows.map((row) => (
               <TableRow key={row.id} className="hover:bg-gray-50 border-black">
-                <TableCell className={`text-center border-x border-black p-0`}>{row.day}</TableCell>
+                <TableCell className={`text-center border-x border-black p-0 h-6`}>{row.day}</TableCell>
                 <TableCell
-                  className={`text-center border-r border-black p-0 ${row.dayStatus == "Sunday" ? "text-red-500" : ""}`}
+                  className={`text-center border-r border-black p-0 h-6 ${row.dayStatus == "Sunday" ? "text-red-500" : ""}`}
                 >
                   {row.dayStatus}
                 </TableCell>
 
                 {/* Work Status - Editable Select */}
-                <TableCell className="text-center border-r py-2 border-black">
+                <TableCell className="text-center border-r p-0 border-black pl-2 pr-2">
                   <Select
                     value={row.workStatus}
                     onValueChange={(value) => handleFieldChange(row.id, "workStatus", value)}
+                    disabled={!selectedMonth}
                   >
                     <SelectTrigger className={`w-full ${cellInputClass}`}>
                       <SelectValue />
@@ -361,7 +363,7 @@ const PayrollsTable: React.FC<PayrollsTableProps> = ({ selectedMonth }) => {
                 </TableCell>
 
                 {/* Shift - Editable Input */}
-                <TableCell className="text-center border-r p-0 border-black">
+                <TableCell className="text-center border-r p-0 border-black h-6">
                   <Input
                     type="text"
                     value={row.shift}
@@ -377,7 +379,7 @@ const PayrollsTable: React.FC<PayrollsTableProps> = ({ selectedMonth }) => {
                 </TableCell>
 
                 {/* Time In 1 - Editable */}
-                <TableCell className="text-center border-r bg-cyan-100 p-0 border-black">
+                <TableCell className="text-center border-r bg-cyan-100 p-0 border-black h-6">
                   <TimeHMInput
                     value={row.timeIn1}
                     selectedMonth={selectedMonth}
@@ -388,7 +390,7 @@ const PayrollsTable: React.FC<PayrollsTableProps> = ({ selectedMonth }) => {
                 </TableCell>
 
                 {/* Time Out 1 - Editable */}
-                <TableCell className="text-center border-r bg-orange-100 p-0 border-black">
+                <TableCell className="text-center border-r bg-orange-100 p-0 border-black h-6">
                   <TimeHMInput
                     value={row.timeOut1}
                     selectedMonth={selectedMonth}
@@ -399,7 +401,7 @@ const PayrollsTable: React.FC<PayrollsTableProps> = ({ selectedMonth }) => {
                 </TableCell>
 
                 {/* Time In 2 - Editable */}
-                <TableCell className="text-center border-r bg-cyan-100 p-0 border-black">
+                <TableCell className="text-center border-r bg-cyan-100 p-0 border-black h-6">
                   <TimeHMInput
                     value={row.timeIn2}
                     selectedMonth={selectedMonth}
@@ -410,7 +412,7 @@ const PayrollsTable: React.FC<PayrollsTableProps> = ({ selectedMonth }) => {
                 </TableCell>
 
                 {/* Time Out 2 - Editable */}
-                <TableCell className="text-center border-r bg-orange-100 p-0 border-black">
+                <TableCell className="text-center border-r bg-orange-100 p-0 border-black h-6">
                   <TimeHMInput
                     value={row.timeOut2}
                     selectedMonth={selectedMonth}
@@ -421,7 +423,7 @@ const PayrollsTable: React.FC<PayrollsTableProps> = ({ selectedMonth }) => {
                 </TableCell>
 
                 {/* Late In - Editable */}
-                <TableCell className="text-center border-r bg-pink-200 p-0 border-black">
+                <TableCell className="text-center border-r bg-pink-200 p-0 border-black h-6">
                   <TimeHMInput
                     value={row.lateIn}
                     selectedMonth={selectedMonth}
@@ -432,7 +434,7 @@ const PayrollsTable: React.FC<PayrollsTableProps> = ({ selectedMonth }) => {
                 </TableCell>
 
                 {/* Late Out - Editable */}
-                <TableCell className="text-center border-r bg-pink-200 p-0 border-black">
+                <TableCell className="text-center border-r bg-pink-200 p-0 border-black h-6">
                   <TimeHMInput
                     value={row.lateOut}
                     selectedMonth={selectedMonth}
@@ -443,7 +445,7 @@ const PayrollsTable: React.FC<PayrollsTableProps> = ({ selectedMonth }) => {
                 </TableCell>
 
                 {/* Normal Hours - Editable */}
-                <TableCell className="text-center border-r bg-yellow-200 p-0 border-black">
+                <TableCell className="text-center border-r bg-yellow-200 p-0 border-black h-6">
                   <Input
                     type="text"
                     value={row.normalHrs}
@@ -459,7 +461,7 @@ const PayrollsTable: React.FC<PayrollsTableProps> = ({ selectedMonth }) => {
                 </TableCell>
 
                 {/* Overtime 1 - Editable */}
-                <TableCell className="text-center border-r bg-green-300 p-0 border-black">
+                <TableCell className="text-center border-r bg-green-300 p-0 border-black h-6">
                   <Input
                     type="text"
                     value={row.overtime1}
@@ -475,7 +477,7 @@ const PayrollsTable: React.FC<PayrollsTableProps> = ({ selectedMonth }) => {
                 </TableCell>
 
                 {/* Overtime 2 - Editable */}
-                <TableCell className="text-center border-r bg-green-300 p-0 border-black">
+                <TableCell className="text-center border-r bg-green-300 p-0 border-black h-6">
                   <Input
                     type="text"
                     value={row.overtime2}
@@ -491,7 +493,7 @@ const PayrollsTable: React.FC<PayrollsTableProps> = ({ selectedMonth }) => {
                 </TableCell>
 
                 {/* Night Hours - Editable (Number) */}
-                <TableCell className="text-center border-r bg-green-300 p-0 border-black">
+                <TableCell className="text-center border-r bg-green-300 p-0 border-black h-6">
                   <Input
                     type="text"
                     value={row.nightHrs}
@@ -507,7 +509,7 @@ const PayrollsTable: React.FC<PayrollsTableProps> = ({ selectedMonth }) => {
                 </TableCell>
 
                 {/* Time Salary - Editable (Number) */}
-                <TableCell className="text-center border-r p-0 border-black">
+                <TableCell className="text-center border-r p-0 border-black h-6">
                   <Input
                     type="text"
                     value={row.timeSalary}
@@ -523,7 +525,7 @@ const PayrollsTable: React.FC<PayrollsTableProps> = ({ selectedMonth }) => {
                 </TableCell>
 
                 {/* Piece Salary - Editable (Number) */}
-                <TableCell className="text-center border-r p-0 border-black">
+                <TableCell className="text-center border-r p-0 border-black h-6">
                   <Input
                     type="text"
                     value={row.pieceSalary}
@@ -539,7 +541,7 @@ const PayrollsTable: React.FC<PayrollsTableProps> = ({ selectedMonth }) => {
                 </TableCell>
 
                 {/* Leave Hour - Editable (Number) */}
-                <TableCell className="text-center border-r bg-blue-200 p-0 border-black">
+                <TableCell className="text-center border-r bg-blue-200 p-0 border-black h-6">
                   <Input
                     type="text"
                     value={row.leaveHour}
@@ -550,12 +552,12 @@ const PayrollsTable: React.FC<PayrollsTableProps> = ({ selectedMonth }) => {
                       const digitsOnly = raw.replace(/\D/g, "")
                       handleFieldChange(row.id, "leaveHour", digitsOnly === "" ? 0 : Number(digitsOnly))
                     }}
-                    className={`w-20 ${cellInputClass}`}
+                    className={`w-16 ${cellInputClass}`}
                   />
                 </TableCell>
 
                 {/* Leave Pay - Editable (Number) */}
-                <TableCell className="text-center border-r bg-blue-200 p-0 border-black">
+                <TableCell className="text-center border-r bg-blue-200 p-0 border-black h-6">
                   <Input
                     type="text"
                     value={row.leavePay}
@@ -571,7 +573,7 @@ const PayrollsTable: React.FC<PayrollsTableProps> = ({ selectedMonth }) => {
                 </TableCell>
 
                 {/* A_L Adjust - Editable (Number) */}
-                <TableCell className="text-center border-r bg-blue-200 p-0 border-black">
+                <TableCell className="text-center border-r p-0 border-black h-6">
                   <Input
                     type="text"
                     value={row.aLAdjust}
@@ -587,7 +589,7 @@ const PayrollsTable: React.FC<PayrollsTableProps> = ({ selectedMonth }) => {
                 </TableCell>
 
                 {/* Food Riel - Editable (Number) */}
-                <TableCell className="text-center border-r bg-green-100 p-0 border-black">
+                <TableCell className="text-center border-r p-0 border-black h-6">
                   <Input
                     type="text"
                     value={row.foodRiel}
@@ -598,12 +600,12 @@ const PayrollsTable: React.FC<PayrollsTableProps> = ({ selectedMonth }) => {
                       const digitsOnly = raw.replace(/\D/g, "")
                       handleFieldChange(row.id, "foodRiel", digitsOnly === "" ? 0 : Number(digitsOnly))
                     }}
-                    className={`w-28 ${cellInputClass}`}
+                    className={`w-24 ${cellInputClass}`}
                   />
                 </TableCell>
 
                 {/* Lunch Riel - Editable (Number) */}
-                <TableCell className="text-center border-r bg-green-100 p-0 border-black">
+                <TableCell className="text-center border-r p-0 border-black h-6">
                   <Input
                     type="text"
                     value={row.lunchRiel}
@@ -614,16 +616,18 @@ const PayrollsTable: React.FC<PayrollsTableProps> = ({ selectedMonth }) => {
                       const digitsOnly = raw.replace(/\D/g, "")
                       handleFieldChange(row.id, "lunchRiel", digitsOnly === "" ? 0 : Number(digitsOnly))
                     }}
-                    className={`w-28 ${cellInputClass}`}
+                    className={`w-24 ${cellInputClass}`}
                   />
                 </TableCell>
 
-                {/* Probation - Editable Checkbox */}
-                <TableCell className="text-center p-0 border-x border-black">
-                  <Checkbox
-                    checked={row.probation}
-                    onCheckedChange={(checked) => handleFieldChange(row.id, "probation", checked)}
-                  />
+                {/* Probation - Checkbox */}
+                <TableCell className="text-center border-r p-1 border-black h-6">
+                  <div className="flex justify-center items-center h-full">
+                    <Checkbox
+                      checked={row.probation}
+                      onCheckedChange={(checked) => handleFieldChange(row.id, "probation", checked)}
+                    />
+                  </div>
                 </TableCell>
               </TableRow>
             ))}

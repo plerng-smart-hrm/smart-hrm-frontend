@@ -54,46 +54,53 @@ const TimeHMInput: React.FC<TimeHMInputProps> = ({ value, selectedMonth, day, on
     onChange(newDate)
   }
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (disabled) return
+
+    const raw = e.target.value.replace(/[^0-9:]/g, "")
+    setIsUserEditing(true)
+
+    if (raw.length <= 5) {
+      setTime(raw)
+    }
+
+    setError(false)
+  }
+
+  const handleBlur = () => {
+    if (disabled) return
+
+    setIsUserEditing(false)
+
+    if (displayValue === "") {
+      onChange(null)
+      setError(false)
+      setTime("")
+      return
+    }
+
+    const normalized = normalizeTime(displayValue)
+
+    if (!normalized) {
+      setError(true)
+      onChange(null)
+      return
+    }
+
+    setError(false)
+    setTime(normalized)
+    buildDate(normalized)
+  }
+
   return (
     <Input
       type="text"
       value={displayValue}
-      disabled={disabled}
+      onChange={handleChange}
+      onBlur={handleBlur}
+      readOnly={disabled}
       maxLength={5}
       inputMode="numeric"
-      onChange={(e) => {
-        const raw = e.target.value.replace(/[^0-9:]/g, "")
-
-        setIsUserEditing(true)
-
-        if (raw.length <= 5) {
-          setTime(raw)
-        }
-
-        setError(false)
-      }}
-      onBlur={() => {
-        setIsUserEditing(false)
-
-        if (displayValue === "") {
-          onChange(null)
-          setError(false)
-          setTime("")
-          return
-        }
-
-        const normalized = normalizeTime(displayValue)
-
-        if (!normalized) {
-          setError(true)
-          onChange(null)
-          return
-        }
-
-        setError(false)
-        setTime(normalized)
-        buildDate(normalized)
-      }}
       className={`
         ${
           error
