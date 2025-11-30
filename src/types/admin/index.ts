@@ -323,3 +323,42 @@ export interface IMaternity {
   updatedAt?: string;
   deletedAt?: string;
 }
+
+export interface IAttendanceLog {
+  id?: number;
+  employeeId?: number;
+  employee?: IEmployee;
+  deviceId?: number;
+  device?: IDevice;
+  scanTime?: string;
+  actionType?: string;
+
+  createdBy?: number;
+  updatedBy?: number;
+  createdAt?: string;
+  updatedAt?: string;
+  deletedAt?: string;
+}
+
+export interface IAttendanceSummary{
+  id?: number;
+  employeeId?: number;
+  employee?: IEmployee;
+  workingShiftId?: number;
+  workingShift?: IWorkingShift;
+  date?: string;
+  firstIn?: string;
+  lastIn?: string;
+  workingHours?: number;
+  overtimeHours?: number;
+  lateMinutes?: number;
+  leaveType?: number;
+  status?: string;
+
+  createdBy?: number;
+  updatedBy?: number;
+  createdAt?: string;
+  updatedAt?: string;
+  deletedAt?: string;
+}
+

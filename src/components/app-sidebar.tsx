@@ -51,6 +51,21 @@ const data = {
       icon: Bot,
     },
     {
+      title: "Attendances",
+      url: "/admin/attendance",
+      icon: BookTextIcon,
+      items: [
+        {
+          title: "Attendance Logs",
+          url: "/admin/attendance-logs",
+        },
+        {
+          title: "Attendance Summary",
+          url: "/admin/attendance-summaries",
+        },
+      ],
+    },
+    {
       title: "Devices",
       url: "/admin/devices",
       icon: Bot,

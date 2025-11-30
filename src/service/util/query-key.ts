@@ -132,4 +132,30 @@ export const queryKeys = {
 
     detail: (id?: number) => ["warnings", "detail", id] as const,
   },
+  attendanceLogs: {
+    root: ["attendanceLogs"] as const,
+
+    list: (
+      pageIndex?: number,
+      pageSize?: number,
+      startDateTime?: string,
+      endDateTime?: string
+    ) =>
+      [
+        "attendanceLogs",
+        "list",
+        { pageIndex, pageSize, startDateTime, endDateTime },
+      ] as const,
+
+    detail: (id?: number) => ["attendanceLogs", "detail", id] as const,
+  },
+
+  attendanceSummaries: {
+    root: ["attendanceSummaries"] as const,
+
+    list: (pageIndex?: number, pageSize?: number) =>
+      ["attendanceSummaries", "list", { pageIndex, pageSize }] as const,
+
+    detail: (id?: number) => ["attendanceSummaries", "detail", id] as const,
+  },
 };

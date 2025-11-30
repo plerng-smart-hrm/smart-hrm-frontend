@@ -305,3 +305,23 @@ export const warningCache = {
     });
   },
 };
+
+export const attendanceLogCache = {
+  clearAll: (queryClient: QueryClient) => {
+    queryClient.removeQueries({
+      queryKey: queryKeys.attendanceLogs.root,
+    });
+  },
+
+  clearList: (queryClient: QueryClient) => {
+    queryClient.removeQueries({
+      queryKey: queryKeys.attendanceLogs.list(),
+    });
+  },
+
+  clearDetail: (queryClient: QueryClient, id?: number) => {
+    queryClient.removeQueries({
+      queryKey: queryKeys.attendanceLogs.detail(id),
+    });
+  },
+};

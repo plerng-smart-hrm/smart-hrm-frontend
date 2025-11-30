@@ -15,7 +15,7 @@ import { IDevice } from "@/types/admin";
 import { useMutateDevice } from "@/stores/admin/useMutateDevice";
 import DeviceDialog from "./DeviceDialog";
 import { DashboardCard } from "@/components/DashboardCard";
-import { CustomBarChart } from "@/components/CustomBarChart";
+import { CustomBarChart } from "@/components/charts/CustomBarChart";
 
 const devices = [
   { id: 1, name: "Device A", employeeCount: 122 },

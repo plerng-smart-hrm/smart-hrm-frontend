@@ -11,7 +11,7 @@ import { useMutateWorkingShift } from "@/stores/admin/useMutateWorkingShift";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { getAllWorkingShifts } from "@/service/admin/working-shifts.service";
 import WorkingShiftDialog from "./WorkingShiftDialog";
-import { CustomBarChart } from "@/components/CustomBarChart";
+import { CustomBarChart } from "@/components/charts/CustomBarChart";
 
 const shifts = [
   { id: 1, name: "Day Shift", employeeCount: 120 },
