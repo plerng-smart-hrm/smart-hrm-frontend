@@ -257,6 +257,7 @@ export interface IWorkingShift {
   startTime?: string;
   endTime?: string;
   breakMinutes?: number;
+  lateAllowMinutes?: number;
   overtimeStart?: string;
   overtimeEnd?: string;
 

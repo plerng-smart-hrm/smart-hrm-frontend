@@ -26,21 +26,13 @@ export type IUpdateAttendanceSummaryRequest = IAttendanceSummary;
 
 export const getAllAttendanceSummaries = async (
   pageIndex: number,
-  pageSize?: number,
-  startDateTime?: string,
-  endDateTime?: string
+  pageSize?: number
 ): Promise<IAttendanceSummariesRes> => {
   const page = pageIndex + 1;
-  let data;
-  if (startDateTime && endDateTime) {
-    data = await api.get<IApiResponse<IAttendanceLog[]>>(
-      `/attendance-summaries?page=${page}&limit=${pageSize}&startDateTime=${startDateTime}&endDateTime=${endDateTime}`
-    );
-  } else {
-    data = await api.get<IApiResponse<IAttendanceLog[]>>(
-      `/attendance-summaries?page=${page}&limit=${pageSize}`
-    );
-  }
+
+  const data = await api.get<IApiResponse<IAttendanceLog[]>>(
+    `/attendance-summary?page=${page}&limit=${pageSize}`
+  );
 
   return {
     attendanceSummaries: data.data,
@@ -48,31 +40,31 @@ export const getAllAttendanceSummaries = async (
   };
 };
 
-export const getAttendanceLogById = async (
-  attendanceLogId?: number
+export const getAttendanceSummaryById = async (
+  attendanceSummaryId?: number
 ): Promise<IAttendanceSummaryRes> => {
-  const data = await api.get<IApiResponse<IAttendanceLog>>(
-    `/categories/${attendanceLogId}`
+  const data = await api.get<IApiResponse<IAttendanceSummary>>(
+    `/attendance-summary/${attendanceSummaryId}`
   );
   return {
     attendanceSummary: data.data,
   };
 };
 
-export const updateAttendanceLog = async (
+export const updateAttendanceSummary = async (
   attendanceSummaryId?: number,
   request?: IUpdateAttendanceSummaryRequest
 ): Promise<void> => {
   await api.patch<IApiResponse<void>>(
-    `/attendance-summaries/${attendanceSummaryId}`,
+    `/attendance-summary/${attendanceSummaryId}`,
     request
   );
 };
 
-export const deleteAttendanceLog = async (
+export const deleteAttendanceSummary = async (
   attendanceSummaryId?: number
 ): Promise<void> => {
   await api.delete<IApiResponse<void>>(
-    `/attendance-summaries/${attendanceSummaryId}`
+    `/attendance-summary/${attendanceSummaryId}`
   );
 };

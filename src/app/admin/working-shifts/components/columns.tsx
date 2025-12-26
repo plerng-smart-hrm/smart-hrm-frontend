@@ -28,6 +28,10 @@ export const workingShiftColumns = (opts?: {
       cell: ({ row }) => <div>{row.original.breakMinutes}</div>,
     },
     {
+      header: "Late Allow Minutes",
+      cell: ({ row }) => <div>{row.original.lateAllowMinutes}</div>,
+    },
+    {
       header: "Start Time",
       cell: ({ row }) => <div>{row.original.startTime?.slice(0, 5)}</div>,
     },

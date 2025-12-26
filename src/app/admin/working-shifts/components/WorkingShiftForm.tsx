@@ -22,11 +22,14 @@ function toFullTime(t: string) {
 }
 
 const formSchema = z.object({
-  factoryId: z.number().min(1, "Factory is required"),
   name: z.string().min(1, "Name is required"),
   startTime: z.string().min(1, "Start time is required"),
   endTime: z.string().min(1, "End time is required"),
   breakMinutes: z
+    .string()
+    .min(1)
+    .refine((v) => !isNaN(Number(v)), "Break minutes must be numeric"),
+  lateAllowMinutes: z
     .string()
     .min(1)
     .refine((v) => !isNaN(Number(v)), "Break minutes must be numeric"),
@@ -47,22 +50,22 @@ export default function WorkingShiftForm({ initialData, onSuccess }: Props) {
     resolver: zodResolver(formSchema),
     defaultValues: initialData
       ? {
-          factoryId: initialData.factoryId ?? 1,
           name: initialData.name ?? "",
           startTime: initialData.startTime ?? "",
           endTime: initialData.endTime ?? "",
           breakMinutes: initialData.breakMinutes?.toString() ?? "60",
           overtimeStart: initialData.overtimeStart ?? "",
           overtimeEnd: initialData.overtimeEnd ?? "",
+          lateAllowMinutes: initialData.lateAllowMinutes?.toString() ?? "0",
         }
       : {
-          factoryId: 1,
           name: "",
           startTime: "",
           endTime: "",
           breakMinutes: "60",
           overtimeStart: "",
           overtimeEnd: "",
+          lateAllowMinutes: "0",
         },
   });
 
@@ -73,9 +76,10 @@ export default function WorkingShiftForm({ initialData, onSuccess }: Props) {
     setIsLoading(true);
 
     const request = {
-      factoryId: values.factoryId,
+      branchId: 1,
       name: values.name,
       breakMinutes: Number(values.breakMinutes),
+      lateAllowMinutes: Number(values.lateAllowMinutes),
 
       startTime: toFullTime(values.startTime),
       endTime: toFullTime(values.endTime),
@@ -111,7 +115,9 @@ export default function WorkingShiftForm({ initialData, onSuccess }: Props) {
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Name *</FormLabel>
+              <FormLabel>
+                Name <span className="text-red-500">*</span>
+              </FormLabel>
               <FormControl>
                 <Input placeholder="Day Shift" {...field} />
               </FormControl>
@@ -127,7 +133,9 @@ export default function WorkingShiftForm({ initialData, onSuccess }: Props) {
             name="startTime"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Start Time *</FormLabel>
+                <FormLabel>
+                  Start Time <span className="text-red-500">*</span>
+                </FormLabel>
                 <FormControl>
                   <Input type="time" {...field} />
                 </FormControl>
@@ -141,7 +149,9 @@ export default function WorkingShiftForm({ initialData, onSuccess }: Props) {
             name="endTime"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>End Time *</FormLabel>
+                <FormLabel>
+                  End Time <span className="text-red-500">*</span>
+                </FormLabel>
                 <FormControl>
                   <Input type="time" {...field} />
                 </FormControl>
@@ -151,20 +161,40 @@ export default function WorkingShiftForm({ initialData, onSuccess }: Props) {
           />
         </div>
 
-        {/* Break Minutes */}
-        <FormField
-          control={form.control}
-          name="breakMinutes"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Break Minutes *</FormLabel>
-              <FormControl>
-                <Input placeholder="60" type="number" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="grid grid-cols-2 gap-4">
+          {/* Break Minutes */}
+          <FormField
+            control={form.control}
+            name="breakMinutes"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  Break Minutes <span className="text-red-500">*</span>
+                </FormLabel>
+                <FormControl>
+                  <Input placeholder="60" type="number" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          {/* Late Allow Minute */}
+          <FormField
+            control={form.control}
+            name="lateAllowMinutes"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  Late Allow Minutes <span className="text-red-500">*</span>
+                </FormLabel>
+                <FormControl>
+                  <Input type="number" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
         {/* Overtime */}
         <div className="grid grid-cols-2 gap-4">
@@ -173,7 +203,9 @@ export default function WorkingShiftForm({ initialData, onSuccess }: Props) {
             name="overtimeStart"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Overtime Start *</FormLabel>
+                <FormLabel>
+                  Overtime Start <span className="text-red-500">*</span>
+                </FormLabel>
                 <FormControl>
                   <Input type="time" {...field} />
                 </FormControl>
@@ -187,7 +219,9 @@ export default function WorkingShiftForm({ initialData, onSuccess }: Props) {
             name="overtimeEnd"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Overtime End *</FormLabel>
+                <FormLabel>
+                  Overtime End <span className="text-red-500">*</span>
+                </FormLabel>
                 <FormControl>
                   <Input type="time" {...field} />
                 </FormControl>
