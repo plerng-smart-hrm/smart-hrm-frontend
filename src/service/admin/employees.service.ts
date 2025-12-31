@@ -46,7 +46,7 @@ export const getAllEmployees = async (
 ): Promise<IEmployeesRes> => {
   const page = pageIndex + 1;
   const data = await api.get<IApiResponse<IEmployee[]>>(
-    `/employees?page=${page}&limit=${pageSize}`
+    `/v1/employees?page=${page}&limit=${pageSize}`
   );
   return {
     employees: data.data,
@@ -58,7 +58,7 @@ export const getEmployeeById = async (
   employeeId?: number
 ): Promise<IEmployeeRes> => {
   const data = await api.get<IApiResponse<IEmployee>>(
-    `/employees/${employeeId}`
+    `/v1/v1/employees/${employeeId}`
   );
   return {
     employee: data.data,
@@ -68,16 +68,16 @@ export const getEmployeeById = async (
 export const createEmployee = async (
   request: ICreateEmployeeRequest
 ): Promise<void> => {
-  await api.post<IApiResponse<void>>(`/employees`, request);
+  await api.post<IApiResponse<void>>(`/v1/employees`, request);
 };
 
 export const updateEmployee = async (
   employeeId?: number,
   request?: IUpdateEmployeeRequest
 ): Promise<void> => {
-  await api.patch<IApiResponse<void>>(`/employees/${employeeId}`, request);
+  await api.patch<IApiResponse<void>>(`/v1/employees/${employeeId}`, request);
 };
 
 export const deleteEmployee = async (employeeId?: number): Promise<void> => {
-  await api.delete<IApiResponse<void>>(`/employees/${employeeId}`);
+  await api.delete<IApiResponse<void>>(`/v1/employees/${employeeId}`);
 };

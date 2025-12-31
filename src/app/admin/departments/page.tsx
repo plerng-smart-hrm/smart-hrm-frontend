@@ -1,9 +1,9 @@
 import { getQueryClient } from "@/lib/query-client";
-import { queryKeys } from "@/service/util/query-key";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { getSearchParams } from "@/utils/searchParams";
 import { getAllDepartments } from "@/service/admin/departments.service";
 import DepartmentClient from "./components/DepartmentClient";
+import { queryKeys } from "@/service/util/query-keys/department";
 
 interface Props {
   searchParams: Promise<{

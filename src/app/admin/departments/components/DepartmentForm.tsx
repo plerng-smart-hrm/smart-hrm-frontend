@@ -1,7 +1,6 @@
 "use client";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import {
   Form,
   FormControl,
@@ -15,13 +14,7 @@ import { IDepartment } from "@/types/admin";
 import { useState } from "react";
 import { useMutateDepartment } from "@/stores/admin/useMutateDepartment";
 import { LoadingButton } from "@/components/LoadingButton";
-
-const formSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  companyId: z.number(),
-});
-
-type FormValues = z.infer<typeof formSchema>;
+import { departmentSchema, DepartmentValues } from "@/schemas/admin/department";
 
 interface Props {
   initialData?: IDepartment;
@@ -33,20 +26,19 @@ export default function DepartmentForm({ initialData, onSuccess }: Props) {
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const defaultValues: FormValues = {
+  const defaultValues: DepartmentValues = {
     name: initialData?.name ?? "",
-    companyId: initialData?.companyId ?? 1,
   };
 
-  const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<DepartmentValues>({
+    resolver: zodResolver(departmentSchema),
     defaultValues,
   });
 
   const { create: createDepartmentMutate, update: updateDepartmentMutate } =
     useMutateDepartment();
 
-  async function onSubmit(values: FormValues) {
+  async function onSubmit(values: DepartmentValues) {
     setIsLoading(true);
     if (isEdit && initialData?.id) {
       await updateDepartmentMutate(
@@ -86,23 +78,6 @@ export default function DepartmentForm({ initialData, onSuccess }: Props) {
               <FormLabel>Name</FormLabel>
               <FormControl>
                 <Input placeholder="Enter name" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="companyId"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Company id</FormLabel>
-              <FormControl>
-                <Input
-                  type="number"
-                  placeholder="Enter company id"
-                  {...field}
-                />
               </FormControl>
               <FormMessage />
             </FormItem>

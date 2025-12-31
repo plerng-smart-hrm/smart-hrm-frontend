@@ -1,13 +1,12 @@
 "use client";
 
+import { DepartmentValues } from "@/schemas/admin/department";
 import {
   createDepartment,
   deleteDepartment,
-  ICreateDepartmentRequest,
-  IUpdateDepartmentRequest,
   updateDepartment,
 } from "@/service/admin/departments.service";
-import { departmentCache } from "@/service/util/query-cache";
+import { departmentCache } from "@/service/util/query-cache/department";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -17,7 +16,7 @@ export const useMutateDepartment = () => {
   const queryClient = useQueryClient();
 
   const createMutation = useMutation({
-    mutationFn: async ({ request }: { request: ICreateDepartmentRequest }) => {
+    mutationFn: async ({ request }: { request: DepartmentValues }) => {
       return await createDepartment(request);
     },
     onSuccess: () => {
@@ -36,7 +35,7 @@ export const useMutateDepartment = () => {
       request,
     }: {
       departmentId?: number;
-      request?: IUpdateDepartmentRequest;
+      request?: DepartmentValues;
     }) => {
       return await updateDepartment(departmentId, request);
     },

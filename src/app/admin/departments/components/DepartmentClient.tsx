@@ -1,7 +1,6 @@
 "use client";
 
 import { DataTable } from "@/components/data-table";
-import { queryKeys } from "@/service/util/query-key";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
@@ -12,6 +11,7 @@ import { IDepartment } from "@/types/admin";
 import { getAllDepartments } from "@/service/admin/departments.service";
 import { departmentColumns } from "./columns";
 import DepartmentDialog from "./DepartmentDialog";
+import { queryKeys } from "@/service/util/query-keys/department";
 
 interface Props {
   initPageIndex: number;
