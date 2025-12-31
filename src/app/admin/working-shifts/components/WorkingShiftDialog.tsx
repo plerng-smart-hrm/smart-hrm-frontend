@@ -6,10 +6,10 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useQuery } from "@tanstack/react-query";
-import { queryKeys } from "@/service/util/query-key";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
 import { getWorkingShiftById } from "@/service/admin/working-shifts.service";
 import WorkingShiftForm from "./WorkingShiftForm";
+import { queryKeys } from "@/service/util/query-keys/working-shift";
 
 interface Props {
   isOpen: boolean;
@@ -33,7 +33,7 @@ const WorkingShiftDialog = ({ isOpen, setIsOpen, workingShiftId }: Props) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="">
+      <DialogContent className="min-w-3xl">
         <DialogHeader>
           <DialogTitle>
             {isEdit ? "Edit WorkingShift" : "Create WorkingShift"}

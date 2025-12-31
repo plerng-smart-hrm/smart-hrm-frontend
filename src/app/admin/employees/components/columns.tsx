@@ -8,8 +8,8 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { IconDotsVertical } from "@tabler/icons-react";
-import { IEmployee } from "@/types/admin";
 import { createRowNumberColumn } from "@/components/data-table";
+import { IEmployee } from "@/types/admin/employee";
 
 export const employeeColumns = (opts?: {
   onEdit?: (row: IEmployee) => void;
@@ -45,15 +45,15 @@ export const employeeColumns = (opts?: {
       cell: ({ row }) => <div>{row.original.position}</div>,
     },
 
-    {
-      header: "Joined Date",
-      cell: ({ row }) =>
-        new Date(row.original.joinedDate ?? "").toLocaleDateString(),
-    },
-    {
-      header: "Status",
-      cell: ({ row }) => <div>{row.original.status}</div>,
-    },
+    // {
+    //   header: "Joined Date",
+    //   cell: ({ row }) =>
+    //     new Date(row.original.joinedDate ?? "").toLocaleDateString(),
+    // },
+    // {
+    //   header: "Status",
+    //   cell: ({ row }) => <div>{row.original.status}</div>,
+    // },
     {
       header: "Created At",
       cell: ({ row }) =>

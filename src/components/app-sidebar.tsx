@@ -56,11 +56,6 @@ const data = {
       icon: Bot,
     },
     {
-      title: "Working Shifts",
-      url: "/admin/working-shifts",
-      icon: Bot,
-    },
-    {
       title: "Holidays",
       url: "/admin/holidays",
       icon: BookOpen,
@@ -111,6 +106,10 @@ const data = {
         {
           title: "Sections",
           url: "/admin/sections",
+        },
+        {
+          title: "Working Shifts",
+          url: "/admin/working-shifts",
         },
       ],
     },

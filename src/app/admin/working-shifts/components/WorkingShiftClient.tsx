@@ -1,17 +1,17 @@
 "use client";
 import { DataTable } from "@/components/data-table";
-import { queryKeys } from "@/service/util/query-key";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
 import { workingShiftColumns } from "./columns";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { IWorkingShift } from "@/types/admin";
+import { IWorkingShift } from "@/types/admin/working-shift";
 import { useMutateWorkingShift } from "@/stores/admin/useMutateWorkingShift";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { getAllWorkingShifts } from "@/service/admin/working-shifts.service";
 import WorkingShiftDialog from "./WorkingShiftDialog";
 import { CustomBarChart } from "@/components/CustomBarChart";
+import { queryKeys } from "@/service/util/query-keys/working-shift";
 
 const shifts = [
   { id: 1, name: "Day Shift", employeeCount: 120 },

@@ -1,13 +1,12 @@
 "use client";
 
+import { WorkingShiftValues } from "@/schemas/admin/working-shift";
 import {
   createWorkingShift,
   deleteWorkingShift,
-  ICreateWorkingShiftRequest,
-  IUpdateWorkingShiftRequest,
   updateWorkingShift,
 } from "@/service/admin/working-shifts.service";
-import { workingShiftCache } from "@/service/util/query-cache";
+import { workingShiftCache } from "@/service/util/query-cache/working-shift";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -20,7 +19,7 @@ export const useMutateWorkingShift = () => {
     mutationFn: async ({
       request,
     }: {
-      request: ICreateWorkingShiftRequest;
+      request: WorkingShiftValues;
     }) => {
       return await createWorkingShift(request);
     },
@@ -40,7 +39,7 @@ export const useMutateWorkingShift = () => {
       request,
     }: {
       workingShiftId?: number;
-      request?: IUpdateWorkingShiftRequest;
+      request?: WorkingShiftValues;
     }) => {
       return await updateWorkingShift(workingShiftId, request);
     },

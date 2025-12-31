@@ -8,7 +8,7 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { IconDotsVertical } from "@tabler/icons-react";
-import { IWorkingShift } from "@/types/admin";
+import { IWorkingShift } from "@/types/admin/working-shift";
 import { createRowNumberColumn } from "@/components/data-table";
 
 export const workingShiftColumns = (opts?: {
@@ -28,20 +28,24 @@ export const workingShiftColumns = (opts?: {
       cell: ({ row }) => <div>{row.original.breakMinutes}</div>,
     },
     {
+      header: "Late Allow Minutes",
+      cell: ({ row }) => <div>{row.original.lateAllowMinutes}</div>,
+    },
+    {
       header: "Start Time",
-      cell: ({ row }) => <div>{row.original.startTime?.slice(0, 5)}</div>,
+      cell: ({ row }) => <div>{row.original.firstInTime?.slice(0, 5)}</div>,
     },
     {
       header: "End Time",
-      cell: ({ row }) => <div>{row.original.endTime?.slice(0, 5)}</div>,
+      cell: ({ row }) => <div>{row.original.firstOutTime?.slice(0, 5)}</div>,
     },
     {
       header: "Overtime Start",
-      cell: ({ row }) => <div>{row.original.overtimeStart?.slice(0, 5)}</div>,
+      cell: ({ row }) => <div>{row.original.secondInTime?.slice(0, 5)}</div>,
     },
     {
       header: "Overtime End",
-      cell: ({ row }) => <div>{row.original.overtimeEnd?.slice(0, 5)}</div>,
+      cell: ({ row }) => <div>{row.original.secondOutTime?.slice(0, 5)}</div>,
     },
     {
       header: "Created At",

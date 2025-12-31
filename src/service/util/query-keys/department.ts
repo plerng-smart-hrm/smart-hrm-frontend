@@ -7,6 +7,6 @@ export const queryKeys = {
 
     detail: (id?: number) => ["departments", "detail", id] as const,
 
-    dropdown: () => ["departments", "dropdown",] as const,
+    dropdown: () => ["departments", "dropdown"] as const,
   },
 };

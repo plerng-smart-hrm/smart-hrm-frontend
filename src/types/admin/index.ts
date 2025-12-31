@@ -1,3 +1,5 @@
+import { IEmployee } from "./employee";
+
 export interface IApiResponse<T = any> {
   statusCode: number;
   message: string;
@@ -75,27 +77,6 @@ export interface IProduct {
 export interface ICategoryOption {
   label?: string;
   value?: string;
-}
-
-export interface IEmployee {
-  id?: number;
-  empCode?: string;
-  firstName?: string;
-  lastName?: string;
-  firstNameKh?: string;
-  lastNameKh?: string;
-  gender?: string;
-  position?: string;
-  joinedDate?: string;
-  status?: string;
-  salary?: string;
-  workingShiftId?: number;
-
-  createdBy?: number;
-  updatedBy?: number;
-  createdAt?: string;
-  updatedAt?: string;
-  deletedAt?: string;
 }
 
 export interface IDevice {
@@ -210,24 +191,6 @@ export interface ICompany {
   deletedAt?: string;
 }
 
-export interface IEmployee {
-  id?: number;
-  empCode?: string;
-  firstName?: string;
-  lastName?: string;
-  firstNameKh?: string;
-  gender?: string;
-  position?: string;
-  joinedDate?: string;
-  status?: string;
-  salary?: string;
-
-  createdBy?: number;
-  updatedBy?: number;
-  createdAt?: string;
-  updatedAt?: string;
-  deletedAt?: string;
-}
 export interface IDepartment {
   id?: number;
   name?: string;
@@ -246,23 +209,6 @@ export interface ISection {
   description?: string;
   departmentId?: number;
   department?: IDepartment;
-
-  createdBy?: number;
-  updatedBy?: number;
-  createdAt?: string;
-  updatedAt?: string;
-  deletedAt?: string;
-}
-
-export interface IWorkingShift {
-  id?: number;
-  factoryId?: number;
-  name?: string;
-  startTime?: string;
-  endTime?: string;
-  breakMinutes?: number;
-  overtimeStart?: string;
-  overtimeEnd?: string;
 
   createdBy?: number;
   updatedBy?: number;

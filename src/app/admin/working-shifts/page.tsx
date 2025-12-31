@@ -1,9 +1,9 @@
 import { getQueryClient } from "@/lib/query-client";
-import { queryKeys } from "@/service/util/query-key";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { getSearchParams } from "@/utils/searchParams";
 import WorkingShiftClient from "./components/WorkingShiftClient";
 import { getAllWorkingShifts } from "@/service/admin/working-shifts.service";
+import { queryKeys } from "@/service/util/query-keys/working-shift";
 
 interface Props {
   searchParams: Promise<{
