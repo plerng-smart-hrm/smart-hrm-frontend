@@ -1,13 +1,12 @@
 "use client";
 
+import { EmployeeValues } from "@/schemas/admin/employee";
 import {
   createEmployee,
   deleteEmployee,
-  ICreateEmployeeRequest,
-  IUpdateEmployeeRequest,
   updateEmployee,
 } from "@/service/admin/employees.service";
-import { employeeCache } from "@/service/util/query-cache";
+import { employeeCache } from "@/service/util/query-cache/employee";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -17,7 +16,7 @@ export const useMutateEmployee = () => {
   const queryClient = useQueryClient();
 
   const createMutation = useMutation({
-    mutationFn: async ({ request }: { request: ICreateEmployeeRequest }) => {
+    mutationFn: async ({ request }: { request: EmployeeValues }) => {
       return await createEmployee(request);
     },
     onSuccess: () => {
@@ -36,7 +35,7 @@ export const useMutateEmployee = () => {
       request,
     }: {
       employeeId?: number;
-      request?: IUpdateEmployeeRequest;
+      request?: EmployeeValues;
     }) => {
       return await updateEmployee(employeeId, request);
     },

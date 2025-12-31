@@ -1,5 +1,4 @@
 "use client";
-import { queryKeys } from "@/service/util/query-key";
 import { useQuery } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
@@ -9,6 +8,7 @@ import { SaveIcon } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import EmployeeForm from "./EmployeeForm";
 import { LoadingButton } from "@/components/LoadingButton";
+import { queryKeys } from "@/service/util/query-keys/employee";
 
 interface Props {
   employeeId?: string;
@@ -26,6 +26,7 @@ const EmployeeIdClient = ({ employeeId }: Props) => {
   const formRef = useRef<HTMLFormElement | null>(null);
 
   const onSave = async () => {
+    console.log('on submit')
     if (formRef.current) {
       formRef.current.dispatchEvent(
         new Event("submit", { cancelable: true, bubbles: true })

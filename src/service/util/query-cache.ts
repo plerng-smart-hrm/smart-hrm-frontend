@@ -85,27 +85,6 @@ export const leaveRequestCache = {
   },
 };
 
-export const employeeCache = {
-  clearAll: (queryClient: QueryClient) => {
-    queryClient.removeQueries({
-      queryKey: queryKeys.employees.root,
-    });
-  },
-
-  clearList: (queryClient: QueryClient) => {
-    queryClient.removeQueries({
-      queryKey: queryKeys.employees.list(),
-      exact: false,
-    });
-  },
-
-  clearDetail: (queryClient: QueryClient, id?: number) => {
-    queryClient.removeQueries({
-      queryKey: queryKeys.employees.detail(id),
-    });
-  },
-};
-
 export const companyCache = {
   clearAll: (queryClient: QueryClient) => {
     queryClient.removeQueries({
@@ -162,25 +141,6 @@ export const holidayCache = {
   clearDetail: (queryClient: QueryClient, id?: number) => {
     queryClient.removeQueries({
       queryKey: queryKeys.holidays.detail(id),
-    });
-  },
-};
-export const workingShiftCache = {
-  clearAll: (queryClient: QueryClient) => {
-    queryClient.removeQueries({
-      queryKey: queryKeys.workingShifts.root,
-    });
-  },
-
-  clearList: (queryClient: QueryClient) => {
-    queryClient.removeQueries({
-      queryKey: queryKeys.workingShifts.list(),
-    });
-  },
-
-  clearDetail: (queryClient: QueryClient, id?: number) => {
-    queryClient.removeQueries({
-      queryKey: queryKeys.workingShifts.detail(id),
     });
   },
 };

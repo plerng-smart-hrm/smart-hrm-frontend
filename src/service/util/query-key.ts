@@ -52,14 +52,7 @@ export const queryKeys = {
 
     detail: (id?: number) => ["companies", "detail", id] as const,
   },
-  employees: {
-    root: ["employees"] as const,
 
-    list: (pageIndex?: number, pageSize?: number) =>
-      ["employees", "list", { pageIndex, pageSize }] as const,
-
-    detail: (id?: number) => ["employees", "detail", id] as const,
-  },
   devices: {
     root: ["devices"] as const,
 
@@ -75,13 +68,5 @@ export const queryKeys = {
       ["holidays", "list", { pageIndex, pageSize }] as const,
 
     detail: (id?: number) => ["holidays", "detail", id] as const,
-  },
-  workingShifts: {
-    root: ["workingShifts"] as const,
-
-    list: (pageIndex?: number, pageSize?: number) =>
-      ["workingShifts", "list", { pageIndex, pageSize }] as const,
-
-    detail: (id?: number) => ["workingShifts", "detail", id] as const,
   },
 };

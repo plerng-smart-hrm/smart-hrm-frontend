@@ -1,7 +1,6 @@
 "use client";
 
 import { DataTable } from "@/components/data-table";
-import { queryKeys } from "@/service/util/query-key";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
@@ -10,8 +9,9 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { useMutateEmployee } from "@/stores/admin/useMutateEmployee";
-import { IEmployee } from "@/types/admin";
+import { IEmployee } from "@/types/admin/employee";
 import { getAllEmployees } from "@/service/admin/employees.service";
+import { queryKeys } from "@/service/util/query-keys/employee";
 
 interface Props {
   initPageIndex: number;

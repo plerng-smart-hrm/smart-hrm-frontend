@@ -1,7 +1,9 @@
 "use server";
 
-import { IApiResponse, IEmployee, IHoliday, IPagination } from "@/types/admin";
+import { IApiResponse, IHoliday, IPagination } from "@/types/admin";
 import { api } from "../util/api";
+import { IEmployee } from "@/types/admin/employee";
+import { EmployeeValues } from "@/schemas/admin/employee";
 
 export interface IEmployeesRes {
   employees?: IEmployee[];
@@ -14,30 +16,6 @@ export interface IHolidaysRes {
 
 export interface IEmployeeRes {
   employee?: IEmployee;
-}
-
-export interface ICreateEmployeeRequest {
-  empCode?: string;
-  firstName?: string;
-  lastName?: string;
-  firstNameKh?: string;
-  gender?: string;
-  position?: string;
-  joinedDate?: string;
-  status?: string;
-  salary?: string;
-}
-
-export interface IUpdateEmployeeRequest {
-  empCode?: string;
-  firstName?: string;
-  lastName?: string;
-  firstNameKh?: string;
-  gender?: string;
-  position?: string;
-  joinedDate?: string;
-  status?: string;
-  salary?: string;
 }
 
 export const getAllEmployees = async (
@@ -58,7 +36,7 @@ export const getEmployeeById = async (
   employeeId?: number
 ): Promise<IEmployeeRes> => {
   const data = await api.get<IApiResponse<IEmployee>>(
-    `/v1/v1/employees/${employeeId}`
+    `/v1/employees/${employeeId}`
   );
   return {
     employee: data.data,
@@ -66,14 +44,14 @@ export const getEmployeeById = async (
 };
 
 export const createEmployee = async (
-  request: ICreateEmployeeRequest
+  request: EmployeeValues
 ): Promise<void> => {
   await api.post<IApiResponse<void>>(`/v1/employees`, request);
 };
 
 export const updateEmployee = async (
   employeeId?: number,
-  request?: IUpdateEmployeeRequest
+  request?: EmployeeValues
 ): Promise<void> => {
   await api.patch<IApiResponse<void>>(`/v1/employees/${employeeId}`, request);
 };
