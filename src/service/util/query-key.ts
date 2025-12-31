@@ -60,14 +60,6 @@ export const queryKeys = {
 
     detail: (id?: number) => ["employees", "detail", id] as const,
   },
-  sections: {
-    root: ["sections"] as const,
-
-    list: (pageIndex?: number, pageSize?: number) =>
-      ["sections", "list", { pageIndex, pageSize }] as const,
-
-    detail: (id?: number) => ["sections", "detail", id] as const,
-  },
   devices: {
     root: ["devices"] as const,
 

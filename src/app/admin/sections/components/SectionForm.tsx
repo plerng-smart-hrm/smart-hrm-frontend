@@ -1,7 +1,6 @@
 "use client";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import {
   Form,
   FormControl,
@@ -16,14 +15,8 @@ import { useState } from "react";
 import { useMutateSection } from "@/stores/admin/useMutateSection";
 import { LoadingButton } from "@/components/LoadingButton";
 import { Textarea } from "@/components/ui/textarea";
-
-const formSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  description: z.string().optional(),
-  departmentId: z.number(),
-});
-
-type FormValues = z.infer<typeof formSchema>;
+import { DepartmentCombobox } from "@/components/comboboxes/DepartmentCombobox";
+import { sectionSchema, SectionValues } from "@/schemas/admin/section";
 
 interface Props {
   initialData?: ISection;
@@ -34,22 +27,25 @@ export default function SectionForm({ initialData, onSuccess }: Props) {
   const isEdit = !!initialData;
 
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedDepartmentId, setSelectedDepartmentId] = useState<
+    number | undefined
+  >(undefined);
 
-  const defaultValues: FormValues = {
+  const defaultValues: Partial<SectionValues> = {
     name: initialData?.name ?? "",
     description: initialData?.description ?? "",
-    departmentId: initialData?.departmentId ?? 1,
+    departmentId: initialData?.departmentId,
   };
 
-  const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<SectionValues>({
+    resolver: zodResolver(sectionSchema),
     defaultValues,
   });
 
   const { create: createSectionMutate, update: updateSectionMutate } =
     useMutateSection();
 
-  async function onSubmit(values: FormValues) {
+  async function onSubmit(values: SectionValues) {
     setIsLoading(true);
     if (isEdit && initialData?.id) {
       await updateSectionMutate(
@@ -81,6 +77,24 @@ export default function SectionForm({ initialData, onSuccess }: Props) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2 p-2">
+        <FormField
+          control={form.control}
+          name="departmentId"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Department <span className="text-red-500">*</span></FormLabel>
+              <DepartmentCombobox
+                value={selectedDepartmentId}
+                onChange={(id) => {
+                  field.onChange(id);
+                  setSelectedDepartmentId(id);
+                }}
+              />
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         <FormField
           control={form.control}
           name="name"

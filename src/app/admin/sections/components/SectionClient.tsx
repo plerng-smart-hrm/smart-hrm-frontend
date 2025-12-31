@@ -1,6 +1,5 @@
 "use client";
 import { DataTable } from "@/components/data-table";
-import { queryKeys } from "@/service/util/query-key";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
@@ -11,6 +10,7 @@ import { getAllSections } from "@/service/admin/sections.service";
 import { useMutateSection } from "@/stores/admin/useMutateSection";
 import { sectionColumns } from "./columns";
 import SectionDialog from "./SectionDialog";
+import { queryKeys } from "@/service/util/query-keys/section";
 
 interface Props {
   initPageIndex: number;

@@ -7,7 +7,7 @@ import {
   IUpdateSectionRequest,
   updateSection,
 } from "@/service/admin/sections.service";
-import { sectionCache } from "@/service/util/query-cache";
+import { sectionCache } from "@/service/util/query-cache/section";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 

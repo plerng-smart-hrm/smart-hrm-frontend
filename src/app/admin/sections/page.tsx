@@ -1,9 +1,9 @@
 import { getQueryClient } from "@/lib/query-client";
-import { queryKeys } from "@/service/util/query-key";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { getSearchParams } from "@/utils/searchParams";
-import { getAllDepartments } from "@/service/admin/departments.service";
-import DepartmentClient from "./components/SectionClient";
+import SectionClient from "./components/SectionClient";
+import { getAllSections } from "@/service/admin/sections.service";
+import { queryKeys } from "@/service/util/query-keys/section";
 
 interface Props {
   searchParams: Promise<{
@@ -17,13 +17,13 @@ const page = async ({ searchParams }: Props) => {
   const { pageIndex, pageSize } = getSearchParams(await searchParams);
 
   await queryClient.prefetchQuery({
-    queryKey: queryKeys.departments.list(pageIndex, pageSize),
-    queryFn: () => getAllDepartments(pageIndex, pageSize),
+    queryKey: queryKeys.sections.list(pageIndex, pageSize),
+    queryFn: () => getAllSections(pageIndex, pageSize),
   });
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <DepartmentClient initPageIndex={pageIndex} initPageSize={pageSize} />
+      <SectionClient initPageIndex={pageIndex} initPageSize={pageSize} />
     </HydrationBoundary>
   );
 };
