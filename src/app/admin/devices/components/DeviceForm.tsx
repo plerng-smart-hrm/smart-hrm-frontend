@@ -1,7 +1,6 @@
 "use client";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import {
   Form,
   FormControl,
@@ -15,15 +14,7 @@ import { IDevice } from "@/types/admin";
 import { useState } from "react";
 import { useMutateDevice } from "@/stores/admin/useMutateDevice";
 import { LoadingButton } from "@/components/LoadingButton";
-
-const formSchema = z.object({
-  name: z.string().min(1),
-  model: z.string().min(1).optional(),
-  location: z.string().min(1).optional(),
-  ipAddress: z.string().min(1).optional(),
-  port: z.number().optional(),
-  factoryId: z.number(),
-});
+import { deviceSchema, DeviceValues } from "@/schemas/admin/device";
 
 interface Props {
   initialData?: IDevice;
@@ -35,8 +26,8 @@ export default function DeviceForm({ initialData, onSuccess }: Props) {
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<DeviceValues>({
+    resolver: zodResolver(deviceSchema),
     defaultValues: initialData ?? {
       name: "",
       model: "",
@@ -50,7 +41,7 @@ export default function DeviceForm({ initialData, onSuccess }: Props) {
   const { create: createDeviceMutate, update: updateDeviceMutate } =
     useMutateDevice();
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: DeviceValues) {
     setIsLoading(true);
     if (isEdit) {
       await updateDeviceMutate(
@@ -186,27 +177,6 @@ export default function DeviceForm({ initialData, onSuccess }: Props) {
               )}
             />
           </div>
-        </div>
-        <div className="col-span-6">
-          <FormField
-            control={form.control}
-            name="factoryId"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Factory Id</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Enter factory id"
-                    type="number"
-                    {...field}
-                    onChange={(e) => field.onChange(Number(e.target.value))}
-                  />
-                </FormControl>
-
-                <FormMessage />
-              </FormItem>
-            )}
-          />
         </div>
         <div className="flex justify-end">
           <LoadingButton type="submit" loading={isLoading}>

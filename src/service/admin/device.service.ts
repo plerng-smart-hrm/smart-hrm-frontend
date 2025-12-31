@@ -26,7 +26,7 @@ export const getAllDevices = async (
 ): Promise<IDevicesRes> => {
   const page = pageIndex + 1;
   const data = await api.get<IApiResponse<IDevice[]>>(
-    `/devices?page=${page}&limit=${pageSize}`
+    `/v1/devices?page=${page}&limit=${pageSize}`
   );
   return {
     devices: data.data,
@@ -35,11 +35,11 @@ export const getAllDevices = async (
 };
 
 export const syncAllDevices = async () => {
-  await api.post<IApiResponse<IDevice[]>>(`/devices/sync-attendance`);
+  await api.post<IApiResponse<IDevice[]>>(`/v1/devices/sync-attendance`);
 };
 
 export const getDeviceById = async (deviceId?: number): Promise<IDeviceRes> => {
-  const data = await api.get<IApiResponse<IDevice>>(`/devices/${deviceId}`);
+  const data = await api.get<IApiResponse<IDevice>>(`/v1/devices/${deviceId}`);
   return {
     device: data.data,
   };
@@ -48,16 +48,16 @@ export const getDeviceById = async (deviceId?: number): Promise<IDeviceRes> => {
 export const createDevice = async (
   request: ICreateDeviceRequest
 ): Promise<void> => {
-  await api.post<IApiResponse<void>>(`/devices`, request);
+  await api.post<IApiResponse<void>>(`/v1/devices`, request);
 };
 
 export const updateDevice = async (
   deviceId?: number,
   request?: IUpdateDeviceRequest
 ): Promise<void> => {
-  await api.patch<IApiResponse<void>>(`/devices/${deviceId}`, request);
+  await api.patch<IApiResponse<void>>(`/v1/devices/${deviceId}`, request);
 };
 
 export const deleteDevice = async (deviceId?: number): Promise<void> => {
-  await api.delete<IApiResponse<void>>(`/devices/${deviceId}`);
+  await api.delete<IApiResponse<void>>(`/v1/devices/${deviceId}`);
 };

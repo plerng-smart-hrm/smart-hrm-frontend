@@ -8,7 +8,7 @@ import {
   syncAllDevices,
   updateDevice,
 } from "@/service/admin/device.service";
-import { deviceCache } from "@/service/util/query-cache";
+import { deviceCache } from "@/service/util/query-cache/device";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
