@@ -22,7 +22,7 @@ export const getAllHolidays = async (
 ): Promise<IHolidaysRes> => {
   const page = pageIndex + 1;
   const data = await api.get<IApiResponse<IHoliday[]>>(
-    `/holidays?page=${page}&limit=${pageSize}&sortBy=startDate&order=ASC`
+    `/v1/holidays?page=${page}&limit=${pageSize}&sortBy=startDate&order=ASC`
   );
   return {
     holidays: data.data,
@@ -33,7 +33,7 @@ export const getAllHolidays = async (
 export const getHolidayById = async (
   holidayId?: number
 ): Promise<IHolidayRes> => {
-  const data = await api.get<IApiResponse<IHoliday>>(`/holidays/${holidayId}`);
+  const data = await api.get<IApiResponse<IHoliday>>(`/v1/holidays/${holidayId}`);
   return {
     holiday: data.data,
   };
@@ -42,16 +42,23 @@ export const getHolidayById = async (
 export const createHoliday = async (
   request: ICreateHolidayRequest
 ): Promise<void> => {
-  await api.post<IApiResponse<void>>(`/holidays`, request);
+  await api.post<IApiResponse<void>>(`/v1/holidays`, request);
 };
 
 export const updateHoliday = async (
   holidayId?: number,
   request?: IUpdateHolidayRequest
 ): Promise<void> => {
-  await api.patch<IApiResponse<void>>(`/holidays/${holidayId}`, request);
+  await api.patch<IApiResponse<void>>(`/v1/holidays/${holidayId}`, request);
 };
 
 export const deleteHoliday = async (holidayId?: number): Promise<void> => {
-  await api.delete<IApiResponse<void>>(`/holidays/${holidayId}`);
+  await api.delete<IApiResponse<void>>(`/v1/holidays/${holidayId}`);
+};
+
+export const importHoliday = async (file: File): Promise<void> => {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  await api.post(`/v1/holidays/import`, formData);
 };

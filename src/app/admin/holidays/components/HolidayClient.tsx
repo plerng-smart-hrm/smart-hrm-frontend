@@ -14,6 +14,7 @@ import HolidayDialog from "./HolidayDialog";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { Button } from "@/components/ui/button";
 import { DownloadIcon } from "lucide-react";
+import ImportFactoryModal from "./ImportHolidayModal";
 
 interface Props {
   initPageIndex: number;
@@ -31,6 +32,7 @@ const HolidayClient = ({ initPageIndex, initPageSize }: Props) => {
   const [isForm, setIsForm] = useState(false);
   const [isDelete, setIsDelete] = useState(false);
   const [holiday, setHoliday] = useState<IHoliday | undefined>(undefined);
+  const [openImportModel, setOpenImportModel] = useState<boolean>(false);
 
   const { data, isFetching } = useQuery({
     queryKey: queryKeys.holidays.list(pageIndex, pageSize),
@@ -153,13 +155,21 @@ const HolidayClient = ({ initPageIndex, initPageSize }: Props) => {
         extractAction={
           <Button
             className="bg-cyan-500 hover:bg-cyan-400 cursor-pointer"
-            onClick={() => {}}
+            onClick={() => {
+              setOpenImportModel(true);
+            }}
           >
             <DownloadIcon className="h-3 w-3" />
             Import
           </Button>
         }
       />
+      {openImportModel && (
+        <ImportFactoryModal
+          open={openImportModel}
+          onClose={() => setOpenImportModel(false)}
+        />
+      )}
     </div>
   );
 };

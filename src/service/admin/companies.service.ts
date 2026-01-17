@@ -42,7 +42,7 @@ export const getAllCompanies = async (
 ): Promise<ICompaniesRes> => {
   const page = pageIndex + 1;
   const data = await api.get<IApiResponse<ICompany[]>>(
-    `/companies?page=${page}&limit=${pageSize}`
+    `/v1/companies?page=${page}&limit=${pageSize}`
   );
   return {
     companies: data.data,
@@ -53,7 +53,7 @@ export const getAllCompanies = async (
 export const getCompanyById = async (
   companyId?: number
 ): Promise<ICompanyRes> => {
-  const data = await api.get<IApiResponse<ICompany>>(`/companies/${companyId}`);
+  const data = await api.get<IApiResponse<ICompany>>(`/v1/companies/${companyId}`);
   return {
     company: data.data,
   };
@@ -62,16 +62,16 @@ export const getCompanyById = async (
 export const createCompany = async (
   request: ICreateCompanyRequest
 ): Promise<void> => {
-  await api.post<IApiResponse<void>>(`/companies`, request);
+  await api.post<IApiResponse<void>>(`/v1/companies`, request);
 };
 
 export const updateCompany = async (
   companyId?: number,
   request?: IUpdateCompanyRequest
 ): Promise<void> => {
-  await api.patch<IApiResponse<void>>(`/companies/${companyId}`, request);
+  await api.patch<IApiResponse<void>>(`/v1/companies/${companyId}`, request);
 };
 
 export const deleteCompany = async (companyId?: number): Promise<void> => {
-  await api.delete<IApiResponse<void>>(`/companies/${companyId}`);
+  await api.delete<IApiResponse<void>>(`/v1/companies/${companyId}`);
 };

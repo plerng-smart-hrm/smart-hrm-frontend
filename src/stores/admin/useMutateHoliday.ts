@@ -4,6 +4,7 @@ import {
   createHoliday,
   deleteHoliday,
   ICreateHolidayRequest,
+  importHoliday,
   IUpdateHolidayRequest,
   updateHoliday,
 } from "@/service/admin/holiday.service";
@@ -64,9 +65,23 @@ export const useMutateHoliday = () => {
     },
   });
 
+  const importMutation = useMutation({
+    mutationFn: async ({ file }: { file: File }) => {
+      return await importHoliday(file);
+    },
+    onSuccess: () => {
+      toast.success("Holidays imported successfully");
+      holidayCache.clearAll(queryClient);
+    },
+    onError: () => {
+      toast.error("Failed to import holidays");
+    },
+  });
+
   return {
     create: createMutation.mutateAsync,
     update: updateMutation.mutateAsync,
     delete: deleteMutation.mutateAsync,
+    import: importMutation.mutateAsync,
   };
 };
