@@ -19,6 +19,7 @@ import {
   workingShiftSchema,
   WorkingShiftValues,
 } from "@/schemas/admin/working-shift";
+import ActionButton from "@/components/shared/button/ActionButton";
 
 // Helper function to convert time format
 function toFullTime(t: string | undefined) {
@@ -34,10 +35,10 @@ function toShortTime(t: string | undefined) {
 
 interface Props {
   initialData?: IWorkingShift;
-  onSuccess: () => void;
+  setOpen: (open: boolean) => void;
 }
 
-export default function WorkingShiftForm({ initialData, onSuccess }: Props) {
+export default function WorkingShiftForm({ initialData, setOpen }: Props) {
   const isEdit = !!initialData;
   const [isLoading, setIsLoading] = useState(false);
 
@@ -57,10 +58,17 @@ export default function WorkingShiftForm({ initialData, onSuccess }: Props) {
     defaultValues,
   });
 
-  const { create: createWorkingShiftMutate, update: updateWorkingShiftMutate } =
-    useMutateWorkingShift();
+  const { createWorkingShift, updateWorkingShift } = useMutateWorkingShift();
 
-  async function onSubmit(values: WorkingShiftValues) {
+  const onSubmit = async () => {
+    const isValid = await form.trigger();
+    console.log("isValid", isValid);
+    console.log("Error", form.formState.errors);
+    if (!isValid) {
+      return;
+    }
+
+    const values = form.getValues();
     setIsLoading(true);
 
     const request = {
@@ -75,23 +83,33 @@ export default function WorkingShiftForm({ initialData, onSuccess }: Props) {
     };
 
     if (isEdit && initialData?.id) {
-      await updateWorkingShiftMutate(
+      updateWorkingShift(
         { workingShiftId: initialData.id, request },
         {
-          onSuccess: () => onSuccess(),
-          onSettled: () => setIsLoading(false),
-        }
+          onSuccess: () => {
+            setOpen(false);
+          },
+          onError: () => {},
+          onSettled: () => {
+            setIsLoading(false);
+          },
+        },
       );
     } else {
-      await createWorkingShiftMutate(
+      createWorkingShift(
         { request },
         {
-          onSuccess: () => onSuccess(),
-          onSettled: () => setIsLoading(false),
-        }
+          onSuccess: () => {
+            setOpen(false);
+          },
+          onError: () => {},
+          onSettled: () => {
+            setIsLoading(false);
+          },
+        },
       );
     }
-  }
+  };
 
   return (
     <Form {...form}>
@@ -163,7 +181,7 @@ export default function WorkingShiftForm({ initialData, onSuccess }: Props) {
                         field.onChange(
                           e.target.value === ""
                             ? 0
-                            : parseInt(e.target.value) || 0
+                            : parseInt(e.target.value) || 0,
                         )
                       }
                       value={field.value ?? 0}
@@ -193,7 +211,7 @@ export default function WorkingShiftForm({ initialData, onSuccess }: Props) {
                         field.onChange(
                           e.target.value === ""
                             ? 0
-                            : parseInt(e.target.value) || 0
+                            : parseInt(e.target.value) || 0,
                         )
                       }
                       value={field.value ?? 0}
@@ -307,11 +325,15 @@ export default function WorkingShiftForm({ initialData, onSuccess }: Props) {
           </div>
         </div>
 
-        {/* Submit Button */}
-        <div className="flex justify-end pt-4">
-          <LoadingButton loading={isLoading} type="submit">
-            {isEdit ? "Update Shift" : "Create Shift"}
-          </LoadingButton>
+        {/* Action Buttons */}
+        <div className="pt-4">
+          <ActionButton
+            setOpen={setOpen}
+            handleSubmit={onSubmit}
+            submitTitle={"Submit"}
+            isLoading={isLoading}
+            disable={isLoading}
+          />
         </div>
       </form>
     </Form>

@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  env: {
+    NEXT_PUBLIC_BACKEND_URL: process.env.BACKEND_URL,
+  },
   experimental: {
     serverActions: {
       bodySizeLimit: "20mb",

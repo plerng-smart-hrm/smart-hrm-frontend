@@ -6,9 +6,10 @@ import {
   deleteEmployee,
   updateEmployee,
 } from "@/service/admin/employees.service";
-import { employeeCache } from "@/service/util/query-cache/employee";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+
+import { employeeKeys } from "@/service/util/query-keys/employee";
 
 const RESOURCE = "Employee";
 
@@ -21,8 +22,9 @@ export const useMutateEmployee = () => {
     },
     onSuccess: () => {
       toast.success(`${RESOURCE} created successfully`);
-
-      employeeCache.clearAll(queryClient);
+      queryClient.invalidateQueries({
+        queryKey: [employeeKeys.list_employee],
+      });
     },
     onError: () => {
       toast.error(`Failed to create ${RESOURCE.toLowerCase()}`);
@@ -41,8 +43,9 @@ export const useMutateEmployee = () => {
     },
     onSuccess: () => {
       toast.success(`${RESOURCE} updated successfully`);
-
-      employeeCache.clearAll(queryClient);
+      queryClient.invalidateQueries({
+        queryKey: [employeeKeys.list_employee],
+      });
     },
     onError: () => {
       toast.error(`Failed to update ${RESOURCE.toLowerCase()}`);
@@ -55,8 +58,9 @@ export const useMutateEmployee = () => {
     },
     onSuccess: () => {
       toast.success(`${RESOURCE} deleted successfully`);
-
-      employeeCache.clearAll(queryClient);
+      queryClient.invalidateQueries({
+        queryKey: [employeeKeys.list_employee],
+      });
     },
     onError: () => {
       toast.error(`Failed to delete ${RESOURCE.toLowerCase()}`);
@@ -64,8 +68,8 @@ export const useMutateEmployee = () => {
   });
 
   return {
-    create: createMutation.mutateAsync,
-    update: updateMutation.mutateAsync,
-    delete: deleteMutation.mutateAsync,
+    createEmployee: createMutation.mutateAsync,
+    updateEmployee: updateMutation.mutateAsync,
+    deleteEmployee: deleteMutation.mutateAsync,
   };
 };

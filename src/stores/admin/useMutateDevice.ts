@@ -8,7 +8,7 @@ import {
   syncAllDevices,
   updateDevice,
 } from "@/service/admin/device.service";
-import { deviceCache } from "@/service/util/query-cache/device";
+import { deviceKeys } from "@/service/util/query-keys/device";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -23,8 +23,9 @@ export const useMutateDevice = () => {
     },
     onSuccess: () => {
       toast.success(`${RESOURCE} created successfully`);
-
-      deviceCache.clearAll(queryClient);
+      queryClient.invalidateQueries({
+        queryKey: [deviceKeys.list_device],
+      });
     },
     onError: () => {
       toast.error(`Failed to create ${RESOURCE.toLowerCase()}`);
@@ -36,6 +37,9 @@ export const useMutateDevice = () => {
     },
     onSuccess: () => {
       toast.success(`${RESOURCE} sync successfully`);
+      queryClient.invalidateQueries({
+        queryKey: [deviceKeys.list_device],
+      });
     },
     onError: () => {
       toast.error(`Failed to sync ${RESOURCE.toLowerCase()}`);
@@ -55,7 +59,9 @@ export const useMutateDevice = () => {
     onSuccess: () => {
       toast.success(`${RESOURCE} updated successfully`);
 
-      deviceCache.clearAll(queryClient);
+      queryClient.invalidateQueries({
+        queryKey: [deviceKeys.list_device],
+      });
     },
     onError: () => {
       toast.error(`Failed to update ${RESOURCE.toLowerCase()}`);
@@ -69,7 +75,9 @@ export const useMutateDevice = () => {
     onSuccess: () => {
       toast.success(`${RESOURCE} deleted successfully`);
 
-      deviceCache.clearAll(queryClient);
+      queryClient.invalidateQueries({
+        queryKey: [deviceKeys.list_device],
+      });
     },
     onError: () => {
       toast.error(`Failed to delete ${RESOURCE.toLowerCase()}`);

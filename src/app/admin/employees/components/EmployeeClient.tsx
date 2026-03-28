@@ -1,56 +1,54 @@
 "use client";
 
-import { DataTable } from "@/components/data-table";
-import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { LoadingOverlay } from "@/components/LoadingOverlay";
-import { employeeColumns } from "./columns";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-
+import { useRouter } from "next/navigation";
+import { IEmployee } from "@/types/admin/employee";
+import { useDataTable } from "@/hooks/use-data-table";
+import { employeeColumns } from "./employeeColumns";
+import BaseDataTable from "@/components/shared/table/BaseDataTable";
+import { ToolBarDataTale } from "@/components/shared/table/ToolBarDataTale";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { useMutateEmployee } from "@/stores/admin/useMutateEmployee";
-import { IEmployee } from "@/types/admin/employee";
-import { getAllEmployees } from "@/service/admin/employees.service";
-import { queryKeys } from "@/service/util/query-keys/employee";
+import SharedDialog from "@/components/shared/SharedDialog";
+import EmployeeForm from "./form/EmployeeForm";
+import { Button } from "@/components/ui/button";
+import { PenIcon, Plus, PlusIcon, TrashIcon } from "lucide-react";
+import { ToolbarActions } from "@/components/shared/table/ToolbarActions";
 
-interface Props {
-  initPageIndex: number;
-  initPageSize: number;
-}
-const EmployeeClient = ({ initPageIndex, initPageSize }: Props) => {
+const EmployeeClient = () => {
   const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
 
   const [isLoading, setIsLoading] = useState(false);
-  const [pageIndex, setPageIndex] = useState(initPageIndex);
-  const [pageSize, setPageSize] = useState(initPageSize);
-
+  const [isEmployeeForm, setIsEmployeeForm] = useState(false);
   const [isDelete, setIsDelete] = useState(false);
   const [employee, setEmployee] = useState<IEmployee | undefined>(undefined);
 
-  const { data, isFetching } = useQuery({
-    queryKey: queryKeys.employees.list(pageIndex, pageSize),
-    queryFn: () => getAllEmployees(pageIndex, pageSize),
+  const actionButton = [
+    {
+      name: "Update",
+      icon: PenIcon,
+      event: (value: any) => {},
+    },
+
+    {
+      name: "Delete",
+      icon: TrashIcon,
+      event: (value: IEmployee) => {
+        setIsDelete(true);
+        setEmployee(value);
+      },
+    },
+  ];
+
+  const { table } = useDataTable<IEmployee, unknown>({
+    columns: employeeColumns(actionButton),
   });
 
-  const employees = data?.employees ?? [];
-  const pagination = data?.pagination;
-
-  const cols = employeeColumns({
-    onEdit: (row) => {
-      router.push(`/admin/employees/${row.id}`);
-    },
-    onDelete: (row) => {
-      setIsDelete(true);
-      setEmployee(row);
-    },
-  });
-  const { delete: deleteEmployeeMutate } = useMutateEmployee();
+  const { deleteEmployee } = useMutateEmployee();
 
   const handleDelete = async () => {
     setIsLoading(true);
-    await deleteEmployeeMutate(
+    await deleteEmployee(
       { employeeId: employee?.id },
       {
         onSuccess: () => {
@@ -60,55 +58,55 @@ const EmployeeClient = ({ initPageIndex, initPageSize }: Props) => {
         onSettled: () => {
           setIsLoading(false);
         },
-      }
+      },
     );
   };
 
-  const handlePaginationChange = ({
-    pageIndex,
-    pageSize,
-  }: {
-    pageIndex: number;
-    pageSize: number;
-  }) => {
-    setPageIndex(pageIndex);
-    setPageSize(pageSize);
-    const params = new URLSearchParams(searchParams);
-    params.set("pageIndex", String(pageIndex));
-    params.set("pageSize", String(pageSize));
-    router.push(`${pathname}?${params.toString()}`);
-  };
-
-  if (isFetching) {
-    return <LoadingOverlay isLoading={isFetching} />;
-  }
-
   return (
     <div>
-      {isDelete && (
-        <ConfirmDialog
-          open={isDelete}
-          onOpenChange={setIsDelete}
-          title="Delete Employee"
-          description={`This will remove employee name ${employee?.lastName} ${employee?.firstName}`}
-          loading={isLoading}
-          onConfirm={handleDelete}
-        />
-      )}
+      <BaseDataTable table={table}>
+        <ToolBarDataTale table={table}>
+          <ToolbarActions
+            actions={[
+              {
+                name: "Create",
+                icon: PlusIcon,
+                event: () => {
+                  setIsEmployeeForm(true);
+                },
+              },
+            ]}
+          />
+        </ToolBarDataTale>
+      </BaseDataTable>
 
-      <DataTable
-        columns={cols}
-        data={employees}
-        serverMode={true}
-        pageCount={pagination?.totalPages ?? 0}
-        onPaginationChange={handlePaginationChange}
-        initialPageIndex={pageIndex}
-        initialPageSize={pageSize}
-        createLabel="Create"
-        onCreateClick={() => {
-          router.push("/admin/employees/new");
-        }}
-      />
+      <SharedDialog
+        title={"Delete Employee"}
+        setOpen={setIsDelete}
+        open={isDelete}
+        submitEvent={handleDelete}
+        isSubmit
+        submitTitle="Yes, Delete"
+        className="bg-red-500"
+        isLoading={isLoading}
+        width="50%"
+      >
+        <p>
+          This will remove employee name
+          <span className="font-bold">
+            {employee?.lastName} {employee?.firstName}
+          </span>
+        </p>
+      </SharedDialog>
+
+      <SharedDialog
+        setOpen={() => setIsEmployeeForm(false)}
+        open={isEmployeeForm}
+        title="Create Employee"
+        isCancel={false}
+      >
+        <EmployeeForm setOpen={setIsEmployeeForm} />
+      </SharedDialog>
     </div>
   );
 };

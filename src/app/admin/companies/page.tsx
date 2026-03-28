@@ -1,9 +1,7 @@
-import { getQueryClient } from "@/lib/query-client";
-import { queryKeys } from "@/service/util/query-key";
-import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
-import { getSearchParams } from "@/utils/searchParams";
-import { getAllContractTypes } from "@/service/admin/contract-types.service";
-import ContractTypeClient from "./components/companyClient";
+import { ContentLayout } from "@/components/admin-panel/content-layout";
+import ContentWrapper from "@/components/content/content-wrapper";
+import { companyKeys } from "@/service/util/query-keys/company";
+import CompanyClient from "./components/CompanyClient";
 
 interface Props {
   searchParams: Promise<{
@@ -12,19 +10,13 @@ interface Props {
   }>;
 }
 
-const page = async ({ searchParams }: Props) => {
-  const queryClient = getQueryClient();
-  const { pageIndex, pageSize } = getSearchParams(await searchParams);
-
-  await queryClient.prefetchQuery({
-    queryKey: queryKeys.contractTypes.list(pageIndex, pageSize),
-    queryFn: () => getAllContractTypes(pageIndex, pageSize),
-  });
-
+const page = async ({}: Props) => {
   return (
-    <HydrationBoundary state={dehydrate(queryClient)}>
-      <ContractTypeClient initPageIndex={pageIndex} initPageSize={pageSize} />
-    </HydrationBoundary>
+    <ContentLayout title={"Companies"}>
+      <ContentWrapper queryKey={companyKeys.list_company}>
+        <CompanyClient />
+      </ContentWrapper>
+    </ContentLayout>
   );
 };
 

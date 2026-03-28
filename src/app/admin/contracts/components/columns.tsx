@@ -1,24 +1,18 @@
 "use client";
 import { ColumnDef } from "@tanstack/react-table";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
-import { IconDotsVertical } from "@tabler/icons-react";
 import { IContract } from "@/types/admin";
-import { createRowNumberColumn } from "@/components/data-table";
+import { Actions, IActions } from "@/components/shared/Actions";
 
-export const contractColumns = (opts?: {
-  onEdit?: (row: IContract) => void;
-  onDelete?: (row: IContract) => void;
-}): ColumnDef<IContract>[] => {
-  const { onDelete, onEdit } = opts ?? {};
+export const contractColumns = (
+  actions: IActions[],
+): ColumnDef<IContract>[] => {
+  return [
+    {
+      header: "ID",
+      size: 50,
+      cell: ({ row }) => <div>{row.original.id}</div>,
+    },
 
-  const cols: ColumnDef<IContract>[] = [
-    createRowNumberColumn<IContract>(),
     {
       header: "Employee",
       cell: ({ row }) => (
@@ -59,39 +53,11 @@ export const contractColumns = (opts?: {
     },
     {
       id: "actions",
-      header: "",
+      header: "Actions",
+      size: 50,
       cell: ({ row }) => (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
-              size="icon"
-            >
-              <IconDotsVertical />
-              <span className="sr-only">Open menu</span>
-            </Button>
-          </DropdownMenuTrigger>
-
-          <DropdownMenuContent align="end" className="w-32">
-            <DropdownMenuItem
-              className="cursor-pointer"
-              onClick={() => onEdit?.(row.original)}
-            >
-              Edit
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              variant="destructive"
-              className="cursor-pointer"
-              onClick={() => onDelete?.(row.original)}
-            >
-              Delete
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <Actions row={row?.original ?? undefined} actions={actions} />
       ),
     },
   ];
-
-  return cols;
 };

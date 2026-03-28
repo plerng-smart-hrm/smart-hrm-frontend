@@ -1,17 +1,17 @@
 "use client";
-import { DataTable } from "@/components/data-table";
-import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { LoadingOverlay } from "@/components/LoadingOverlay";
-import { workingShiftColumns } from "./columns";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { IWorkingShift } from "@/types/admin/working-shift";
 import { useMutateWorkingShift } from "@/stores/admin/useMutateWorkingShift";
-import { ConfirmDialog } from "@/components/ConfirmDialog";
-import { getAllWorkingShifts } from "@/service/admin/working-shifts.service";
-import WorkingShiftDialog from "./WorkingShiftDialog";
 import { CustomBarChart } from "@/components/CustomBarChart";
-import { queryKeys } from "@/service/util/query-keys/working-shift";
+import { useDataTable } from "@/hooks/use-data-table";
+import { IEmployee } from "@/types/admin/employee";
+import { PenIcon, PlusIcon, TrashIcon } from "lucide-react";
+import BaseDataTable from "@/components/shared/table/BaseDataTable";
+import { ToolbarActions } from "@/components/shared/table/ToolbarActions";
+import { ToolBarDataTale } from "@/components/shared/table/ToolBarDataTale";
+import SharedDialog from "@/components/shared/SharedDialog";
+import WorkingShiftForm from "./WorkingShiftForm";
+import { workingShiftColumns } from "./columns";
 
 const shifts = [
   { id: 1, name: "Day Shift", employeeCount: 120 },
@@ -23,64 +23,45 @@ const chartData = shifts.map((d) => ({
   value: d.employeeCount ?? 0,
 }));
 
-interface Props {
-  initPageIndex: number;
-  initPageSize: number;
-}
-const WorkingShiftClient = ({ initPageIndex, initPageSize }: Props) => {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-
+interface Props {}
+const WorkingShiftClient = ({}: Props) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [pageIndex, setPageIndex] = useState(initPageIndex);
-  const [pageSize, setPageSize] = useState(initPageSize);
 
   const [isForm, setIsForm] = useState(false);
   const [isDelete, setIsDelete] = useState(false);
   const [workingShift, setWorkingShift] = useState<IWorkingShift | undefined>(
-    undefined
+    undefined,
   );
 
-  const { data, isFetching } = useQuery({
-    queryKey: queryKeys.workingShifts.list(pageIndex, pageSize),
-    queryFn: () => getAllWorkingShifts(pageIndex, pageSize),
+  const actionButton = [
+    {
+      name: "Update",
+      icon: PenIcon,
+      event: (value: IWorkingShift) => {
+        setIsForm(true);
+        setWorkingShift(value);
+      },
+    },
+
+    {
+      name: "Delete",
+      icon: TrashIcon,
+      event: (value: IWorkingShift) => {
+        setIsDelete(true);
+        setWorkingShift(value);
+      },
+    },
+  ];
+
+  const { table } = useDataTable<IEmployee, unknown>({
+    columns: workingShiftColumns(actionButton),
   });
 
-  const workingShifts = data?.workingShifts ?? [];
-  const pagination = data?.pagination;
-
-  const cols = workingShiftColumns({
-    onEdit: (row) => {
-      setIsForm(true);
-      setWorkingShift(row);
-    },
-    onDelete: (row) => {
-      setIsDelete(true);
-      setWorkingShift(row);
-    },
-  });
-
-  const { delete: deleteWorkingShiftMutate } = useMutateWorkingShift();
-
-  const handlePaginationChange = ({
-    pageIndex,
-    pageSize,
-  }: {
-    pageIndex: number;
-    pageSize: number;
-  }) => {
-    setPageIndex(pageIndex);
-    setPageSize(pageSize);
-    const params = new URLSearchParams(searchParams);
-    params.set("pageIndex", String(pageIndex));
-    params.set("pageSize", String(pageSize));
-    router.push(`${pathname}?${params.toString()}`);
-  };
+  const { deleteWorkingShift } = useMutateWorkingShift();
 
   const handleDelete = async () => {
     setIsLoading(true);
-    await deleteWorkingShiftMutate(
+    await deleteWorkingShift(
       { workingShiftId: workingShift?.id },
       {
         onSuccess: () => {
@@ -90,54 +71,57 @@ const WorkingShiftClient = ({ initPageIndex, initPageSize }: Props) => {
         onSettled: () => {
           setIsLoading(false);
         },
-      }
+      },
     );
   };
 
-  if (isFetching) {
-    return <LoadingOverlay isLoading={isFetching} />;
-  }
-
   return (
     <div>
-      {isForm && (
-        <WorkingShiftDialog
-          isOpen={isForm}
-          setIsOpen={() => {
-            setIsForm(false);
-            setWorkingShift(undefined);
-          }}
-          workingShiftId={workingShift?.id}
-        />
-      )}
-      {isDelete && (
-        <ConfirmDialog
-          open={isDelete}
-          onOpenChange={setIsDelete}
-          title="Delete Device"
-          description={`This will remove the ${workingShift?.name}`}
-          loading={isLoading}
-          onConfirm={handleDelete}
-        />
-      )}
-
-      <div className="grid grid-cols-2 mb-4">
+      <div className="grid grid-cols-2 mb-2">
         <CustomBarChart title="Employees per shift" data={chartData} />
       </div>
 
-      <DataTable
-        columns={cols}
-        data={workingShifts}
-        serverMode={true}
-        pageCount={pagination?.totalPages ?? 0}
-        onPaginationChange={handlePaginationChange}
-        initialPageIndex={pageIndex}
-        initialPageSize={pageSize}
-        createLabel="Create"
-        onCreateClick={() => {
-          setIsForm(true);
+      <BaseDataTable table={table}>
+        <ToolBarDataTale table={table}>
+          <ToolbarActions
+            actions={[
+              {
+                name: "Create",
+                icon: PlusIcon,
+                event: () => {
+                  setIsForm(true);
+                },
+              },
+            ]}
+          />
+        </ToolBarDataTale>
+      </BaseDataTable>
+
+      <SharedDialog
+        setOpen={() => {
+          setIsForm(false);
+          setWorkingShift(undefined);
         }}
-      />
+        open={isForm}
+        title={`${workingShift ? "Update" : "Create"} Working Shift`}
+        isCancel={false}
+      >
+        <WorkingShiftForm initialData={undefined} setOpen={setIsForm} />
+      </SharedDialog>
+
+      <SharedDialog
+        title={"Delete Working Shift"}
+        setOpen={setIsDelete}
+        open={isDelete}
+        submitEvent={handleDelete}
+        isSubmit
+        submitTitle="Yes, Delete"
+        className="bg-red-500"
+        isLoading={isLoading}
+        width="50%"
+      >
+        <p>This will remove the {workingShift?.name}</p>
+      </SharedDialog>
     </div>
   );
 };

@@ -1,53 +1,48 @@
 "use client";
-import { DataTable } from "@/components/data-table";
-import { queryKeys } from "@/service/util/query-key";
-import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { LoadingOverlay } from "@/components/LoadingOverlay";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import ContractDialog from "./ContractDialog";
-import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { useMutateContract } from "@/stores/admin/useMutateContract";
 import { IContract } from "@/types/admin";
-import { getAllContracts } from "@/service/admin/contracts.service";
 import { contractColumns } from "./columns";
 import { DashboardCard } from "@/components/DashboardCard";
+import { useDataTable } from "@/hooks/use-data-table";
+import { PenIcon, PlusIcon, TrashIcon } from "lucide-react";
+import SharedDialog from "@/components/shared/SharedDialog";
+import BaseDataTable from "@/components/shared/table/BaseDataTable";
+import { ToolbarActions } from "@/components/shared/table/ToolbarActions";
+import { ToolBarDataTale } from "@/components/shared/table/ToolBarDataTale";
 
-interface Props {
-  initPageIndex: number;
-  initPageSize: number;
-}
-const ContractClient = ({ initPageIndex, initPageSize }: Props) => {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-
+interface Props {}
+const ContractClient = ({}: Props) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [pageIndex, setPageIndex] = useState(initPageIndex);
-  const [pageSize, setPageSize] = useState(initPageSize);
 
   const [isOpen, setIsOpen] = useState(false);
   const [isDelete, setIsDelete] = useState(false);
   const [contract, setContract] = useState<IContract | undefined>(undefined);
 
-  const { data, isFetching } = useQuery({
-    queryKey: queryKeys.contracts.list(pageIndex, pageSize),
-    queryFn: () => getAllContracts(pageIndex, pageSize),
+  const actionButton = [
+    {
+      name: "Update",
+      icon: PenIcon,
+      event: (value: IContract) => {
+        setIsOpen(true);
+        setContract(value);
+      },
+    },
+
+    {
+      name: "Delete",
+      icon: TrashIcon,
+      event: (value: IContract) => {
+        setIsDelete(true);
+        setContract(value);
+      },
+    },
+  ];
+
+  const { table } = useDataTable({
+    columns: contractColumns(actionButton),
   });
 
-  const contracts = data?.contracts ?? [];
-  const pagination = data?.pagination;
-
-  const cols = contractColumns({
-    onEdit: (row) => {
-      setIsOpen(true);
-      setContract(row);
-    },
-    onDelete: (row) => {
-      setIsDelete(true);
-      setContract(row);
-    },
-  });
   const { delete: deleteContractMutate } = useMutateContract();
 
   const handleDelete = async () => {
@@ -62,53 +57,12 @@ const ContractClient = ({ initPageIndex, initPageSize }: Props) => {
         onSettled: () => {
           setIsLoading(false);
         },
-      }
+      },
     );
   };
 
-  const handlePaginationChange = ({
-    pageIndex,
-    pageSize,
-  }: {
-    pageIndex: number;
-    pageSize: number;
-  }) => {
-    setPageIndex(pageIndex);
-    setPageSize(pageSize);
-    const params = new URLSearchParams(searchParams);
-    params.set("pageIndex", String(pageIndex));
-    params.set("pageSize", String(pageSize));
-    router.push(`${pathname}?${params.toString()}`);
-  };
-
-  if (isFetching) {
-    return <LoadingOverlay isLoading={isFetching} />;
-  }
-
   return (
     <div>
-      {isOpen && (
-        <ContractDialog
-          isOpen={isOpen}
-          setIsOpen={() => {
-            setIsOpen(false);
-            setContract(undefined);
-          }}
-          contractId={contract?.id}
-        />
-      )}
-
-      {isDelete && (
-        <ConfirmDialog
-          open={isDelete}
-          onOpenChange={setIsDelete}
-          title="Delete Category"
-          description={`This will remove`}
-          loading={isLoading}
-          onConfirm={handleDelete}
-        />
-      )}
-
       <div className="grid gap-4 grid-cols-4 mb-4">
         <DashboardCard
           title="Contract UDC"
@@ -131,19 +85,38 @@ const ContractClient = ({ initPageIndex, initPageSize }: Props) => {
         />
       </div>
 
-      <DataTable
-        columns={cols}
-        data={contracts}
-        serverMode={true}
-        pageCount={pagination?.totalPages ?? 0}
-        onPaginationChange={handlePaginationChange}
-        initialPageIndex={pageIndex}
-        initialPageSize={pageSize}
-        createLabel="Create"
-        onCreateClick={() => {
-          setIsOpen(true);
-        }}
-      />
+      <BaseDataTable table={table}>
+        <ToolBarDataTale table={table}>
+          <ToolbarActions
+            actions={[
+              {
+                name: "Create",
+                icon: PlusIcon,
+                event: () => {
+                  setIsOpen(true);
+                },
+              },
+            ]}
+          />
+        </ToolBarDataTale>
+      </BaseDataTable>
+
+      <SharedDialog
+        title={"Delete Contract"}
+        setOpen={setIsDelete}
+        open={isDelete}
+        submitEvent={handleDelete}
+        isSubmit
+        submitTitle="Yes, Delete"
+        className="bg-red-500"
+        isLoading={isLoading}
+        width="50%"
+      >
+        <p>
+          This will remove contract
+          <span className="font-bold">{contract?.id}</span>
+        </p>
+      </SharedDialog>
     </div>
   );
 };

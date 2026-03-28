@@ -9,7 +9,7 @@ import { useQuery } from "@tanstack/react-query";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
 import { getWorkingShiftById } from "@/service/admin/working-shifts.service";
 import WorkingShiftForm from "./WorkingShiftForm";
-import { queryKeys } from "@/service/util/query-keys/working-shift";
+import { workingShiftKeys } from "@/service/util/query-keys/working-shift";
 
 interface Props {
   isOpen: boolean;
@@ -20,7 +20,7 @@ const WorkingShiftDialog = ({ isOpen, setIsOpen, workingShiftId }: Props) => {
   const isEdit = !!workingShiftId;
 
   const { data, isFetching } = useQuery({
-    queryKey: queryKeys.workingShifts.detail(workingShiftId),
+    queryKey: [workingShiftKeys.get_working_shift_by_id],
     queryFn: () => getWorkingShiftById(workingShiftId),
     enabled: isEdit,
   });
@@ -41,7 +41,7 @@ const WorkingShiftDialog = ({ isOpen, setIsOpen, workingShiftId }: Props) => {
         </DialogHeader>
         <WorkingShiftForm
           initialData={workingShift}
-          onSuccess={() => setIsOpen(false)}
+          setOpen={() => setIsOpen(false)}
         />
       </DialogContent>
     </Dialog>

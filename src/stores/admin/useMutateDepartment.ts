@@ -6,7 +6,8 @@ import {
   deleteDepartment,
   updateDepartment,
 } from "@/service/admin/departments.service";
-import { departmentCache } from "@/service/util/query-cache/department";
+import { departmentKeys } from "@/service/util/query-keys/department";
+
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -22,7 +23,9 @@ export const useMutateDepartment = () => {
     onSuccess: () => {
       toast.success(`${RESOURCE} created successfully`);
 
-      departmentCache.clearAll(queryClient);
+      queryClient.invalidateQueries({
+        queryKey: [departmentKeys.list_department],
+      });
     },
     onError: () => {
       toast.error(`Failed to create ${RESOURCE.toLowerCase()}`);
@@ -42,7 +45,9 @@ export const useMutateDepartment = () => {
     onSuccess: () => {
       toast.success(`${RESOURCE} updated successfully`);
 
-      departmentCache.clearAll(queryClient);
+      queryClient.invalidateQueries({
+        queryKey: [departmentKeys.list_department],
+      });
     },
     onError: () => {
       toast.error(`Failed to update ${RESOURCE.toLowerCase()}`);
@@ -56,7 +61,9 @@ export const useMutateDepartment = () => {
     onSuccess: () => {
       toast.success(`${RESOURCE} deleted successfully`);
 
-      departmentCache.clearAll(queryClient);
+      queryClient.invalidateQueries({
+        queryKey: [departmentKeys.list_department],
+      });
     },
     onError: () => {
       toast.error(`Failed to delete ${RESOURCE.toLowerCase()}`);

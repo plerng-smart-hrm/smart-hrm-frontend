@@ -1,30 +1,15 @@
-import { getQueryClient } from "@/lib/query-client";
-import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
-import { getSearchParams } from "@/utils/searchParams";
 import WorkingShiftClient from "./components/WorkingShiftClient";
-import { getAllWorkingShifts } from "@/service/admin/working-shifts.service";
-import { queryKeys } from "@/service/util/query-keys/working-shift";
+import { workingShiftKeys } from "@/service/util/query-keys/working-shift";
+import { ContentLayout } from "@/components/admin-panel/content-layout";
+import ContentWrapper from "@/components/content/content-wrapper";
 
-interface Props {
-  searchParams: Promise<{
-    pageIndex?: string;
-    pageSize?: string;
-  }>;
-}
-
-const page = async ({ searchParams }: Props) => {
-  const queryClient = getQueryClient();
-  const { pageIndex, pageSize } = getSearchParams(await searchParams);
-
-  await queryClient.prefetchQuery({
-    queryKey: queryKeys.workingShifts.list(pageIndex, pageSize),
-    queryFn: () => getAllWorkingShifts(pageIndex, pageSize),
-  });
-
+const page = async () => {
   return (
-    <HydrationBoundary state={dehydrate(queryClient)}>
-      <WorkingShiftClient initPageIndex={pageIndex} initPageSize={pageSize} />
-    </HydrationBoundary>
+    <ContentLayout title={"Working Shifts"}>
+      <ContentWrapper queryKey={workingShiftKeys.list_working_shift}>
+        <WorkingShiftClient />
+      </ContentWrapper>
+    </ContentLayout>
   );
 };
 

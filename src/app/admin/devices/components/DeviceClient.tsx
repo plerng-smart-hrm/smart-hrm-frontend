@@ -9,13 +9,17 @@ import { LoadingOverlay } from "@/components/LoadingOverlay";
 import { getAllDevices } from "@/service/admin/device.service";
 import { deviceColumns } from "./columns";
 import { Button } from "@/components/ui/button";
-import { RefreshCcwDotIcon } from "lucide-react";
+import { PenIcon, PlusIcon, RefreshCcwDotIcon, TrashIcon } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { IDevice } from "@/types/admin";
 import { useMutateDevice } from "@/stores/admin/useMutateDevice";
 import DeviceDialog from "./DeviceDialog";
 import { DashboardCard } from "@/components/DashboardCard";
 import { CustomBarChart } from "@/components/CustomBarChart";
+import { ToolBarDataTale } from "@/components/shared/table/ToolBarDataTale";
+import { ToolbarActions } from "@/components/shared/table/ToolbarActions";
+import { useDataTable } from "@/hooks/use-data-table";
+import BaseDataTable from "@/components/shared/table/BaseDataTable";
 
 const devices = [
   { id: 1, name: "Device A", employeeCount: 122 },
@@ -35,60 +39,39 @@ const chartData = devices.map((d) => ({
   value: d.employeeCount ?? 0,
 }));
 
-interface Props {
-  initPageIndex: number;
-  initPageSize: number;
-}
-
-const DeviceClient = ({ initPageIndex, initPageSize }: Props) => {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-
+const DeviceClient = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [pageIndex, setPageIndex] = useState(initPageIndex);
-  const [pageSize, setPageSize] = useState(initPageSize);
 
   const [isForm, setIsForm] = useState(false);
   const [isDelete, setIsDelete] = useState(false);
   const [device, setDevice] = useState<IDevice | undefined>(undefined);
 
-  const { data, isFetching } = useQuery({
-    queryKey: queryKeys.devices.list(pageIndex, pageSize),
-    queryFn: () => getAllDevices(pageIndex, pageSize),
-  });
-
-  const devices = data?.devices ?? [];
-  const pagination = data?.pagination;
-
-  const cols = deviceColumns({
-    onEdit: (row) => {
-      setIsForm(true);
-      setDevice(row);
+  const actionButton = [
+    {
+      name: "Update",
+      icon: PenIcon,
+      event: (value: IDevice) => {
+        setIsForm(true);
+        setDevice(value);
+      },
     },
-    onDelete: (row) => {
-      setIsDelete(true);
-      setDevice(row);
+
+    {
+      name: "Delete",
+      icon: TrashIcon,
+      event: (value: IDevice) => {
+        setIsDelete(true);
+        setDevice(value);
+      },
     },
+  ];
+
+  const { table } = useDataTable<IDevice, unknown>({
+    columns: deviceColumns(actionButton),
   });
 
   const { delete: deleteDeviceMutate, sync: syncDeviceMutate } =
     useMutateDevice();
-
-  const handlePaginationChange = ({
-    pageIndex,
-    pageSize,
-  }: {
-    pageIndex: number;
-    pageSize: number;
-  }) => {
-    setPageIndex(pageIndex);
-    setPageSize(pageSize);
-    const params = new URLSearchParams(searchParams);
-    params.set("pageIndex", String(pageIndex));
-    params.set("pageSize", String(pageSize));
-    router.push(`${pathname}?${params.toString()}`);
-  };
 
   const handleSyncDevice = async () => {
     await syncDeviceMutate();
@@ -106,16 +89,44 @@ const DeviceClient = ({ initPageIndex, initPageSize }: Props) => {
         onSettled: () => {
           setIsLoading(false);
         },
-      }
+      },
     );
   };
 
-  if (isFetching) {
-    return <LoadingOverlay isLoading={isFetching} />;
-  }
-
   return (
     <div>
+      <div className="grid gap-4 grid-cols-1 md:grid-cols-4 mb-4">
+        <div className="flex flex-col gap-2 md:col-span-1">
+          <DashboardCard
+            title="Offline"
+            value={60}
+            icon="/icons/wifi-slash.png"
+          />
+
+          <DashboardCard title="Online" value={60} icon="/icons/wifi.png" />
+        </div>
+
+        <div className="md:col-span-3">
+          <CustomBarChart title="Employees per device" data={chartData} />
+        </div>
+      </div>
+
+      <BaseDataTable table={table}>
+        <ToolBarDataTale table={table}>
+          <ToolbarActions
+            actions={[
+              {
+                name: "Create",
+                icon: PlusIcon,
+                event: () => {
+                  // setIsEmployeeForm(true);
+                },
+              },
+            ]}
+          />
+        </ToolBarDataTale>
+      </BaseDataTable>
+
       {isForm && (
         <DeviceDialog
           isOpen={isForm}
@@ -136,45 +147,6 @@ const DeviceClient = ({ initPageIndex, initPageSize }: Props) => {
           onConfirm={handleDelete}
         />
       )}
-
-      <div className="grid gap-4 grid-cols-1 md:grid-cols-4 mb-4">
-        <div className="flex flex-col gap-2 md:col-span-1">
-          <DashboardCard
-            title="Offline"
-            value={60}
-            icon="/icons/wifi-slash.png"
-          />
-
-          <DashboardCard title="Online" value={60} icon="/icons/wifi.png" />
-        </div>
-
-        <div className="md:col-span-3">
-          <CustomBarChart title="Employees per device" data={chartData} />
-        </div>
-      </div>
-
-      <DataTable
-        columns={cols}
-        data={devices}
-        serverMode={true}
-        pageCount={pagination?.totalPages ?? 0}
-        onPaginationChange={handlePaginationChange}
-        initialPageIndex={pageIndex}
-        initialPageSize={pageSize}
-        createLabel="Create"
-        onCreateClick={() => {
-          setIsForm(true);
-        }}
-        extractAction={
-          <Button
-            className="bg-cyan-500 hover:bg-cyan-400 cursor-pointer"
-            onClick={handleSyncDevice}
-          >
-            <RefreshCcwDotIcon className="h-3 w-3" />
-            Sync Devices
-          </Button>
-        }
-      />
     </div>
   );
 };

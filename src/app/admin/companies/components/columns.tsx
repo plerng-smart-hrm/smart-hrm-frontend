@@ -1,24 +1,15 @@
 "use client";
 import { ColumnDef } from "@tanstack/react-table";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
-import { IconDotsVertical } from "@tabler/icons-react";
 import { ICompany } from "@/types/admin";
-import { createRowNumberColumn } from "@/components/data-table";
+import { Actions, IActions } from "@/components/shared/Actions";
 
-export const companyColumns = (opts?: {
-  onEdit?: (row: ICompany) => void;
-  onDelete?: (row: ICompany) => void;
-}): ColumnDef<ICompany>[] => {
-  const { onDelete, onEdit } = opts ?? {};
-
-  const cols: ColumnDef<ICompany>[] = [
-    createRowNumberColumn<ICompany>(),
+export const companyColumns = (actions: IActions[]): ColumnDef<ICompany>[] => {
+  return [
+    {
+      header: "ID",
+      size: 50,
+      cell: ({ row }) => <div>{row.original.id}</div>,
+    },
     {
       header: "Company",
       cell: ({ row }) => (
@@ -42,35 +33,11 @@ export const companyColumns = (opts?: {
     },
     {
       id: "actions",
-      header: "",
+      header: "Actions",
+      size: 50,
       cell: ({ row }) => (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
-              size="icon"
-            >
-              <IconDotsVertical />
-              <span className="sr-only">Open menu</span>
-            </Button>
-          </DropdownMenuTrigger>
-
-          <DropdownMenuContent align="end" className="w-32">
-            <DropdownMenuItem onClick={() => onEdit?.(row.original)}>
-              Edit
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              variant="destructive"
-              onClick={() => onDelete?.(row.original)}
-            >
-              Delete
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <Actions row={row?.original ?? undefined} actions={actions} />
       ),
     },
   ];
-
-  return cols;
 };

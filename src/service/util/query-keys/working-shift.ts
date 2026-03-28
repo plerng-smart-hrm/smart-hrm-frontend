@@ -1,12 +1,4 @@
-export const queryKeys = {
-  workingShifts: {
-    root: ["workingShifts"] as const,
-
-    list: (pageIndex?: number, pageSize?: number) =>
-      ["workingShifts", "list", { pageIndex, pageSize }] as const,
-
-    detail: (id?: number) => ["workingShifts", "detail", id] as const,
-
-    dropdown: () => ["workingShifts", "detail"] as const,
-  },
+export const workingShiftKeys = {
+  list_working_shift: "list_working_shift",
+  get_working_shift_by_id: "get_working_shift_by_id_{key}"
 };

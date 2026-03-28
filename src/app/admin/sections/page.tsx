@@ -3,7 +3,10 @@ import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { getSearchParams } from "@/utils/searchParams";
 import SectionClient from "./components/SectionClient";
 import { getAllSections } from "@/service/admin/sections.service";
-import { queryKeys } from "@/service/util/query-keys/section";
+import { ContentLayout } from "@/components/admin-panel/content-layout";
+import ContentWrapper from "@/components/content/content-wrapper";
+import { employeeKeys } from "@/service/util/query-keys/employee";
+import { sectionKeys } from "@/service/util/query-keys/section";
 
 interface Props {
   searchParams: Promise<{
@@ -12,19 +15,13 @@ interface Props {
   }>;
 }
 
-const page = async ({ searchParams }: Props) => {
-  const queryClient = getQueryClient();
-  const { pageIndex, pageSize } = getSearchParams(await searchParams);
-
-  await queryClient.prefetchQuery({
-    queryKey: queryKeys.sections.list(pageIndex, pageSize),
-    queryFn: () => getAllSections(pageIndex, pageSize),
-  });
-
+const page = async ({}: Props) => {
   return (
-    <HydrationBoundary state={dehydrate(queryClient)}>
-      <SectionClient initPageIndex={pageIndex} initPageSize={pageSize} />
-    </HydrationBoundary>
+    <ContentLayout title={"Sections"}>
+      <ContentWrapper queryKey={sectionKeys.list_section}>
+        <SectionClient />
+      </ContentWrapper>
+    </ContentLayout>
   );
 };
 

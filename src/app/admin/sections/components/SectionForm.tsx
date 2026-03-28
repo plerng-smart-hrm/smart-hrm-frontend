@@ -42,13 +42,12 @@ export default function SectionForm({ initialData, onSuccess }: Props) {
     defaultValues,
   });
 
-  const { create: createSectionMutate, update: updateSectionMutate } =
-    useMutateSection();
+  const { createSection, updateSection } = useMutateSection();
 
   async function onSubmit(values: SectionValues) {
     setIsLoading(true);
     if (isEdit && initialData?.id) {
-      await updateSectionMutate(
+      await updateSection(
         { sectionId: initialData.id, request: values },
         {
           onSuccess: () => {
@@ -57,10 +56,10 @@ export default function SectionForm({ initialData, onSuccess }: Props) {
           onSettled: () => {
             setIsLoading(false);
           },
-        }
+        },
       );
     } else {
-      await createSectionMutate(
+      await createSection(
         { request: values },
         {
           onSuccess: () => {
@@ -69,7 +68,7 @@ export default function SectionForm({ initialData, onSuccess }: Props) {
           onSettled: () => {
             setIsLoading(false);
           },
-        }
+        },
       );
     }
   }
@@ -82,7 +81,9 @@ export default function SectionForm({ initialData, onSuccess }: Props) {
           name="departmentId"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Department <span className="text-red-500">*</span></FormLabel>
+              <FormLabel>
+                Department <span className="text-red-500">*</span>
+              </FormLabel>
               <DepartmentCombobox
                 value={selectedDepartmentId}
                 onChange={(id) => {

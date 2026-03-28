@@ -1,9 +1,7 @@
-import { getQueryClient } from "@/lib/query-client";
-import { queryKeys } from "@/service/util/query-key";
-import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
-import { getAllDevices } from "@/service/admin/device.service";
 import DeviceClient from "./components/DeviceClient";
-import { getSearchParams } from "@/utils/searchParams";
+import { ContentLayout } from "@/components/admin-panel/content-layout";
+import ContentWrapper from "@/components/content/content-wrapper";
+import { deviceKeys } from "@/service/util/query-keys/device";
 
 interface Props {
   searchParams: Promise<{
@@ -12,19 +10,13 @@ interface Props {
   }>;
 }
 
-const page = async ({ searchParams }: Props) => {
-  const queryClient = getQueryClient();
-  const { pageIndex, pageSize } = getSearchParams(await searchParams);
-
-  await queryClient.prefetchQuery({
-    queryKey: queryKeys.devices.list(pageIndex, pageSize),
-    queryFn: () => getAllDevices(pageIndex, pageSize),
-  });
-
+const page = async ({}: Props) => {
   return (
-    <HydrationBoundary state={dehydrate(queryClient)}>
-      <DeviceClient initPageIndex={pageIndex} initPageSize={pageSize} />
-    </HydrationBoundary>
+    <ContentLayout title={"Devices"}>
+      <ContentWrapper queryKey={deviceKeys.list_device}>
+        <DeviceClient />
+      </ContentWrapper>
+    </ContentLayout>
   );
 };
 

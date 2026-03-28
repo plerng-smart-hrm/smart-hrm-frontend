@@ -20,8 +20,8 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { getDepartmentsList } from "@/service/admin/departments.service";
-import { queryKeys } from "@/service/util/query-keys/department";
 import { IDepartmentOption } from "@/types/admin/department";
+import { departmentKeys } from "@/service/util/query-keys/department";
 
 interface Props {
   value?: number;
@@ -40,19 +40,19 @@ export function DepartmentCombobox({
   const [searchQuery, setSearchQuery] = React.useState("");
 
   const { data, isLoading } = useQuery({
-    queryKey: queryKeys.departments.dropdown(),
+    queryKey: [departmentKeys.list_department],
     queryFn: () => getDepartmentsList(),
   });
 
   const departments: IDepartmentOption[] = React.useMemo(
     () => data?.data ?? [],
-    [data?.data]
+    [data?.data],
   );
 
   // Find the selected department
   const selectedDepartment = React.useMemo(
     () => departments.find((department) => department.value === value),
-    [departments, value]
+    [departments, value],
   );
 
   // Filter departments based on search query
@@ -61,14 +61,14 @@ export function DepartmentCombobox({
 
     const query = searchQuery.toLowerCase();
     return departments.filter((department) =>
-      department.label?.toLowerCase().includes(query)
+      department.label?.toLowerCase().includes(query),
     );
   }, [departments, searchQuery]);
 
   // Handle selection
   const handleSelect = (departmentValue: string) => {
     const department = departments.find(
-      (d) => d.value.toString() === departmentValue
+      (d) => d.value.toString() === departmentValue,
     );
     if (department) {
       const newValue =
@@ -127,7 +127,7 @@ export function DepartmentCombobox({
                   <Check
                     className={cn(
                       "mr-2 h-4 w-4",
-                      value === department.value ? "opacity-100" : "opacity-0"
+                      value === department.value ? "opacity-100" : "opacity-0",
                     )}
                   />
                   <span className="font-medium truncate">
