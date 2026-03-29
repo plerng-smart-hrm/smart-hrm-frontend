@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "cp .env.template .env && next dev --turbopack",
+    "dev": "cp .env.template .env && next dev",
     "build:dev": "cp .env.template .env && next build",
     "build": "next build",
     "start": "next start",

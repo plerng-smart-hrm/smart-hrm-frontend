@@ -60,7 +60,7 @@ const SharedDialog = ({
   title,
   desc = undefined,
   actions = undefined,
-  submitTitle = "Submit",
+  submitTitle = "Save",
   cancelTitle,
   width = "70%",
   height,

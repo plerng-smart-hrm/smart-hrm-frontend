@@ -40,8 +40,8 @@ export function DataTableViewOptions<TData>({
                     .getAllColumns()
                     .filter(
                         column =>
-                            typeof column.accessorFn !== "undefined" &&
-                            column.getCanHide(),
+                            typeof column.id !== "undefined" &&
+                            column.getCanHide() && column.id !== "actions"
                     )
                     .map(column => {
                         return (

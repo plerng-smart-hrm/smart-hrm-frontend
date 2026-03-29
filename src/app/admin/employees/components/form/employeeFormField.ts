@@ -1,4 +1,6 @@
-export const employeeFields = [
+import { FieldDefinition } from "@/components/shared/form/RenderField";
+
+export const employeeFields: FieldDefinition[] = [
   {
     label: "Emp Code",
     key: "empCode",
@@ -80,7 +82,6 @@ export const employeeFields = [
     key: "phone",
     type: "phone",
     required: false,
-    defaultCountry: "KH",
   },
   {
     label: "Current Address",

@@ -122,26 +122,6 @@ export interface IContractType {
   deletedAt?: string;
 }
 
-export interface IContract {
-  id?: number;
-  employeeId?: number;
-  employee?: IEmployee;
-  contractTypeId?: number;
-  contractType?: IContractType;
-
-  startDate?: string;
-  endDate?: string;
-  baseSalary?: number;
-  contractDetail?: string;
-  isExpired?: boolean;
-
-  createdBy?: number;
-  updatedBy?: number;
-  createdAt?: string;
-  updatedAt?: string;
-  deletedAt?: string;
-}
-
 export interface ILeaveType {
   id?: number;
   name?: string;

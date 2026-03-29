@@ -190,8 +190,29 @@ export function useDataTable<TData, TValue>({
 
   // Table states
   const [rowSelection, setRowSelection] = React.useState({});
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
+  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
+
+  React.useEffect(() => {
+    try {
+      const saved = localStorage.getItem(`table-cols-${pathname}`);
+      if (saved) {
+        setColumnVisibility(JSON.parse(saved));
+      }
+    } catch {}
+  }, [pathname]);
+
+  const handleColumnVisibilityChange = React.useCallback(
+    (updater: React.SetStateAction<VisibilityState>) => {
+      setColumnVisibility((old) => {
+        const newValue = typeof updater === "function" ? updater(old) : updater;
+        try {
+          localStorage.setItem(`table-cols-${pathname}`, JSON.stringify(newValue));
+        } catch {}
+        return newValue;
+      });
+    },
+    [pathname]
+  );
   const [columnFilters, setColumnFilters] =
     React.useState<ColumnFiltersState>(initialColumnFilters);
 
@@ -340,7 +361,7 @@ export function useDataTable<TData, TValue>({
     onPaginationChange: setPagination,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
-    onColumnVisibilityChange: setColumnVisibility,
+    onColumnVisibilityChange: handleColumnVisibilityChange,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),

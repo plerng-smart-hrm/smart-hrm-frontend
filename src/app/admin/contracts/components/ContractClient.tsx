@@ -1,25 +1,36 @@
 "use client";
 import { useState } from "react";
 import { useMutateContract } from "@/stores/admin/useMutateContract";
-import { IContract } from "@/types/admin";
 import { contractColumns } from "./columns";
 import { DashboardCard } from "@/components/DashboardCard";
 import { useDataTable } from "@/hooks/use-data-table";
-import { PenIcon, PlusIcon, TrashIcon } from "lucide-react";
+import { EyeIcon, PenIcon, PlusIcon, TrashIcon } from "lucide-react";
 import SharedDialog from "@/components/shared/SharedDialog";
 import BaseDataTable from "@/components/shared/table/BaseDataTable";
 import { ToolbarActions } from "@/components/shared/table/ToolbarActions";
 import { ToolBarDataTale } from "@/components/shared/table/ToolBarDataTale";
+import ContractForm from "./form/ContractForm";
+import ContractView from "./view/ContractView";
+import { IContract } from "@/types/admin/contract";
 
 interface Props {}
 const ContractClient = ({}: Props) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const [isOpen, setIsOpen] = useState(false);
+  const [isView, setIsView] = useState(false);
   const [isDelete, setIsDelete] = useState(false);
   const [contract, setContract] = useState<IContract | undefined>(undefined);
 
   const actionButton = [
+    {
+      name: "View",
+      icon: EyeIcon,
+      event: (value: IContract) => {
+        setIsView(true);
+        setContract(value);
+      },
+    },
     {
       name: "Update",
       icon: PenIcon,
@@ -43,11 +54,11 @@ const ContractClient = ({}: Props) => {
     columns: contractColumns(actionButton),
   });
 
-  const { delete: deleteContractMutate } = useMutateContract();
+  const { deleteContract } = useMutateContract();
 
   const handleDelete = async () => {
     setIsLoading(true);
-    await deleteContractMutate(
+    await deleteContract(
       { contractId: contract?.id },
       {
         onSuccess: () => {
@@ -64,25 +75,13 @@ const ContractClient = ({}: Props) => {
   return (
     <div>
       <div className="grid gap-4 grid-cols-4 mb-4">
-        <DashboardCard
-          title="Contract UDC"
-          value={60}
-          icon="/icons/contract.png"
-        />
+        <DashboardCard title="Contract UDC" value={60} icon="/icons/contract.png" />
 
-        <DashboardCard
-          title="Contract FDC"
-          value={60}
-          icon="/icons/contract.png"
-        />
+        <DashboardCard title="Contract FDC" value={60} icon="/icons/contract.png" />
 
         <DashboardCard title="Near Expired" value={60} icon="/icons/time.png" />
 
-        <DashboardCard
-          title="Pending Severance"
-          value={60}
-          icon="/icons/pay.png"
-        />
+        <DashboardCard title="Pending Severance" value={60} icon="/icons/pay.png" />
       </div>
 
       <BaseDataTable table={table}>
@@ -100,6 +99,26 @@ const ContractClient = ({}: Props) => {
           />
         </ToolBarDataTale>
       </BaseDataTable>
+
+      <SharedDialog
+        setOpen={() => setIsOpen(false)}
+        open={isOpen}
+        title={contract ? "Update Contract" : "Create Contract"}
+        isCancel={false}
+      >
+        <ContractForm onSuccess={() => setIsOpen(false)} initialData={contract} />
+      </SharedDialog>
+
+      <SharedDialog
+        setOpen={() => setIsView(false)}
+        open={isView}
+        title="Contract Details"
+        isCancel={false}
+        width="85%"
+        height="95%"
+      >
+        <ContractView contract={contract} />
+      </SharedDialog>
 
       <SharedDialog
         title={"Delete Contract"}

@@ -1,6 +1,7 @@
+import { FieldDefinition } from "@/components/shared/form/RenderField";
 import { IDevice } from "@/types/admin";
 
-export const deviceFields = [
+export const deviceFields: FieldDefinition[] = [
   {
     label: "Name",
     key: "name",

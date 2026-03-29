@@ -1,5 +1,6 @@
 "use client";
 
+import { ContractValues } from "@/schemas/admin/contract";
 import {
   createContract,
   deleteContract,
@@ -7,7 +8,7 @@ import {
   IUpdateContractRequest,
   updateContract,
 } from "@/service/admin/contracts.service";
-import { contractCache } from "@/service/util/query-cache";
+import { contractKeys } from "@/service/util/query-keys/contract";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -17,13 +18,13 @@ export const useMutateContract = () => {
   const queryClient = useQueryClient();
 
   const createMutation = useMutation({
-    mutationFn: async ({ request }: { request: ICreateContractRequest }) => {
+    mutationFn: async ({ request }: { request: ContractValues }) => {
       return await createContract(request);
     },
     onSuccess: () => {
       toast.success(`${RESOURCE} created successfully`);
 
-      contractCache.clearAll(queryClient);
+      queryClient.invalidateQueries({ queryKey: [contractKeys.list_contract] });
     },
     onError: () => {
       toast.error(`Failed to create ${RESOURCE.toLowerCase()}`);
@@ -31,19 +32,13 @@ export const useMutateContract = () => {
   });
 
   const updateMutation = useMutation({
-    mutationFn: async ({
-      contractId,
-      request,
-    }: {
-      contractId?: number;
-      request?: IUpdateContractRequest;
-    }) => {
+    mutationFn: async ({ contractId, request }: { contractId?: number; request?: ContractValues }) => {
       return await updateContract(contractId, request);
     },
     onSuccess: () => {
       toast.success(`${RESOURCE} updated successfully`);
 
-      contractCache.clearAll(queryClient);
+      queryClient.invalidateQueries({ queryKey: [contractKeys.list_contract] });
     },
     onError: () => {
       toast.error(`Failed to update ${RESOURCE.toLowerCase()}`);
@@ -57,7 +52,7 @@ export const useMutateContract = () => {
     onSuccess: () => {
       toast.success(`${RESOURCE} deleted successfully`);
 
-      contractCache.clearAll(queryClient);
+      queryClient.invalidateQueries({ queryKey: [contractKeys.list_contract] });
     },
     onError: () => {
       toast.error(`Failed to delete ${RESOURCE.toLowerCase()}`);
@@ -65,8 +60,8 @@ export const useMutateContract = () => {
   });
 
   return {
-    create: createMutation.mutateAsync,
-    update: updateMutation.mutateAsync,
-    delete: deleteMutation.mutateAsync,
+    createContract: createMutation.mutateAsync,
+    updateContract: updateMutation.mutateAsync,
+    deleteContract: deleteMutation.mutateAsync,
   };
 };
