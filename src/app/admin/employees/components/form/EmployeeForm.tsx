@@ -13,47 +13,50 @@ import { Separator } from "@/components/ui/separator";
 import { WorkingShiftCombobox } from "@/components/comboboxes/WorkingShiftCombobox";
 import { useMutateEmployee } from "@/stores/admin/useMutateEmployee";
 import { showValidationWarning } from "@/utils/form-validation";
+import { IEmployee } from "@/types/admin/employee";
 
 interface IProps {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  employee?: IEmployee;
 }
 
-export default function EmployeeForm({ setOpen }: IProps) {
+export default function EmployeeForm({ setOpen, employee }: IProps) {
+  const isEditMode = !!employee?.id;
   const [isLoading, setIsLoading] = React.useState(false);
   const [photoPreview, setPhotoPreview] = React.useState<string | null>(null);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
-  const { createEmployee } = useMutateEmployee();
+  const { createEmployee, updateEmployee } = useMutateEmployee();
 
   const form = useForm<EmployeeValues>({
     resolver: zodResolver(employeeSchema),
     defaultValues: {
-      empCode: "",
-      firstName: "",
-      lastName: "",
-      firstNameKh: "",
-      lastNameKh: "",
-      gender: "",
-      dateOfBirth: "",
-      placeOfBirth: "",
-      nationality: "",
-      race: "",
-      maritalStatus: "",
-      childrenNumber: 0,
-      phone: "",
-      currentAddress: "",
-      education: "",
-      employeeType: "",
-      workStatus: "",
-      employeeStatus: "",
-      start: "",
-      position: "",
-      startDate: "",
-      endDate: "",
-      laborBookNo: "",
-      idCardNo: "",
-      nssfRegisterNo: "",
-      workingShiftId: 0,
+      empCode: employee?.empCode || "",
+      firstName: employee?.firstName || "",
+      lastName: employee?.lastName || "",
+      firstNameKh: employee?.firstNameKh || "",
+      lastNameKh: employee?.lastNameKh || "",
+      gender: employee?.gender || "",
+      dateOfBirth: employee?.dateOfBirth || "",
+      placeOfBirth: employee?.placeOfBirth || "",
+      nationality: employee?.nationality || "",
+      race: employee?.race || "",
+      maritalStatus: employee?.maritalStatus || "",
+      childrenNumber: employee?.childrenNumber || 0,
+      phone: employee?.phone || "",
+      currentAddress: employee?.currentAddress || "",
+      education: employee?.education || "",
+      employeeType: employee?.employeeType || "",
+      workStatus: employee?.workStatus || "",
+      employeeStatus: employee?.employeeStatus || "",
+      start: employee?.start || "",
+      position: employee?.position || "",
+      startDate: employee?.startDate || "",
+      endDate: employee?.endDate || "",
+      laborBookNo: employee?.laborBookNo || "",
+      idCardNo: employee?.idCardNo || "",
+      nssfRegisterNo: employee?.nssfRegisterNo || "",
+      workingShiftId: employee?.workingShiftId || 0,
     },
     mode: "onChange",
   });
@@ -86,18 +89,24 @@ export default function EmployeeForm({ setOpen }: IProps) {
     const data = form.getValues();
     setIsLoading(true);
 
-    createEmployee(
-      { request: data },
-      {
-        onSuccess: () => {
-          setOpen(false);
-        },
-        onError: () => {},
-        onSettled: () => {
-          setIsLoading(false);
-        },
+    const mutationOptions = {
+      onSuccess: () => {
+        setOpen(false);
       },
-    );
+      onError: () => {},
+      onSettled: () => {
+        setIsLoading(false);
+      },
+    };
+
+    if (isEditMode) {
+      updateEmployee(
+        { employeeId: employee?.id, request: data },
+        mutationOptions,
+      );
+    } else {
+      createEmployee({ request: data }, mutationOptions);
+    }
   };
 
   return (
@@ -201,7 +210,7 @@ export default function EmployeeForm({ setOpen }: IProps) {
           <ActionButton
             setOpen={setOpen}
             handleSubmit={onSubmit}
-            submitTitle={"Submit"}
+            submitTitle={isEditMode ? "Update" : "Submit"}
             isLoading={isLoading}
             disable={isLoading}
           />

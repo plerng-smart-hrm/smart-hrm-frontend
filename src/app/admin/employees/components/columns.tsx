@@ -6,11 +6,20 @@ import { Actions, IActions } from "@/components/shared/Actions";
 export const employeeColumns = (
   actions: IActions[],
 ): ColumnDef<IEmployee>[] => {
+  const viewAction = actions.find((action) => action.name === "View")?.event;
+
   return [
     {
       header: "ID",
       size: 50,
-      cell: ({ row }) => <div>{row.original.id}</div>,
+      cell: ({ row }) => (
+        <div 
+          className="cursor-pointer text-primary hover:underline hover:text-primary/80 font-medium" 
+          onClick={() => viewAction?.(row.original)}
+        >
+          {row.original.id}
+        </div>
+      ),
     },
     {
       header: "Code",

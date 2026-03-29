@@ -4,32 +4,40 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { IEmployee } from "@/types/admin/employee";
 import { useDataTable } from "@/hooks/use-data-table";
-import { employeeColumns } from "./employeeColumns";
+import { employeeColumns } from "./columns";
 import BaseDataTable from "@/components/shared/table/BaseDataTable";
 import { ToolBarDataTale } from "@/components/shared/table/ToolBarDataTale";
-import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { useMutateEmployee } from "@/stores/admin/useMutateEmployee";
 import SharedDialog from "@/components/shared/SharedDialog";
 import EmployeeForm from "./form/EmployeeForm";
-import { Button } from "@/components/ui/button";
-import { PenIcon, Plus, PlusIcon, TrashIcon } from "lucide-react";
+import { EyeIcon, PenIcon, PlusIcon, TrashIcon } from "lucide-react";
 import { ToolbarActions } from "@/components/shared/table/ToolbarActions";
+import EmployeeView from "./view/EmployeeView";
 
 const EmployeeClient = () => {
-  const router = useRouter();
-
   const [isLoading, setIsLoading] = useState(false);
   const [isEmployeeForm, setIsEmployeeForm] = useState(false);
+  const [isEmployeeView, setIsEmployeeView] = useState(false);
   const [isDelete, setIsDelete] = useState(false);
   const [employee, setEmployee] = useState<IEmployee | undefined>(undefined);
 
   const actionButton = [
     {
+      name: "View",
+      icon: EyeIcon,
+      event: (value: IEmployee) => {
+        setEmployee(value);
+        setIsEmployeeView(true);
+      },
+    },
+    {
       name: "Update",
       icon: PenIcon,
-      event: (value: any) => {},
+      event: (value: IEmployee) => {
+        setEmployee(value);
+        setIsEmployeeForm(true);
+      },
     },
-
     {
       name: "Delete",
       icon: TrashIcon,
@@ -72,6 +80,7 @@ const EmployeeClient = () => {
                 name: "Create",
                 icon: PlusIcon,
                 event: () => {
+                  setEmployee(undefined);
                   setIsEmployeeForm(true);
                 },
               },
@@ -100,12 +109,31 @@ const EmployeeClient = () => {
       </SharedDialog>
 
       <SharedDialog
-        setOpen={() => setIsEmployeeForm(false)}
+        setOpen={() => {
+          setIsEmployeeForm(false);
+          setEmployee(undefined);
+        }}
         open={isEmployeeForm}
-        title="Create Employee"
+        title={employee ? "Update Employee" : "Create Employee"}
         isCancel={false}
+        width="90%"
+        height="95%"
       >
-        <EmployeeForm setOpen={setIsEmployeeForm} />
+        <EmployeeForm setOpen={setIsEmployeeForm} employee={employee} />
+      </SharedDialog>
+
+      <SharedDialog
+        setOpen={() => {
+          setIsEmployeeView(false);
+          setEmployee(undefined);
+        }}
+        open={isEmployeeView}
+        title="Employee Details"
+        isCancel={false}
+        width="85%"
+        height="95%"
+      >
+        <EmployeeView employee={employee ?? null} />
       </SharedDialog>
     </div>
   );

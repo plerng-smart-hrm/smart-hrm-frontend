@@ -166,6 +166,11 @@ const SharedDialog = ({
   return (
     <AlertDialog open={open}>
       <AlertDialogContent
+        onEscapeKeyDown={() => {
+          if (!isClose && !isLoading) {
+            handleClose();
+          }
+        }}
         className={cn("gap-2 overflow-y-auto", contentClassName)}
         style={{
           width: width,
