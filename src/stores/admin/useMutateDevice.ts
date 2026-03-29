@@ -1,5 +1,6 @@
 "use client";
 
+import { DeviceValues } from "@/schemas/admin/device";
 import {
   createDevice,
   deleteDevice,
@@ -18,7 +19,7 @@ export const useMutateDevice = () => {
   const queryClient = useQueryClient();
 
   const createMutation = useMutation({
-    mutationFn: async ({ request }: { request: ICreateDeviceRequest }) => {
+    mutationFn: async ({ request }: { request: DeviceValues }) => {
       return await createDevice(request);
     },
     onSuccess: () => {
@@ -52,7 +53,7 @@ export const useMutateDevice = () => {
       request,
     }: {
       deviceId?: number;
-      request?: IUpdateDeviceRequest;
+      request?: DeviceValues;
     }) => {
       return await updateDevice(deviceId, request);
     },
@@ -85,9 +86,9 @@ export const useMutateDevice = () => {
   });
 
   return {
-    create: createMutation.mutateAsync,
-    update: updateMutation.mutateAsync,
-    delete: deleteMutation.mutateAsync,
-    sync: syncAllDevicesMutation.mutateAsync,
+    createDevice: createMutation.mutateAsync,
+    updateDevice: updateMutation.mutateAsync,
+    deleteDevice: deleteMutation.mutateAsync,
+    syncDevice: syncAllDevicesMutation.mutateAsync,
   };
 };

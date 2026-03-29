@@ -28,7 +28,7 @@ export const getAllWorkingShifts = async (
 ): Promise<IWorkingShiftsRes> => {
   const page = pageIndex + 1;
   const data = await api.get<IApiResponse<IWorkingShift[]>>(
-    `/v1/working-shift?page=${page}&limit=${pageSize}`
+    `/v1/working-shifts?page=${page}&limit=${pageSize}`
   );
   return {
     workingShifts: data.data,
@@ -38,7 +38,7 @@ export const getAllWorkingShifts = async (
 
 export const getWorkingShiftsList = async () => {
   const data = await api.get<IApiResponse<IWorkingShiftOption[]>>(
-    `/v1/working-shift/list`
+    `/v1/working-shifts/list`
   )
 
   return {
@@ -50,7 +50,7 @@ export const getWorkingShiftById = async (
   workingShiftId?: number
 ): Promise<IWorkingShiftRes> => {
   const data = await api.get<IApiResponse<IWorkingShift>>(
-    `/v1/working-shift/${workingShiftId}`
+    `/v1/working-shifts/${workingShiftId}`
   );
   return {
     workingShift: data.data,
@@ -60,7 +60,7 @@ export const getWorkingShiftById = async (
 export const createWorkingShift = async (
   request: WorkingShiftValues
 ): Promise<void> => {
-  await api.post<IApiResponse<void>>(`/v1/working-shift`, request);
+  await api.post<IApiResponse<void>>(`/v1/working-shifts`, request);
 };
 
 export const updateWorkingShift = async (
@@ -68,7 +68,7 @@ export const updateWorkingShift = async (
   request?: WorkingShiftValues
 ): Promise<void> => {
   await api.patch<IApiResponse<void>>(
-    `/v1/working-shift/${workingShiftId}`,
+    `/v1/working-shifts/${workingShiftId}`,
     request
   );
 };
@@ -76,5 +76,5 @@ export const updateWorkingShift = async (
 export const deleteWorkingShift = async (
   workingShiftId?: number
 ): Promise<void> => {
-  await api.delete<IApiResponse<void>>(`/v1/working-shift/${workingShiftId}`);
+  await api.delete<IApiResponse<void>>(`/v1/working-shifts/${workingShiftId}`);
 };

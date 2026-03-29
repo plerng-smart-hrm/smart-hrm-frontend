@@ -1,25 +1,19 @@
 "use client";
 
-import { DataTable } from "@/components/data-table";
-import { queryKeys } from "@/service/util/query-key";
-import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
-import { LoadingOverlay } from "@/components/LoadingOverlay";
-import { getAllDevices } from "@/service/admin/device.service";
 import { deviceColumns } from "./columns";
-import { Button } from "@/components/ui/button";
-import { PenIcon, PlusIcon, RefreshCcwDotIcon, TrashIcon } from "lucide-react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { PenIcon, PlusIcon, TrashIcon } from "lucide-react";
 import { IDevice } from "@/types/admin";
 import { useMutateDevice } from "@/stores/admin/useMutateDevice";
-import DeviceDialog from "./DeviceDialog";
 import { DashboardCard } from "@/components/DashboardCard";
 import { CustomBarChart } from "@/components/CustomBarChart";
 import { ToolBarDataTale } from "@/components/shared/table/ToolBarDataTale";
 import { ToolbarActions } from "@/components/shared/table/ToolbarActions";
 import { useDataTable } from "@/hooks/use-data-table";
 import BaseDataTable from "@/components/shared/table/BaseDataTable";
+import DeviceForm from "./form/DeviceForm";
+import SharedDialog from "@/components/shared/SharedDialog";
 
 const devices = [
   { id: 1, name: "Device A", employeeCount: 122 },
@@ -70,16 +64,15 @@ const DeviceClient = () => {
     columns: deviceColumns(actionButton),
   });
 
-  const { delete: deleteDeviceMutate, sync: syncDeviceMutate } =
-    useMutateDevice();
+  const { deleteDevice, syncDevice } = useMutateDevice();
 
   const handleSyncDevice = async () => {
-    await syncDeviceMutate();
+    await syncDevice();
   };
 
   const handleDelete = async () => {
     setIsLoading(true);
-    await deleteDeviceMutate(
+    await deleteDevice(
       { deviceId: device?.id },
       {
         onSuccess: () => {
@@ -119,7 +112,8 @@ const DeviceClient = () => {
                 name: "Create",
                 icon: PlusIcon,
                 event: () => {
-                  // setIsEmployeeForm(true);
+                  setDevice(undefined);
+                  setIsForm(true);
                 },
               },
             ]}
@@ -127,16 +121,15 @@ const DeviceClient = () => {
         </ToolBarDataTale>
       </BaseDataTable>
 
-      {isForm && (
-        <DeviceDialog
-          isOpen={isForm}
-          setIsOpen={() => {
-            setIsForm(false);
-            setDevice(undefined);
-          }}
-          deviceId={device?.id}
-        />
-      )}
+      <SharedDialog
+        setOpen={() => setIsForm(false)}
+        open={isForm}
+        title={device ? "Update Device" : "Create Device"}
+        isCancel={false}
+      >
+        <DeviceForm onSuccess={() => setIsForm(false)} initialData={device} />
+      </SharedDialog>
+
       {isDelete && (
         <ConfirmDialog
           open={isDelete}
@@ -147,6 +140,23 @@ const DeviceClient = () => {
           onConfirm={handleDelete}
         />
       )}
+
+      <SharedDialog
+        title={"Delete Device"}
+        setOpen={setIsDelete}
+        open={isDelete}
+        submitEvent={handleDelete}
+        isSubmit
+        submitTitle="Yes, Delete"
+        className="bg-red-500"
+        isLoading={isLoading}
+        width="50%"
+      >
+        <p>
+          This will remove device name
+          <span className="font-bold">{device?.name}</span>
+        </p>
+      </SharedDialog>
     </div>
   );
 };

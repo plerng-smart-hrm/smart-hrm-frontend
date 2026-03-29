@@ -2,6 +2,7 @@
 
 import { IApiResponse, IDevice, IHoliday, IPagination } from "@/types/admin";
 import { api } from "../util/api";
+import { DeviceValues } from "@/schemas/admin/device";
 
 export interface IDevicesRes {
   devices?: IDevice[];
@@ -22,11 +23,11 @@ export type IUpdateDeviceRequest = IDevice;
 
 export const getAllDevices = async (
   pageIndex: number,
-  pageSize?: number
+  pageSize?: number,
 ): Promise<IDevicesRes> => {
   const page = pageIndex + 1;
   const data = await api.get<IApiResponse<IDevice[]>>(
-    `/v1/devices?page=${page}&limit=${pageSize}`
+    `/v1/devices?page=${page}&limit=${pageSize}`,
   );
   return {
     devices: data.data,
@@ -45,15 +46,13 @@ export const getDeviceById = async (deviceId?: number): Promise<IDeviceRes> => {
   };
 };
 
-export const createDevice = async (
-  request: ICreateDeviceRequest
-): Promise<void> => {
+export const createDevice = async (request: DeviceValues): Promise<void> => {
   await api.post<IApiResponse<void>>(`/v1/devices`, request);
 };
 
 export const updateDevice = async (
   deviceId?: number,
-  request?: IUpdateDeviceRequest
+  request?: DeviceValues,
 ): Promise<void> => {
   await api.patch<IApiResponse<void>>(`/v1/devices/${deviceId}`, request);
 };

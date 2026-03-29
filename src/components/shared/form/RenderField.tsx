@@ -1,7 +1,8 @@
 import { Input } from "@/components/ui/input";
-import { FormItem } from "@/components/ui/form";
+import { FormItem, FormField } from "@/components/ui/form";
 import { FormLabel as Label } from "@/components/ui/form";
 import MessageHelper from "./MessageHelper";
+import { Control, FieldValues, Path } from "react-hook-form";
 import {
   Select,
   SelectContent,
@@ -435,6 +436,31 @@ const RenderField = ({ form }: IProps) => {
     );
   }
 
+  if (defaultType === "time") {
+    return (
+      <FormItem className="grid gap-y-2 w-full">
+        <FormLabel
+          label={form?.label}
+          required={form?.required}
+          helper={form?.helper}
+        />
+        <Input
+          {...sanitizedProps({ form, field })}
+          value={field?.value ?? ""}
+          onChange={(e: any) => {
+            const value = e.target.value;
+            form?.handleEvent?.(value);
+            field?.onChange?.(value);
+          }}
+          type="time"
+          step="300"
+          className="text-gray-800"
+          error={hasError}
+        />
+      </FormItem>
+    );
+  }
+
   if (defaultType === "file") {
     return (
       <FormItem className="grid gap-y-2 w-full">
@@ -468,5 +494,48 @@ const RenderField = ({ form }: IProps) => {
 
   return null;
 };
+
+// Field definition interface for reusable field configurations
+export interface FieldDefinition {
+  label: string;
+  key: string;
+  type?: string;
+  required?: boolean;
+  placeholder?: string;
+  disable?: boolean;
+  readonly?: boolean;
+  helper?: string;
+  options?: { label: string; value: string | number }[];
+  isLoading?: boolean;
+  handleEvent?: (value: any) => void;
+  handleEnterEvent?: (value: any) => void;
+  row?: number;
+  dataType?: string;
+}
+
+// Props for RenderFields component
+interface RenderFieldsProps<T extends FieldValues> {
+  fields: FieldDefinition[];
+  control: Control<T>;
+}
+
+// Reusable component to render multiple form fields
+export function RenderFields<T extends FieldValues>({
+  fields,
+  control,
+}: RenderFieldsProps<T>) {
+  return (
+    <>
+      {fields.map((item, index) => (
+        <FormField
+          key={index}
+          control={control}
+          name={item.key as Path<T>}
+          render={(field) => <RenderField form={{ ...item, field }} />}
+        />
+      ))}
+    </>
+  );
+}
 
 export default RenderField;

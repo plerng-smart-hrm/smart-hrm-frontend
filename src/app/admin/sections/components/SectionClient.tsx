@@ -3,13 +3,13 @@ import { useState } from "react";
 import { ISection } from "@/types/admin";
 import { useMutateSection } from "@/stores/admin/useMutateSection";
 import { sectionColumns } from "./columns";
-import SectionDialog from "./SectionDialog";
 import { useDataTable } from "@/hooks/use-data-table";
 import { PenIcon, PlusIcon, TrashIcon } from "lucide-react";
 import BaseDataTable from "@/components/shared/table/BaseDataTable";
 import { ToolbarActions } from "@/components/shared/table/ToolbarActions";
 import { ToolBarDataTale } from "@/components/shared/table/ToolBarDataTale";
 import SharedDialog from "@/components/shared/SharedDialog";
+import SectionForm from "./form/SectionForm";
 
 const SectionClient = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -62,16 +62,34 @@ const SectionClient = () => {
 
   return (
     <div>
-      {isOpen && (
-        <SectionDialog
-          isOpen={isOpen}
-          setIsOpen={() => {
-            setIsOpen(false);
-            setSection(undefined);
-          }}
-          sectionId={section?.id}
-        />
-      )}
+      <BaseDataTable table={table}>
+        <ToolBarDataTale table={table}>
+          <ToolbarActions
+            actions={[
+              {
+                name: "Create",
+                icon: PlusIcon,
+                event: () => {
+                  setSection(undefined);
+                  setIsOpen(true);
+                },
+              },
+            ]}
+          />
+        </ToolBarDataTale>
+      </BaseDataTable>
+
+      <SharedDialog
+        title={`${section ? "Update" : "Create"} Section`}
+        setOpen={setIsOpen}
+        open={isOpen}
+        isSubmit={false}
+        isCancel={false}
+        isLoading={isLoading}
+        width="40%"
+      >
+        <SectionForm initialData={section} onSuccess={() => setIsOpen(false)} />
+      </SharedDialog>
 
       <SharedDialog
         title={"Delete Section"}
@@ -86,22 +104,6 @@ const SectionClient = () => {
       >
         <p>This will remove the {section?.name}</p>
       </SharedDialog>
-
-      <BaseDataTable table={table}>
-        <ToolBarDataTale table={table}>
-          <ToolbarActions
-            actions={[
-              {
-                name: "Create",
-                icon: PlusIcon,
-                event: () => {
-                  setIsOpen(true);
-                },
-              },
-            ]}
-          />
-        </ToolBarDataTale>
-      </BaseDataTable>
     </div>
   );
 };

@@ -10,7 +10,7 @@ import BaseDataTable from "@/components/shared/table/BaseDataTable";
 import { ToolbarActions } from "@/components/shared/table/ToolbarActions";
 import { ToolBarDataTale } from "@/components/shared/table/ToolBarDataTale";
 import SharedDialog from "@/components/shared/SharedDialog";
-import WorkingShiftForm from "./WorkingShiftForm";
+import WorkingShiftForm from "./form/WorkingShiftForm";
 import { workingShiftColumns } from "./columns";
 
 const shifts = [
@@ -89,6 +89,7 @@ const WorkingShiftClient = ({}: Props) => {
                 name: "Create",
                 icon: PlusIcon,
                 event: () => {
+                  setWorkingShift(undefined);
                   setIsForm(true);
                 },
               },
@@ -106,7 +107,10 @@ const WorkingShiftClient = ({}: Props) => {
         title={`${workingShift ? "Update" : "Create"} Working Shift`}
         isCancel={false}
       >
-        <WorkingShiftForm initialData={undefined} setOpen={setIsForm} />
+        <WorkingShiftForm
+          initialData={workingShift}
+          onSuccess={() => setIsForm(false)}
+        />
       </SharedDialog>
 
       <SharedDialog

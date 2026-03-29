@@ -5,7 +5,7 @@ import { departmentKeys } from "@/service/util/query-keys/department";
 
 const page = async () => {
   return (
-    <ContentLayout title={"Departments"}>
+    <ContentLayout title={"Daily Attendance"}>
       <ContentWrapper queryKey={departmentKeys.list_department}>
         <DepartmentClient />
       </ContentWrapper>

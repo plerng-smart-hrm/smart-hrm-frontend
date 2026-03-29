@@ -71,8 +71,8 @@ export const useMutateDepartment = () => {
   });
 
   return {
-    create: createMutation.mutateAsync,
-    update: updateMutation.mutateAsync,
-    delete: deleteMutation.mutateAsync,
+    createDepartment: createMutation.mutateAsync,
+    updateDepartment: updateMutation.mutateAsync,
+    deleteDepartment: deleteMutation.mutateAsync,
   };
 };

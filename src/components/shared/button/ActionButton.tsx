@@ -38,7 +38,7 @@ const ActionButton = ({
         </Button>
         {OtherButton && OtherButton}
         <LoadingButton
-          label={submitTitle ?? "Submit"}
+          label={submitTitle ?? "Save"}
           handleEvent={() => handleSubmit?.()}
           isLoading={isLoading}
           disabled={disable}

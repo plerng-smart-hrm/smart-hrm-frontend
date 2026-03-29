@@ -1,16 +1,7 @@
 "use client";
 import { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
-import { IconDotsVertical } from "@tabler/icons-react";
 import { IDevice } from "@/types/admin";
-import { createRowNumberColumn } from "@/components/data-table";
 import { BadgeCheckIcon, XCircleIcon } from "lucide-react";
 import { Actions, IActions } from "@/components/shared/Actions";
 

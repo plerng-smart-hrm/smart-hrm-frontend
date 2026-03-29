@@ -1,20 +1,20 @@
-import SectionClient from "./components/SectionClient";
 import { ContentLayout } from "@/components/admin-panel/content-layout";
 import ContentWrapper from "@/components/content/content-wrapper";
-import { sectionKeys } from "@/service/util/query-keys/section";
+import LogsClient from "./components/LogsClient";
+import { attendanceLogKeys } from "@/service/util/query-keys/attendance-log";
 
 interface Props {
   searchParams: Promise<{
-    pageIndex?: string;
-    pageSize?: string;
+    page?: string;
+    limit?: string;
   }>;
 }
 
 const page = async ({}: Props) => {
   return (
-    <ContentLayout title={"Sections"}>
-      <ContentWrapper queryKey={sectionKeys.list_section}>
-        <SectionClient />
+    <ContentLayout title={"Attendance Logs"}>
+      <ContentWrapper queryKey={attendanceLogKeys.list_attendance_log}>
+        <LogsClient />
       </ContentWrapper>
     </ContentLayout>
   );

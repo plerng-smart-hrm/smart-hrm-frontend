@@ -12,6 +12,7 @@ import RenderField from "@/components/shared/form/RenderField";
 import { Separator } from "@/components/ui/separator";
 import { WorkingShiftCombobox } from "@/components/comboboxes/WorkingShiftCombobox";
 import { useMutateEmployee } from "@/stores/admin/useMutateEmployee";
+import { showValidationWarning } from "@/utils/form-validation";
 
 interface IProps {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -74,9 +75,11 @@ export default function EmployeeForm({ setOpen }: IProps) {
 
   const onSubmit = async () => {
     const isValid = await form.trigger();
-    console.log('isValid', isValid)
-    console.log('Error', form.formState.errors)
     if (!isValid) {
+      showValidationWarning({
+        fields: employeeFields,
+        errors: form.formState.errors,
+      });
       return;
     }
 
