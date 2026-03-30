@@ -11,6 +11,7 @@ export type TypeVariant =
   | "link"
   | null
   | undefined;
+
 interface IProps {
   handleEvent: (_value?: any) => void;
   isLoading?: boolean;
@@ -27,34 +28,20 @@ const LoadingButton = ({
   label = "Create",
   variant = "default",
   className,
-  icon,
+  icon: Icon,
   disabled,
 }: IProps) => {
-  const Icon = () => {
-    if (icon) {
-      const Icon = icon;
-      return <Icon className="-mt-[2px] mr-1 " />;
-    }
-  };
   return (
     <Button
       type="submit"
-      className={`w-full sm:w-auto px-6 py-2 h-9 flex items-center justify-center gap-2 select-none ${className}`}
+      className={`w-full sm:w-auto px-6 py-2 select-none ${className ?? ""}`}
       disabled={isLoading || disabled}
       onClick={() => handleEvent?.()}
       variant={variant}
     >
-      {isLoading ? (
-        <>
-          <Spinner size="small" className="text-white" />
-          <span>Please wait</span>
-        </>
-      ) : (
-        <>
-          {icon ? <Icon /> : null}
-          <span>{label}</span>
-        </>
-      )}
+      {Icon ? <Icon className="-mt-[2px] mr-1" /> : null}
+      {isLoading ? <Spinner size="small" className="text-white" /> : null}
+      {isLoading ? "Please wait" : label}
     </Button>
   );
 };

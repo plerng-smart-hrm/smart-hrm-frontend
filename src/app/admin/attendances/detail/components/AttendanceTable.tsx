@@ -4,13 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,17 +13,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ChevronLeft, ChevronRight, Settings2 } from "lucide-react";
-import {
-  format,
-  startOfMonth,
-  endOfMonth,
-  eachDayOfInterval,
-  getDay,
-} from "date-fns";
-import {
-  IDailyAttendance,
-  AttendanceStatus,
-} from "@/types/admin/attendance-summary";
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay } from "date-fns";
+import { IDailyAttendance, AttendanceStatus } from "@/types/admin/attendance-summary";
 import { cn } from "@/lib/utils";
 
 interface AttendanceTableProps {
@@ -114,13 +99,8 @@ const generateMonthDays = (month: Date): IDailyAttendance[] => {
   });
 };
 
-const mergeAttendanceData = (
-  monthDays: IDailyAttendance[],
-  attendanceData: IDailyAttendance[]
-): IDailyAttendance[] => {
-  const attendanceMap = new Map(
-    attendanceData.map((item) => [item.date, item])
-  );
+const mergeAttendanceData = (monthDays: IDailyAttendance[], attendanceData: IDailyAttendance[]): IDailyAttendance[] => {
+  const attendanceMap = new Map(attendanceData.map((item) => [item.date, item]));
 
   return monthDays.map((day) => {
     const existingData = attendanceMap.get(day.date);
@@ -136,10 +116,8 @@ const getRowBackground = (status: AttendanceStatus, day: string) => {
 };
 
 const getDayStatusStyle = (status: AttendanceStatus, day: string) => {
-  if (status === "HOLIDAY")
-    return "text-blue-700 dark:text-blue-300 font-semibold";
-  if (day === "Sun" || day === "Sat")
-    return "text-red-600 dark:text-red-400 font-semibold";
+  if (status === "HOLIDAY") return "text-blue-700 dark:text-blue-300 font-semibold";
+  if (day === "Sun" || day === "Sat") return "text-red-600 dark:text-red-400 font-semibold";
   return "text-gray-700 dark:text-gray-300";
 };
 
@@ -157,18 +135,24 @@ const getWorkStatusLabel = (status: AttendanceStatus) => {
 };
 
 const months = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December",
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
 ];
 
 const currentYear = new Date().getFullYear();
 const years = Array.from({ length: 10 }, (_, i) => currentYear - 5 + i);
 
-export default function AttendanceTable({
-  attendanceData,
-  selectedMonth,
-  onMonthChange,
-}: AttendanceTableProps) {
+export default function AttendanceTable({ attendanceData, selectedMonth, onMonthChange }: AttendanceTableProps) {
   // Initialize visible columns from config
   const [visibleColumns, setVisibleColumns] = useState<Set<ColumnKey>>(() => {
     const initial = new Set<ColumnKey>();
@@ -207,29 +191,22 @@ export default function AttendanceTable({
       ot2: acc.ot2 + record.overtime.ot2,
       lateMinutes: acc.lateMinutes + record.lateMinutes,
     }),
-    { normalHours: 0, ot1: 0, ot2: 0, lateMinutes: 0 }
+    { normalHours: 0, ot1: 0, ot2: 0, lateMinutes: 0 },
   );
 
   // Calculate colSpan for Time group
-  const timeColSpan = [
-    isVisible("timeIn1"),
-    isVisible("timeOut1"),
-    isVisible("timeIn2"),
-    isVisible("timeOut2"),
-  ].filter(Boolean).length;
+  const timeColSpan = [isVisible("timeIn1"), isVisible("timeOut1"), isVisible("timeIn2"), isVisible("timeOut2")].filter(
+    Boolean,
+  ).length;
 
   // Calculate colSpan for Late group
-  const lateColSpan = [isVisible("lateIn"), isVisible("earlyOut")].filter(
-    Boolean
-  ).length;
+  const lateColSpan = [isVisible("lateIn"), isVisible("earlyOut")].filter(Boolean).length;
 
   // Calculate colSpan for Overtime group
   const otColSpan = [isVisible("ot1"), isVisible("ot2")].filter(Boolean).length;
 
   // Calculate colSpan for Leave group
-  const leaveColSpan = [isVisible("leaveHour"), isVisible("leavePay")].filter(
-    Boolean
-  ).length;
+  const leaveColSpan = [isVisible("leaveHour"), isVisible("leavePay")].filter(Boolean).length;
 
   const handlePreviousMonth = () => {
     const newDate = new Date(selectedMonth);
@@ -260,19 +237,11 @@ export default function AttendanceTable({
       <div className="pb-2 flex-shrink-0 flex items-center justify-between">
         {/* Month Selector */}
         <div className="flex items-center gap-1">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handlePreviousMonth}
-            className="h-8 w-8"
-          >
+          <Button variant="ghost" size="icon" onClick={handlePreviousMonth} className="h-8 w-8">
             <ChevronLeft className="h-4 w-4" />
           </Button>
 
-          <Select
-            value={selectedMonth.getMonth().toString()}
-            onValueChange={handleMonthChange}
-          >
+          <Select value={selectedMonth.getMonth().toString()} onValueChange={handleMonthChange}>
             <SelectTrigger className="h-8 w-[120px] text-sm">
               <SelectValue />
             </SelectTrigger>
@@ -285,10 +254,7 @@ export default function AttendanceTable({
             </SelectContent>
           </Select>
 
-          <Select
-            value={selectedMonth.getFullYear().toString()}
-            onValueChange={handleYearChange}
-          >
+          <Select value={selectedMonth.getFullYear().toString()} onValueChange={handleYearChange}>
             <SelectTrigger className="h-8 w-[80px] text-sm">
               <SelectValue />
             </SelectTrigger>
@@ -301,21 +267,11 @@ export default function AttendanceTable({
             </SelectContent>
           </Select>
 
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleNextMonth}
-            className="h-8 w-8"
-          >
+          <Button variant="ghost" size="icon" onClick={handleNextMonth} className="h-8 w-8">
             <ChevronRight className="h-4 w-4" />
           </Button>
 
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onMonthChange(new Date())}
-            className="h-8 text-xs ml-1"
-          >
+          <Button variant="ghost" size="sm" onClick={() => onMonthChange(new Date())} className="h-8 text-xs ml-1">
             Today
           </Button>
         </div>
@@ -329,13 +285,12 @@ export default function AttendanceTable({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48">
-            <DropdownMenuLabel className="text-xs">
-              Toggle Columns
-            </DropdownMenuLabel>
+            <DropdownMenuLabel className="text-xs">Toggle Columns</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <div className="max-h-[300px] overflow-y-auto">
               {columnConfigs.map((col) => (
-                <div
+                <button
+                  type="button"
                   key={col.key}
                   className="flex items-center space-x-2 px-2 py-1.5 hover:bg-muted rounded-sm cursor-pointer"
                   onClick={() => toggleColumn(col.key)}
@@ -346,13 +301,10 @@ export default function AttendanceTable({
                     onCheckedChange={() => toggleColumn(col.key)}
                     className="h-3.5 w-3.5"
                   />
-                  <label
-                    htmlFor={col.key}
-                    className="text-xs cursor-pointer flex-1"
-                  >
+                  <label htmlFor={col.key} className="text-xs cursor-pointer flex-1">
                     {col.label}
                   </label>
-                </div>
+                </button>
               ))}
             </div>
           </DropdownMenuContent>
@@ -537,17 +489,10 @@ export default function AttendanceTable({
                 {fullMonthData.map((record, index) => {
                   const dayNum = parseInt(record.date.split("-")[2]);
                   const rowBg = getRowBackground(record.status, record.day);
-                  const dayStatusStyle = getDayStatusStyle(
-                    record.status,
-                    record.day
-                  );
+                  const dayStatusStyle = getDayStatusStyle(record.status, record.day);
                   const workStatus = getWorkStatusLabel(record.status);
-                  const hasData =
-                    record.status === "PRESENT" || record.status === "LEAVE";
-                  const isFutureOrEmpty =
-                    !record.time.fi &&
-                    record.status !== "HOLIDAY" &&
-                    record.status !== "LEAVE";
+                  const hasData = record.status === "PRESENT" || record.status === "LEAVE";
+                  const isFutureOrEmpty = !record.time.fi && record.status !== "HOLIDAY" && record.status !== "LEAVE";
 
                   return (
                     <tr key={index} className={cn(rowBg, "hover:brightness-95")}>
@@ -560,7 +505,7 @@ export default function AttendanceTable({
                         <td
                           className={cn(
                             "border border-slate-300 dark:border-slate-600 px-2 py-1 text-center",
-                            dayStatusStyle
+                            dayStatusStyle,
                           )}
                         >
                           {record.status === "HOLIDAY" ? "PH" : record.day}
@@ -571,10 +516,8 @@ export default function AttendanceTable({
                           <span
                             className={cn(
                               "text-xs",
-                              record.status === "ABSENT" &&
-                                "text-red-600 font-semibold",
-                              record.status === "LEAVE" &&
-                                "text-orange-600 font-semibold"
+                              record.status === "ABSENT" && "text-red-600 font-semibold",
+                              record.status === "LEAVE" && "text-orange-600 font-semibold",
                             )}
                           >
                             {workStatus}
@@ -582,15 +525,13 @@ export default function AttendanceTable({
                         </td>
                       )}
                       {isVisible("shift") && (
-                        <td className="border border-slate-300 dark:border-slate-600 px-2 py-1 text-center">
-                          1
-                        </td>
+                        <td className="border border-slate-300 dark:border-slate-600 px-2 py-1 text-center">1</td>
                       )}
                       {isVisible("timeIn1") && (
                         <td
                           className={cn(
                             "border border-slate-300 dark:border-slate-600 px-1 py-1 text-center font-mono",
-                            isFutureOrEmpty && "bg-green-200 dark:bg-green-800"
+                            isFutureOrEmpty && "bg-green-200 dark:bg-green-800",
                           )}
                         >
                           {formatTime(record.time.fi)}
@@ -600,7 +541,7 @@ export default function AttendanceTable({
                         <td
                           className={cn(
                             "border border-slate-300 dark:border-slate-600 px-1 py-1 text-center font-mono",
-                            isFutureOrEmpty && "bg-green-200 dark:bg-green-800"
+                            isFutureOrEmpty && "bg-green-200 dark:bg-green-800",
                           )}
                         >
                           {formatTime(record.time.fo)}
@@ -610,7 +551,7 @@ export default function AttendanceTable({
                         <td
                           className={cn(
                             "border border-slate-300 dark:border-slate-600 px-1 py-1 text-center font-mono",
-                            isFutureOrEmpty && "bg-green-200 dark:bg-green-800"
+                            isFutureOrEmpty && "bg-green-200 dark:bg-green-800",
                           )}
                         >
                           {formatTime(record.time.si)}
@@ -621,7 +562,7 @@ export default function AttendanceTable({
                           className={cn(
                             "border border-slate-300 dark:border-slate-600 px-1 py-1 text-center font-mono",
                             isFutureOrEmpty && "bg-green-200 dark:bg-green-800",
-                            record.overtime.ot1 > 0 && "text-red-600 font-bold"
+                            record.overtime.ot1 > 0 && "text-red-600 font-bold",
                           )}
                         >
                           {formatTime(record.time.so)}
@@ -631,7 +572,7 @@ export default function AttendanceTable({
                         <td
                           className={cn(
                             "border border-slate-300 dark:border-slate-600 px-1 py-1 text-center bg-cyan-50 dark:bg-cyan-900/30",
-                            isFutureOrEmpty && "bg-green-200 dark:bg-green-800"
+                            isFutureOrEmpty && "bg-green-200 dark:bg-green-800",
                           )}
                         >
                           {record.lateMinutes > 0 ? record.lateMinutes : ""}
@@ -641,7 +582,7 @@ export default function AttendanceTable({
                         <td
                           className={cn(
                             "border border-slate-300 dark:border-slate-600 px-1 py-1 text-center bg-cyan-50 dark:bg-cyan-900/30",
-                            isFutureOrEmpty && "bg-green-200 dark:bg-green-800"
+                            isFutureOrEmpty && "bg-green-200 dark:bg-green-800",
                           )}
                         >
                           {/* Early out placeholder */}
@@ -651,7 +592,7 @@ export default function AttendanceTable({
                         <td
                           className={cn(
                             "border border-slate-300 dark:border-slate-600 px-1 py-1 text-center font-medium bg-green-100 dark:bg-green-900/30",
-                            isFutureOrEmpty && "bg-green-200 dark:bg-green-800"
+                            isFutureOrEmpty && "bg-green-200 dark:bg-green-800",
                           )}
                         >
                           {record.workingHours > 0 ? record.workingHours : ""}
@@ -662,7 +603,7 @@ export default function AttendanceTable({
                           className={cn(
                             "border border-slate-300 dark:border-slate-600 px-1 py-1 text-center bg-pink-50 dark:bg-pink-900/30",
                             record.overtime.ot1 > 0 && "font-bold",
-                            isFutureOrEmpty && "bg-pink-200 dark:bg-pink-800"
+                            isFutureOrEmpty && "bg-pink-200 dark:bg-pink-800",
                           )}
                         >
                           {record.overtime.ot1 > 0 ? record.overtime.ot1 : ""}
@@ -673,7 +614,7 @@ export default function AttendanceTable({
                           className={cn(
                             "border border-slate-300 dark:border-slate-600 px-1 py-1 text-center bg-pink-50 dark:bg-pink-900/30",
                             record.overtime.ot2 > 0 && "font-bold",
-                            isFutureOrEmpty && "bg-pink-200 dark:bg-pink-800"
+                            isFutureOrEmpty && "bg-pink-200 dark:bg-pink-800",
                           )}
                         >
                           {record.overtime.ot2 > 0 ? record.overtime.ot2 : ""}
@@ -683,7 +624,7 @@ export default function AttendanceTable({
                         <td
                           className={cn(
                             "border border-slate-300 dark:border-slate-600 px-1 py-1 text-center bg-purple-50 dark:bg-purple-900/30",
-                            isFutureOrEmpty && "bg-purple-200 dark:bg-purple-800"
+                            isFutureOrEmpty && "bg-purple-200 dark:bg-purple-800",
                           )}
                         >
                           {/* Night hours placeholder */}
@@ -691,9 +632,7 @@ export default function AttendanceTable({
                       )}
                       {isVisible("timeSalary") && (
                         <td className="border border-slate-300 dark:border-slate-600 px-1 py-1 text-right">
-                          {record.workingHours > 0
-                            ? `$${(record.workingHours * 1).toFixed(3)}`
-                            : ""}
+                          {record.workingHours > 0 ? `$${(record.workingHours * 1).toFixed(3)}` : ""}
                         </td>
                       )}
                       {isVisible("leaveHour") && (
@@ -715,14 +654,10 @@ export default function AttendanceTable({
                         <td
                           className={cn(
                             "border border-slate-300 dark:border-slate-600 px-1 py-1 text-right bg-lime-50 dark:bg-lime-900/30",
-                            isFutureOrEmpty && "bg-lime-200 dark:bg-lime-800"
+                            isFutureOrEmpty && "bg-lime-200 dark:bg-lime-800",
                           )}
                         >
-                          {hasData
-                            ? "2,000"
-                            : isFutureOrEmpty
-                              ? ""
-                              : "$0.000"}
+                          {hasData ? "2,000" : isFutureOrEmpty ? "" : "$0.000"}
                         </td>
                       )}
                     </tr>
@@ -742,12 +677,9 @@ export default function AttendanceTable({
                 {isVisible("day") && (
                   <td
                     colSpan={
-                      [
-                        isVisible("day"),
-                        isVisible("dayStatus"),
-                        isVisible("workStatus"),
-                        isVisible("shift"),
-                      ].filter(Boolean).length
+                      [isVisible("day"), isVisible("dayStatus"), isVisible("workStatus"), isVisible("shift")].filter(
+                        Boolean,
+                      ).length
                     }
                     className="border border-slate-400 dark:border-slate-500 px-2 py-2 text-center w-[calc(10px+16px+16px+12px)]"
                   >
@@ -757,11 +689,7 @@ export default function AttendanceTable({
                 {!isVisible("day") && isVisible("dayStatus") && (
                   <td
                     colSpan={
-                      [
-                        isVisible("dayStatus"),
-                        isVisible("workStatus"),
-                        isVisible("shift"),
-                      ].filter(Boolean).length
+                      [isVisible("dayStatus"), isVisible("workStatus"), isVisible("shift")].filter(Boolean).length
                     }
                     className="border border-slate-400 dark:border-slate-500 px-2 py-2 text-center"
                   >

@@ -90,7 +90,6 @@ export default function MultiSelect({
                     />
                     <Button
                         variant="outline"
-                        role="combobox"
                         disabled={disabled || isLoading}
                         className={cn(
                             "w-full h-auto min-h-[2.5rem] justify-between mt-[9px]",

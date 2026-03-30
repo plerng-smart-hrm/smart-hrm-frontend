@@ -29,6 +29,7 @@ interface IProps {
   max?: number;
   step?: number;
 }
+
 const InputText = ({
   label,
   type = "text",
@@ -54,26 +55,15 @@ const InputText = ({
   const hasError = Boolean(fieldError);
   const [localValue, setLocalValue] = React.useState<any>("");
 
-  const Icon = () => {
-    let defaultIcon = icon;
+  let IconComponent = icon;
 
-    if (!icon && type === "file") {
-      defaultIcon = CloudUpload;
-    }
+  if (!icon && type === "file") {
+    IconComponent = CloudUpload;
+  }
 
-    const IconComponent =
-      type === "file" && getField?.value && getField?.value !== "undefined"
-        ? FileCheck2
-        : defaultIcon;
-
-    if (!IconComponent) return null;
-
-    return (
-      <IconComponent
-        className={`absolute right-2 top-[7px] cursor-pointer ${getField?.value ? "text-green-600" : ""}`}
-      />
-    );
-  };
+  if (type === "file" && getField?.value && getField?.value !== "undefined") {
+    IconComponent = FileCheck2;
+  }
 
   const parseValue = (value: string): any => {
     if (dataType === "number") {
@@ -83,16 +73,15 @@ const InputText = ({
   };
 
   return (
-    <FormItem className="grid gap-y-2 w-full">
-      {isRequiredLabel ? (
-        <FormLabel label={label} required={required} helper={helper} />
-      ) : null}
+    <FormItem className="grid w-full gap-y-2">
+      {isRequiredLabel ? <FormLabel label={label} required={required} helper={helper} /> : null}
+
       <FormControl>
         {rows > 0 ? (
           <Textarea
             rows={rows}
             placeholder={`${label?.toLowerCase()}`}
-            onChange={e => {
+            onChange={(e) => {
               const parsedValue = parseValue(e.target.value);
               getField?.onChange(parsedValue);
               handleEvent?.(parsedValue);
@@ -101,19 +90,18 @@ const InputText = ({
             disabled={disable}
             readOnly={readonly}
             autoComplete="off"
-            className="text-[11px] mt-[2px]"
-            aria-invalid={!!hasError}
+            className="mt-[2px] text-[11px]"
+            aria-invalid={hasError}
           />
         ) : (
           <div className="relative">
             <Input
               {...(type === "number" ? { min, max, step } : {})}
-              id={type === "file" ? `file-upload-${label}` : ""}
-              placeholder={`${label}`}
+              id={type === "file" ? `file-upload-${label}` : undefined}
+              placeholder={label}
               type={dataType === "number" ? "number" : type}
-              onChange={e => {
-                const parsedValue =
-                  type === "file" ? (e.target.files?.[0] ?? "") : parseValue(e.target.value);
+              onChange={(e) => {
+                const parsedValue = type === "file" ? (e.target.files?.[0] ?? "") : parseValue(e.target.value);
 
                 if (getField) {
                   getField.onChange(parsedValue);
@@ -123,23 +111,30 @@ const InputText = ({
 
                 handleEvent?.(parsedValue);
               }}
-              onKeyDown={e => {
+              onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   e.preventDefault();
                   handleEnterEvent?.(getField ? getField.value : localValue);
                 }
               }}
-              value={getField ? (getField.value ?? "") : localValue}
+              value={type === "file" ? undefined : getField ? (getField.value ?? "") : localValue}
               name={getField?.name}
               disabled={disable}
               readOnly={readonly}
               autoComplete="off"
               error={hasError}
-              className="text-gray-800 "
+              className="text-gray-800"
             />
-            <label htmlFor={`file-upload-${label}`}>
-              <Icon />
-            </label>
+
+            {type === "file" && IconComponent ? (
+              <label htmlFor={`file-upload-${label}`}>
+                <IconComponent
+                  className={`absolute right-2 top-[7px] cursor-pointer ${getField?.value ? "text-green-600" : ""}`}
+                />
+              </label>
+            ) : IconComponent ? (
+              <IconComponent className={`absolute right-2 top-[7px] ${getField?.value ? "text-green-600" : ""}`} />
+            ) : null}
           </div>
         )}
       </FormControl>

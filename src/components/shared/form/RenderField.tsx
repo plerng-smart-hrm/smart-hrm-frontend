@@ -21,7 +21,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { format, parse } from "date-fns";
 import { cn } from "@/lib/utils";
-import { get } from "lodash";
+import { get } from "lodash/fp";
 import MultiSelect from "./MultiSelect";
 import { PhoneInput } from "./PhoneInput";
 import { Textarea } from "@/components/ui/textarea";

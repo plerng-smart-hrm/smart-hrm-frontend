@@ -12,7 +12,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { TypeVariant } from "./LoadingButton";
+import { TypeVariant } from "@/components/shared/button/LoadingButton";
 import { Separator } from "@radix-ui/react-dropdown-menu";
 import React from "react";
 

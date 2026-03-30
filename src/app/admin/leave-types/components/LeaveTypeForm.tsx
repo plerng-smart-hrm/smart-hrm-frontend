@@ -2,29 +2,19 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { ILeaveType } from "@/types/admin";
 import { useState } from "react";
 import { useMutateLeaveType } from "@/stores/admin/useMutateLeaveType";
-import { LoadingButton } from "@/components/LoadingButton";
+import LoadingButton from "@/components/shared/button/LoadingButton";
 
 const formSchema = z.object({
   name: z.string().min(1, "Name is required"),
   nameKh: z.string().min(1, "Name kh is required"),
   description: z.string().min(1, "Description is required"),
   defaultDays: z.number().min(0, "Default days must be 0 or greater"),
-  payRate: z
-    .number()
-    .min(0, "Pay rate must be 0 or greater")
-    .max(1, "Pay rate must be 1 or less"),
+  payRate: z.number().min(0, "Pay rate must be 0 or greater").max(1, "Pay rate must be 1 or less"),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -52,8 +42,7 @@ export default function LeaveTypeForm({ initialData, onSuccess }: Props) {
     defaultValues,
   });
 
-  const { create: createLeaveTypeMutate, update: updateLeaveTypeMutate } =
-    useMutateLeaveType();
+  const { create: createLeaveTypeMutate, update: updateLeaveTypeMutate } = useMutateLeaveType();
 
   async function onSubmit(values: FormValues) {
     setIsLoading(true);
@@ -67,7 +56,7 @@ export default function LeaveTypeForm({ initialData, onSuccess }: Props) {
           onSettled: () => {
             setIsLoading(false);
           },
-        }
+        },
       );
     } else {
       await createLeaveTypeMutate(
@@ -79,7 +68,7 @@ export default function LeaveTypeForm({ initialData, onSuccess }: Props) {
           onSettled: () => {
             setIsLoading(false);
           },
-        }
+        },
       );
     }
   }
@@ -174,9 +163,7 @@ export default function LeaveTypeForm({ initialData, onSuccess }: Props) {
           )}
         />
 
-        <LoadingButton type="submit" loading={isLoading}>
-          {isEdit ? "Save" : "Create"}
-        </LoadingButton>
+        <LoadingButton isLoading={isLoading} label={isEdit ? "Save" : "Create"} handleEvent={() => {}} />
       </form>
     </Form>
   );

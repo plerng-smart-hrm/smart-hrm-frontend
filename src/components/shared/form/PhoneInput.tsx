@@ -21,7 +21,7 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import FormLabel from "./FormLabel";
-import { get } from "lodash";
+import { get } from "lodash/fp";
 
 type PhoneInputProps = Omit<
   React.ComponentProps<"input">,

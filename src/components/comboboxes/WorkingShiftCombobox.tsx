@@ -81,7 +81,6 @@ export function WorkingShiftCombobox({
       <PopoverTrigger asChild>
         <Button
           variant="outline"
-          role="combobox"
           aria-expanded={open}
           disabled={disabled || isLoading}
           className="w-full justify-between font-normal min-h-10 h-auto py-2"
