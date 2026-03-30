@@ -1,32 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import {
-  BookOpen,
-  BookTextIcon,
-  Bot,
-  ChevronDown,
-  LayoutDashboard,
-  LogOut,
-  User,
-} from "lucide-react";
+import { BookOpen, BookTextIcon, Bot, ChevronDown, LayoutDashboard, LogOut, User } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  Tooltip,
-  TooltipTrigger,
-  TooltipContent,
-  TooltipProvider,
-} from "@/components/ui/tooltip";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 interface MenuItem {
   name: string;
@@ -97,6 +80,11 @@ const menuItems: MenuItem[] = [
         path: "/admin/attendances/logs",
         icon: User,
       },
+      {
+        name: "Attendance Adjustment",
+        path: "/admin/attendances/adjustments",
+        icon: User,
+      },
     ],
   },
 ];
@@ -107,9 +95,7 @@ export function Menu({ isOpen }: MenuProps) {
   const [openSubmenus, setOpenSubmenus] = useState<string[]>([]);
 
   const toggleSubmenu = (name: string) => {
-    setOpenSubmenus((prev) =>
-      prev.includes(name) ? prev.filter((n) => n !== name) : [...prev, name],
-    );
+    setOpenSubmenus((prev) => (prev.includes(name) ? prev.filter((n) => n !== name) : [...prev, name]));
   };
 
   const renderMenuItem = (item: MenuItem, index: number) => {
@@ -121,27 +107,19 @@ export function Menu({ isOpen }: MenuProps) {
     if (hasChildren) {
       return (
         <li key={index} className="w-full">
-          <Collapsible
-            open={isSubmenuOpen}
-            onOpenChange={() => toggleSubmenu(item.name)}
-          >
+          <Collapsible open={isSubmenuOpen} onOpenChange={() => toggleSubmenu(item.name)}>
             <TooltipProvider disableHoverableContent>
               <Tooltip delayDuration={100}>
                 <TooltipTrigger asChild>
                   <CollapsibleTrigger asChild>
-                    <Button
-                      variant={isActive ? "secondary" : "ghost"}
-                      className="mb-1 h-10 w-full justify-start"
-                    >
+                    <Button variant={isActive ? "secondary" : "ghost"} className="mb-1 h-10 w-full justify-start">
                       <span className={cn(isOpen === false ? "" : "mr-2")}>
                         <Icon size={14} />
                       </span>
                       <span
                         className={cn(
                           "flex-1 truncate text-left transition-all",
-                          isOpen === false
-                            ? "hidden opacity-0"
-                            : "block opacity-100",
+                          isOpen === false ? "hidden opacity-0" : "block opacity-100",
                         )}
                       >
                         {item.name}
@@ -149,26 +127,16 @@ export function Menu({ isOpen }: MenuProps) {
                       {isOpen !== false && (
                         <ChevronDown
                           size={14}
-                          className={cn(
-                            "transition-transform duration-200",
-                            isSubmenuOpen && "rotate-180",
-                          )}
+                          className={cn("transition-transform duration-200", isSubmenuOpen && "rotate-180")}
                         />
                       )}
                     </Button>
                   </CollapsibleTrigger>
                 </TooltipTrigger>
-                {isOpen === false && (
-                  <TooltipContent side="right">{item.name}</TooltipContent>
-                )}
+                {isOpen === false && <TooltipContent side="right">{item.name}</TooltipContent>}
               </Tooltip>
             </TooltipProvider>
-            <CollapsibleContent
-              className={cn(
-                "overflow-hidden transition-all",
-                isOpen === false && "hidden",
-              )}
-            >
+            <CollapsibleContent className={cn("overflow-hidden transition-all", isOpen === false && "hidden")}>
               <ul className="ml-4 space-y-1 border-l pl-2">
                 {item.children?.map((child, childIndex) => {
                   const isChildActive = pathname === child.path;
@@ -203,11 +171,7 @@ export function Menu({ isOpen }: MenuProps) {
         <TooltipProvider disableHoverableContent>
           <Tooltip delayDuration={100}>
             <TooltipTrigger asChild>
-              <Button
-                variant={isActive ? "secondary" : "ghost"}
-                className="mb-1 h-10 w-full justify-start"
-                asChild
-              >
+              <Button variant={isActive ? "secondary" : "ghost"} className="mb-1 h-10 w-full justify-start" asChild>
                 <Link href={item.path}>
                   <span className={cn(isOpen === false ? "" : "mr-2")}>
                     <Icon size={14} />
@@ -215,9 +179,7 @@ export function Menu({ isOpen }: MenuProps) {
                   <span
                     className={cn(
                       "truncate transition-all",
-                      isOpen === false
-                        ? "hidden opacity-0"
-                        : "block opacity-100",
+                      isOpen === false ? "hidden opacity-0" : "block opacity-100",
                     )}
                   >
                     {item.name}
@@ -225,9 +187,7 @@ export function Menu({ isOpen }: MenuProps) {
                 </Link>
               </Button>
             </TooltipTrigger>
-            {isOpen === false && (
-              <TooltipContent side="right">{item.name}</TooltipContent>
-            )}
+            {isOpen === false && <TooltipContent side="right">{item.name}</TooltipContent>}
           </Tooltip>
         </TooltipProvider>
       </li>
@@ -240,12 +200,7 @@ export function Menu({ isOpen }: MenuProps) {
         <ul className="flex min-h-[calc(100vh-48px-36px-16px-32px)] flex-col space-y-1 px-2 lg:min-h-[calc(100vh-32px-40px-32px)]">
           {menuItems.map((item, index) => renderMenuItem(item, index))}
 
-          <li
-            className={cn(
-              "fixed bottom-2 left-3",
-              isOpen ? "w-[calc(15rem-1.5rem)]" : "w-10",
-            )}
-          >
+          <li className={cn("fixed bottom-2 left-3", isOpen ? "w-[calc(15rem-1.5rem)]" : "w-10")}>
             <TooltipProvider disableHoverableContent>
               <Tooltip delayDuration={100}>
                 <TooltipTrigger asChild>
@@ -257,20 +212,10 @@ export function Menu({ isOpen }: MenuProps) {
                     <span className={cn(isOpen === false ? "" : "mr-4")}>
                       <LogOut size={18} />
                     </span>
-                    <span
-                      className={cn(
-                        isOpen === false
-                          ? "hidden opacity-0"
-                          : "block opacity-100",
-                      )}
-                    >
-                      Sign out
-                    </span>
+                    <span className={cn(isOpen === false ? "hidden opacity-0" : "block opacity-100")}>Sign out</span>
                   </Button>
                 </TooltipTrigger>
-                {isOpen === false && (
-                  <TooltipContent side="right">Sign out</TooltipContent>
-                )}
+                {isOpen === false && <TooltipContent side="right">Sign out</TooltipContent>}
               </Tooltip>
             </TooltipProvider>
           </li>

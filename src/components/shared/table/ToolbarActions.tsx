@@ -17,7 +17,7 @@ export function ToolbarActions({ actions = [] }: IProps) {
               return (
                 <React.Fragment key={key}>
                   <Button
-                    variant={"outline"}
+                    variant={(item.variant as any) || "default"}
                     size={"sm"}
                     onClick={() => item?.event?.()}
                   >

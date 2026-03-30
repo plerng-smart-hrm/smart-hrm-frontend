@@ -83,7 +83,7 @@ const BaseDataTable = <TData,>({
         onScroll={onScrollX}
       >
         <Table>
-          <TableHeader className="bg-[#006EB4]">
+          <TableHeader className="bg-primary">
             {table.getHeaderGroups()?.map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {isCheckBox ? (
