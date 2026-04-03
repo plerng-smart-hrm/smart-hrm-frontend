@@ -8,6 +8,10 @@ import BaseDataTable from "@/components/shared/table/BaseDataTable";
 import { ToolbarActions } from "@/components/shared/table/ToolbarActions";
 import { ToolBarDataTale } from "@/components/shared/table/ToolBarDataTale";
 import { IAttAdjustment } from "@/types/admin/att-adjustment";
+import { useMutateAttAdjustment } from "@/stores/admin/useMutateAttAdjustment";
+import SharedDialog from "@/components/shared/SharedDialog";
+import AttAdjustmentForm from "./form/AttAdjustmentForm";
+import AttAdjustmentView from "./view/AttAdjustmentView";
 
 interface Props {}
 const AttAdjustmentClient = ({}: Props) => {
@@ -50,23 +54,23 @@ const AttAdjustmentClient = ({}: Props) => {
     columns: attAdjustmentColumns(actionButton),
   });
 
-  // const { deleteAttAdjustment } = useMutateAttAdjustment();
+  const { deleteAttAdjustment } = useMutateAttAdjustment();
 
-  // const handleDelete = async () => {
-  //   setIsLoading(true);
-  //   await deleteAttAdjustment(
-  //     { attAdjustmentId: attAdjustment?.id },
-  //     {
-  //       onSuccess: () => {
-  //         setIsDelete(false);
-  //         setAttAdjustment(undefined);
-  //       },
-  //       onSettled: () => {
-  //         setIsLoading(false);
-  //       },
-  //     },
-  //   );
-  // };
+  const handleDelete = async () => {
+    setIsLoading(true);
+    await deleteAttAdjustment(
+      { id: attAdjustment?.id },
+      {
+        onSuccess: () => {
+          setIsDelete(false);
+          setAttAdjustment(undefined);
+        },
+        onSettled: () => {
+          setIsLoading(false);
+        },
+      },
+    );
+  };
 
   return (
     <div>
@@ -85,7 +89,7 @@ const AttAdjustmentClient = ({}: Props) => {
           />
         </ToolBarDataTale>
       </BaseDataTable>
-      {/* 
+
       <SharedDialog
         setOpen={() => setIsOpen(false)}
         open={isOpen}
@@ -94,16 +98,15 @@ const AttAdjustmentClient = ({}: Props) => {
       >
         <AttAdjustmentForm onSuccess={() => setIsOpen(false)} initialData={attAdjustment} />
       </SharedDialog>
-
       <SharedDialog
         setOpen={() => setIsView(false)}
         open={isView}
-        title="AttAdjustment Details"
+        title="Attendance Adjustment Details"
         isCancel={false}
         width="85%"
         height="95%"
       >
-        <AttAdjustmentView attAdjustment={attAdjustment} />
+        <AttAdjustmentView initialData={attAdjustment} />
       </SharedDialog>
 
       <SharedDialog
@@ -121,7 +124,7 @@ const AttAdjustmentClient = ({}: Props) => {
           This will remove attAdjustment
           <span className="font-bold">{attAdjustment?.id}</span>
         </p>
-      </SharedDialog>*/}
+      </SharedDialog>
     </div>
   );
 };
