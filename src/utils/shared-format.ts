@@ -13,3 +13,8 @@ export const formatToDate = (value?: string) => {
 export const formatToTodayDate = () => {
   return format(new Date(), "yyyy-MM-dd");
 };
+
+export const formatToYYYYMM = (value?: Date) => {
+  if (!value) return format(new Date(), "yyyy-MM");
+  return format(value, "yyyy-MM");
+};
