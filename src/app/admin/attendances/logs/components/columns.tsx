@@ -1,6 +1,8 @@
 "use client";
 import { ColumnDef } from "@tanstack/react-table";
 import { IAttendanceLog } from "@/types/admin/attendance-log";
+import { SharedBadge } from "@/components/shared/SharedBadge";
+import { formatToDate, formatToDateTime } from "@/utils/shared-format";
 
 export const attendanceLogsColumns = (): ColumnDef<IAttendanceLog>[] => {
   return [
@@ -10,12 +12,18 @@ export const attendanceLogsColumns = (): ColumnDef<IAttendanceLog>[] => {
       cell: ({ row }) => <div>{row.original.id}</div>,
     },
     {
-      header: "Name",
+      header: "Code",
+      cell: ({ row }) => <div>{row.original.employee?.empCode}</div>,
+    },
+    {
+      header: "Employee",
       cell: ({ row }) => (
         <div className="flex flex-col">
-          <p className="text-md">{row.original.employee?.firstNameKh}</p>
+          <p className="text-md">
+            {row.original.employee?.lastName} {row.original.employee?.firstName}
+          </p>
           <span className="text-muted-foreground text-sm">
-            {row.original.employee?.lastNameKh}
+            {row.original.employee?.lastNameKh} {row.original.employee?.firstNameKh}
           </span>
         </div>
       ),
@@ -24,7 +32,7 @@ export const attendanceLogsColumns = (): ColumnDef<IAttendanceLog>[] => {
       header: "Scan Time",
       cell: ({ row }) => (
         <div>
-          <p>{row.original.scanTime}</p>
+          <SharedBadge variant={"blue"}>{formatToDateTime(row.original.scanTime)}</SharedBadge>
         </div>
       ),
     },
@@ -46,8 +54,7 @@ export const attendanceLogsColumns = (): ColumnDef<IAttendanceLog>[] => {
     },
     {
       header: "Created At",
-      cell: ({ row }) =>
-        new Date(row.original.createdAt ?? "").toLocaleDateString(),
+      cell: ({ row }) => <div>{formatToDate(row.original.createdAt)}</div>,
     },
   ];
 };

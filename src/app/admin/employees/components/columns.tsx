@@ -3,9 +3,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { IEmployee } from "@/types/admin/employee";
 import { Actions, IActions } from "@/components/shared/Actions";
 
-export const employeeColumns = (
-  actions: IActions[],
-): ColumnDef<IEmployee>[] => {
+export const employeeColumns = (actions: IActions[]): ColumnDef<IEmployee>[] => {
   const viewAction = actions.find((action) => action.name === "View")?.event;
 
   return [
@@ -13,8 +11,8 @@ export const employeeColumns = (
       header: "ID",
       size: 50,
       cell: ({ row }) => (
-        <div 
-          className="cursor-pointer text-primary hover:underline hover:text-primary/80 font-medium" 
+        <div
+          className="cursor-pointer text-primary hover:underline hover:text-primary/80 font-medium"
           onClick={() => viewAction?.(row.original)}
         >
           {row.original.id}
@@ -23,7 +21,7 @@ export const employeeColumns = (
     },
     {
       header: "Code",
-      cell: ({ row }) => <div>EMP-{row.original.empCode}</div>,
+      cell: ({ row }) => <div>{row.original.empCode}</div>,
     },
     {
       header: "Employee",
@@ -49,8 +47,7 @@ export const employeeColumns = (
 
     {
       header: "Joined Date",
-      cell: ({ row }) =>
-        new Date(row.original.startDate ?? "").toLocaleDateString(),
+      cell: ({ row }) => new Date(row.original.startDate ?? "").toLocaleDateString(),
     },
     {
       header: "Status",
@@ -58,16 +55,13 @@ export const employeeColumns = (
     },
     {
       header: "Updated At",
-      cell: ({ row }) =>
-        new Date(row.original.updatedAt ?? "").toLocaleDateString(),
+      cell: ({ row }) => new Date(row.original.updatedAt ?? "").toLocaleDateString(),
     },
     {
       id: "actions",
       header: "Actions",
       size: 50,
-      cell: ({ row }) => (
-        <Actions row={row?.original ?? undefined} actions={actions} />
-      ),
+      cell: ({ row }) => <Actions row={row?.original ?? undefined} actions={actions} />,
     },
   ];
 };

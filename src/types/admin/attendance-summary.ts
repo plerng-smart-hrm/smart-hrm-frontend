@@ -73,3 +73,12 @@ export interface IEmployeeAttendanceSummary {
   attendanceSummary: IDailyAttendance[];
   totals: IAttendanceTotals;
 }
+
+
+export interface ITriggerAttendanceSummaryResponse {
+  date?: string;
+  total?: number;
+  succeeded?: number; 
+  failed?: number; 
+  failedEmployeeIds?: number[]; 
+}

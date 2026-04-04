@@ -2,6 +2,8 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Actions, IActions } from "@/components/shared/Actions";
 import { IAttAdjustment } from "@/types/admin/att-adjustment";
+import { SharedBadge } from "@/components/shared/SharedBadge";
+import { formatToDate } from "@/utils/shared-format";
 
 export const attAdjustmentColumns = (actions: IActions[]): ColumnDef<IAttAdjustment>[] => {
   const viewAction = actions.find((action) => action.name === "View")?.event;
@@ -19,7 +21,10 @@ export const attAdjustmentColumns = (actions: IActions[]): ColumnDef<IAttAdjustm
         </div>
       ),
     },
-
+    {
+      header: "Code",
+      cell: ({ row }) => <div>{row.original.employee?.empCode}</div>,
+    },
     {
       header: "Employee",
       cell: ({ row }) => (
@@ -27,7 +32,9 @@ export const attAdjustmentColumns = (actions: IActions[]): ColumnDef<IAttAdjustm
           <p className="text-md">
             {row.original.employee?.lastName} {row.original.employee?.firstName}
           </p>
-          <span className="text-muted-foreground text-sm">{row.original.employee?.position}</span>
+          <span className="text-muted-foreground text-sm">
+            {row.original.employee?.lastNameKh} {row.original.employee?.firstNameKh}
+          </span>
         </div>
       ),
     },
@@ -37,7 +44,11 @@ export const attAdjustmentColumns = (actions: IActions[]): ColumnDef<IAttAdjustm
     },
     {
       header: "Field Change",
-      cell: ({ row }) => <div>{row.original.fieldChanged}</div>,
+      cell: ({ row }) => (
+        <div>
+          <SharedBadge variant={"blue"}>{row.original.fieldChanged}</SharedBadge>
+        </div>
+      ),
     },
     {
       header: "Old Value",
@@ -57,11 +68,18 @@ export const attAdjustmentColumns = (actions: IActions[]): ColumnDef<IAttAdjustm
     },
     {
       header: "Is Applied",
-      cell: ({ row }) => <div>{row.original.isApplied}</div>,
+      cell: ({ row }) => (
+        <input
+          type="checkbox"
+          checked={row.original.isApplied ?? false}
+          readOnly
+          className="h-4 w-4 accent-primary cursor-default"
+        />
+      ),
     },
     {
       header: "Created",
-      cell: ({ row }) => new Date(row.original.createdAt ?? "").toLocaleDateString(),
+      cell: ({ row }) => <div>{formatToDate(row.original.createdAt)}</div>,
     },
     {
       id: "actions",

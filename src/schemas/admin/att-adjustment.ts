@@ -1,11 +1,10 @@
 import { z } from "zod";
-
-const DATE_REGEX = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
+import { DATE_REGEX } from "../shared-regex";
 
 export const attAdjustmentSchema = z
   .object({
     attendanceSummaryId: z.number().int().nonnegative().optional(),
-    employeeId: z.number().int("Employee ID must be an integer").positive("Employee ID must be a positive number"),
+    empCode: z.string().min(1, "Employee Code is required"),
     date: z.string().regex(DATE_REGEX, "Date must be in YYYY-MM-DD format"),
     fieldChanged: z.string().min(1, "Field changed is required"),
     oldValue: z.string().optional(),

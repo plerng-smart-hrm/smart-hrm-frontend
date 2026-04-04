@@ -2,10 +2,10 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Actions, IActions } from "@/components/shared/Actions";
 import { IAttendanceSummary } from "@/types/admin/attendance-summary";
+import { formatToDate, formatToDateTime } from "@/utils/shared-format";
+import { SharedBadge } from "@/components/shared/SharedBadge";
 
-export const attendanceSummaryColumns = (
-  actions: IActions[],
-): ColumnDef<IAttendanceSummary>[] => {
+export const attendanceSummaryColumns = (actions: IActions[]): ColumnDef<IAttendanceSummary>[] => {
   return [
     {
       header: "ID",
@@ -13,29 +13,31 @@ export const attendanceSummaryColumns = (
       cell: ({ row }) => <div>{row.original.id}</div>,
     },
     {
-      header: "Name",
+      header: "Code",
+      cell: ({ row }) => <div>{row.original.employee?.empCode}</div>,
+    },
+    {
+      header: "Employee",
       cell: ({ row }) => (
         <div className="flex flex-col">
-          <p className="text-md">{row.original.employee?.firstNameKh}</p>
+          <p className="text-md">
+            {row.original.employee?.lastName} {row.original.employee?.firstName}
+          </p>
           <span className="text-muted-foreground text-sm">
-            {row.original.employee?.lastNameKh}
+            {row.original.employee?.lastNameKh} {row.original.employee?.firstNameKh}
           </span>
         </div>
       ),
     },
     {
       header: "Date",
-      cell: ({ row }) => (
-        <span className="inline-flex items-center gap-x-1.5 py-0.5 px-3 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-800/30 dark:text-blue-500">
-          {row.original.date}
-        </span>
-      ),
+      cell: ({ row }) => <SharedBadge variant={"blue"}>{formatToDate(row.original.date)}</SharedBadge>,
     },
     {
       header: "First In",
       cell: ({ row }) => (
         <div>
-          <p>{row.original.firstIn}</p>
+          <SharedBadge variant={"yellow"}>{formatToDateTime(row.original.firstIn)}</SharedBadge>
         </div>
       ),
     },
@@ -43,7 +45,7 @@ export const attendanceSummaryColumns = (
       header: "First Out",
       cell: ({ row }) => (
         <div>
-          <p>{row.original.firstOut}</p>
+          <SharedBadge variant={"yellow"}>{formatToDateTime(row.original.firstOut)}</SharedBadge>
         </div>
       ),
     },
@@ -51,7 +53,15 @@ export const attendanceSummaryColumns = (
       header: "Second In",
       cell: ({ row }) => (
         <div>
-          <p>{row.original.firstIn}</p>
+          <SharedBadge variant={"green"}>{formatToDateTime(row.original.secondIn)}</SharedBadge>
+        </div>
+      ),
+    },
+    {
+      header: "Second Out",
+      cell: ({ row }) => (
+        <div>
+          <SharedBadge variant={"green"}>{formatToDateTime(row.original.secondOut)}</SharedBadge>
         </div>
       ),
     },
@@ -88,12 +98,18 @@ export const attendanceSummaryColumns = (
       ),
     },
     {
+      header: "Created At",
+      cell: ({ row }) => <div>{formatToDate(row.original.createdAt)}</div>,
+    },
+    {
+      header: "Updated At",
+      cell: ({ row }) => <div>{formatToDate(row.original.updatedAt)}</div>,
+    },
+    {
       id: "actions",
       header: "Actions",
       size: 50,
-      cell: ({ row }) => (
-        <Actions row={row?.original ?? undefined} actions={actions} />
-      ),
+      cell: ({ row }) => <Actions row={row?.original ?? undefined} actions={actions} />,
     },
   ];
 };

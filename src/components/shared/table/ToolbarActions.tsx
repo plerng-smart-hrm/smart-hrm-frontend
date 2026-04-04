@@ -21,7 +21,7 @@ export function ToolbarActions({ actions = [] }: IProps) {
                     size={"sm"}
                     onClick={() => item?.event?.()}
                   >
-                    {Icon && <Icon className="h-4 w-4" />} {item?.name}
+                    {Icon && <Icon className="h-4 w-4 mr-1" />} {item?.name}
                   </Button>
                 </React.Fragment>
               );

@@ -1,6 +1,7 @@
 import { FieldDefinition } from "@/components/shared/form/RenderField";
 import { formatToNumber, formatToString } from "@/lib/custom-format";
 import { IAttAdjustment } from "@/types/admin/att-adjustment";
+import { formatToTodayDate } from "@/utils/shared-format";
 
 export const attAdjustmentFields: FieldDefinition[] = [
   {
@@ -10,9 +11,9 @@ export const attAdjustmentFields: FieldDefinition[] = [
     required: true,
   },
   {
-    label: "Employee",
-    key: "employeeId",
-    type: "number",
+    label: "Employee Code",
+    key: "empCode",
+    type: "text",
     required: true,
   },
 
@@ -28,8 +29,10 @@ export const attAdjustmentFields: FieldDefinition[] = [
     type: "select",
     required: true,
     options: [
-      { label: "CHECK_IN", value: "CHECK_IN" },
-      { label: "CHECK_OUT", value: "CHECK_OUT" },
+      { label: "FIRST_IN", value: "FIRST_IN" },
+      { label: "FIRST_OUT", value: "FIRST_OUT" },
+      { label: "SECOND_IN", value: "SECOND_IN" },
+      { label: "SECOND_OUT", value: "SECOND_OUT" },
       { label: "STATUS", value: "STATUS" },
     ],
   },
@@ -54,8 +57,8 @@ export const attAdjustmentFields: FieldDefinition[] = [
 
 export const getAttAdjustmentValues = (initialData?: IAttAdjustment): any => ({
   attendanceSummaryId: formatToNumber(initialData?.attendanceSummaryId),
-  employeeId: formatToNumber(initialData?.employeeId),
-  date: formatToString(initialData?.date),
+  empCode: formatToString(initialData?.employee?.empCode),
+  date: formatToString(initialData?.date) || formatToTodayDate(),
   fieldChanged: formatToString(initialData?.fieldChanged),
   oldValue: formatToString(initialData?.oldValue),
   newValue: formatToString(initialData?.newValue),
