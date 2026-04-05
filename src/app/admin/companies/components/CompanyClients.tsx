@@ -14,7 +14,7 @@ import { PenIcon, TrashIcon, PlusIcon } from "lucide-react";
 import { IActions } from "@/components/shared/Actions";
 
 interface Props {}
-const CompanyClient = ({}: Props) => {
+const CompanyClients = ({}: Props) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const [isOpen, setIsOpen] = useState(false);
@@ -113,4 +113,4 @@ const CompanyClient = ({}: Props) => {
   );
 };
 
-export default CompanyClient;
+export default CompanyClients;
