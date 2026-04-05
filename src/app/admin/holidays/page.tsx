@@ -4,27 +4,25 @@ import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import HolidayClient from "./components/HolidayClient";
 import { getSearchParams } from "@/utils/searchParams";
 import { getAllHolidays } from "@/service/admin/holiday.service";
+import { ContentLayout } from "@/components/admin-panel/content-layout";
+import ContentWrapper from "@/components/content/content-wrapper";
+import { employeeKeys } from "@/service/util/query-keys/employee";
+import { holidayKeys } from "@/service/util/query-keys/holiday";
 
 interface Props {
   searchParams: Promise<{
-    pageIndex?: string;
-    pageSize?: string;
+    page?: string;
+    limit?: string;
   }>;
 }
 
-const page = async ({ searchParams }: Props) => {
-  const queryClient = getQueryClient();
-  const { pageIndex, pageSize } = getSearchParams(await searchParams);
-
-  await queryClient.prefetchQuery({
-    queryKey: queryKeys.holidays.list(pageIndex, pageSize),
-    queryFn: () => getAllHolidays(pageIndex, pageSize),
-  });
-
+const page = async ({}: Props) => {
   return (
-    <HydrationBoundary state={dehydrate(queryClient)}>
-      <HolidayClient initPageIndex={pageIndex} initPageSize={pageSize} />
-    </HydrationBoundary>
+    <ContentLayout title={"Holidays"}>
+      <ContentWrapper queryKey={holidayKeys.list_holiday}>
+        <HolidayClient />
+      </ContentWrapper>
+    </ContentLayout>
   );
 };
 

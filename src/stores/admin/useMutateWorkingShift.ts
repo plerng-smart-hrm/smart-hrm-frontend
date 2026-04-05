@@ -6,7 +6,8 @@ import {
   deleteWorkingShift,
   updateWorkingShift,
 } from "@/service/admin/working-shifts.service";
-import { workingShiftCache } from "@/service/util/query-cache/working-shift";
+import { workingShiftKeys } from "@/service/util/query-keys/working-shift";
+
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -16,17 +17,15 @@ export const useMutateWorkingShift = () => {
   const queryClient = useQueryClient();
 
   const createMutation = useMutation({
-    mutationFn: async ({
-      request,
-    }: {
-      request: WorkingShiftValues;
-    }) => {
+    mutationFn: async ({ request }: { request: WorkingShiftValues }) => {
       return await createWorkingShift(request);
     },
     onSuccess: () => {
       toast.success(`${RESOURCE} created successfully`);
 
-      workingShiftCache.clearAll(queryClient);
+      queryClient.invalidateQueries({
+        queryKey: [workingShiftKeys.list_working_shift],
+      });
     },
     onError: () => {
       toast.error(`Failed to create ${RESOURCE.toLowerCase()}`);
@@ -45,8 +44,9 @@ export const useMutateWorkingShift = () => {
     },
     onSuccess: () => {
       toast.success(`${RESOURCE} updated successfully`);
-
-      workingShiftCache.clearAll(queryClient);
+      queryClient.invalidateQueries({
+        queryKey: [workingShiftKeys.list_working_shift],
+      });
     },
     onError: () => {
       toast.error(`Failed to update ${RESOURCE.toLowerCase()}`);
@@ -60,7 +60,9 @@ export const useMutateWorkingShift = () => {
     onSuccess: () => {
       toast.success(`${RESOURCE} deleted successfully`);
 
-      workingShiftCache.clearAll(queryClient);
+      queryClient.invalidateQueries({
+        queryKey: [workingShiftKeys.list_working_shift],
+      });
     },
     onError: () => {
       toast.error(`Failed to delete ${RESOURCE.toLowerCase()}`);
@@ -68,8 +70,8 @@ export const useMutateWorkingShift = () => {
   });
 
   return {
-    create: createMutation.mutateAsync,
-    update: updateMutation.mutateAsync,
-    delete: deleteMutation.mutateAsync,
+    createWorkingShift: createMutation.mutateAsync,
+    updateWorkingShift: updateMutation.mutateAsync,
+    deleteWorkingShift: deleteMutation.mutateAsync,
   };
 };

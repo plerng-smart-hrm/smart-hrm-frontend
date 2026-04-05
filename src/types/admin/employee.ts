@@ -5,6 +5,7 @@ export interface IEmployee {
   lastName?: string;
   firstNameKh?: string;
   lastNameKh?: string;
+  profileUrl?: string;
   gender?: string;
   dateOfBirth?: string;
   placeOfBirth?: string;

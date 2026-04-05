@@ -3,7 +3,7 @@
 import { cookies } from "next/headers";
 
 const API_KEY = process.env.API_KEY!;
-const API_BASE_URL = process.env.API_BASE_URL!;
+const API_BASE_URL = process.env.BACKEND_URL!;
 
 export interface ApiOptions extends RequestInit {
   body?: any;
@@ -13,7 +13,7 @@ export interface ApiOptions extends RequestInit {
 export async function apiRequest<T = any>(
   method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE",
   url: string,
-  options: ApiOptions = {}
+  options: ApiOptions = {},
 ): Promise<T> {
   const cookieStore = await cookies();
   const accessToken = cookieStore.get("accessToken")?.value;
@@ -57,10 +57,10 @@ export async function apiRequest<T = any>(
   if (!response.ok) {
     const text = await response.text();
     console.error(
-      `API ${method} ${url} failed: ${text || response.statusText}`
+      `API ${method} ${url} failed: ${text || response.statusText}`,
     );
     throw new Error(
-      `API ${method} ${url} failed: ${text || response.statusText}`
+      `API ${method} ${url} failed: ${text || response.statusText}`,
     );
   }
 

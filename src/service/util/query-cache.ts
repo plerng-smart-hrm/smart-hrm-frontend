@@ -22,27 +22,6 @@ export const contractTypeCache = {
   },
 };
 
-export const contractCache = {
-  clearAll: (queryClient: QueryClient) => {
-    queryClient.removeQueries({
-      queryKey: queryKeys.contracts.root,
-    });
-  },
-
-  clearList: (queryClient: QueryClient) => {
-    queryClient.removeQueries({
-      queryKey: queryKeys.contracts.list(),
-      exact: false,
-    });
-  },
-
-  clearDetail: (queryClient: QueryClient, id?: number) => {
-    queryClient.removeQueries({
-      queryKey: queryKeys.contracts.detail(id),
-    });
-  },
-};
-
 export const leaveTypeCache = {
   clearAll: (queryClient: QueryClient) => {
     queryClient.removeQueries({

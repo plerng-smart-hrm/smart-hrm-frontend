@@ -1,57 +1,52 @@
 "use client";
-import { DataTable } from "@/components/data-table";
-import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { LoadingOverlay } from "@/components/LoadingOverlay";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { ISection } from "@/types/admin";
-import { getAllSections } from "@/service/admin/sections.service";
 import { useMutateSection } from "@/stores/admin/useMutateSection";
 import { sectionColumns } from "./columns";
-import SectionDialog from "./SectionDialog";
-import { queryKeys } from "@/service/util/query-keys/section";
+import { useDataTable } from "@/hooks/use-data-table";
+import { PenIcon, PlusIcon, TrashIcon } from "lucide-react";
+import BaseDataTable from "@/components/shared/table/BaseDataTable";
+import { ToolbarActions } from "@/components/shared/table/ToolbarActions";
+import { ToolBarDataTale } from "@/components/shared/table/ToolBarDataTale";
+import SharedDialog from "@/components/shared/SharedDialog";
+import SectionForm from "./form/SectionForm";
 
-interface Props {
-  initPageIndex: number;
-  initPageSize: number;
-}
-const SectionClient = ({ initPageIndex, initPageSize }: Props) => {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-
+const SectionClient = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [pageIndex, setPageIndex] = useState(initPageIndex);
-  const [pageSize, setPageSize] = useState(initPageSize);
 
   const [isOpen, setIsOpen] = useState(false);
   const [isDelete, setIsDelete] = useState(false);
   const [section, setSection] = useState<ISection | undefined>(undefined);
 
-  const { data, isFetching } = useQuery({
-    queryKey: queryKeys.sections.list(pageIndex, pageSize),
-    queryFn: () => getAllSections(pageIndex, pageSize),
+  const actionButton = [
+    {
+      name: "Update",
+      icon: PenIcon,
+      event: (value: ISection) => {
+        setIsOpen(true);
+        setSection(value);
+      },
+    },
+
+    {
+      name: "Delete",
+      icon: TrashIcon,
+      event: (value: ISection) => {
+        setIsDelete(true);
+        setSection(value);
+      },
+    },
+  ];
+
+  const { table } = useDataTable({
+    columns: sectionColumns(actionButton),
   });
 
-  const sections = data?.sections ?? [];
-  const pagination = data?.pagination;
-
-  const cols = sectionColumns({
-    onEdit: (row) => {
-      setIsOpen(true);
-      setSection(row);
-    },
-    onDelete: (row) => {
-      setIsDelete(true);
-      setSection(row);
-    },
-  });
-  const { delete: deleteSectionMutate } = useMutateSection();
+  const { deleteSection } = useMutateSection();
 
   const handleDelete = async () => {
     setIsLoading(true);
-    await deleteSectionMutate(
+    await deleteSection(
       { sectionId: section?.id },
       {
         onSuccess: () => {
@@ -61,66 +56,54 @@ const SectionClient = ({ initPageIndex, initPageSize }: Props) => {
         onSettled: () => {
           setIsLoading(false);
         },
-      }
+      },
     );
   };
 
-  const handlePaginationChange = ({
-    pageIndex,
-    pageSize,
-  }: {
-    pageIndex: number;
-    pageSize: number;
-  }) => {
-    setPageIndex(pageIndex);
-    setPageSize(pageSize);
-    const params = new URLSearchParams(searchParams);
-    params.set("pageIndex", String(pageIndex));
-    params.set("pageSize", String(pageSize));
-    router.push(`${pathname}?${params.toString()}`);
-  };
-
-  if (isFetching) {
-    return <LoadingOverlay isLoading={isFetching} />;
-  }
-
   return (
     <div>
-      {isOpen && (
-        <SectionDialog
-          isOpen={isOpen}
-          setIsOpen={() => {
-            setIsOpen(false);
-            setSection(undefined);
-          }}
-          sectionId={section?.id}
-        />
-      )}
+      <BaseDataTable table={table}>
+        <ToolBarDataTale table={table}>
+          <ToolbarActions
+            actions={[
+              {
+                name: "Create",
+                icon: PlusIcon,
+                event: () => {
+                  setSection(undefined);
+                  setIsOpen(true);
+                },
+              },
+            ]}
+          />
+        </ToolBarDataTale>
+      </BaseDataTable>
 
-      {isDelete && (
-        <ConfirmDialog
-          open={isDelete}
-          onOpenChange={setIsDelete}
-          title="Delete Section"
-          description={`This will remove the ${section?.name}`}
-          loading={isLoading}
-          onConfirm={handleDelete}
-        />
-      )}
+      <SharedDialog
+        title={`${section ? "Update" : "Create"} Section`}
+        setOpen={setIsOpen}
+        open={isOpen}
+        isSubmit={false}
+        isCancel={false}
+        isLoading={isLoading}
+        width="40%"
+      >
+        <SectionForm initialData={section} onSuccess={() => setIsOpen(false)} />
+      </SharedDialog>
 
-      <DataTable
-        columns={cols}
-        data={sections}
-        serverMode={true}
-        pageCount={pagination?.totalPages ?? 0}
-        onPaginationChange={handlePaginationChange}
-        initialPageIndex={pageIndex}
-        initialPageSize={pageSize}
-        createLabel="Create"
-        onCreateClick={() => {
-          setIsOpen(true);
-        }}
-      />
+      <SharedDialog
+        title={"Delete Section"}
+        setOpen={setIsDelete}
+        open={isDelete}
+        submitEvent={handleDelete}
+        isSubmit
+        submitTitle="Yes, Delete"
+        className="bg-red-500"
+        isLoading={isLoading}
+        width="50%"
+      >
+        <p>This will remove the {section?.name}</p>
+      </SharedDialog>
     </div>
   );
 };

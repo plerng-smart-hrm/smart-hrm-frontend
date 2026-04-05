@@ -2,26 +2,13 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { IHoliday } from "@/types/admin";
 import { useState } from "react";
-import { LoadingButton } from "@/components/LoadingButton";
 import { useMutateHoliday } from "@/stores/admin/useMutateHoliday";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import LoadingButton from "@/components/shared/button/LoadingButton";
 
 const formSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -50,8 +37,7 @@ export default function HolidayForm({ initialData, onSuccess }: Props) {
     },
   });
 
-  const { create: createHolidayMutate, update: updateHolidayMutate } =
-    useMutateHoliday();
+  const { create: createHolidayMutate, update: updateHolidayMutate } = useMutateHoliday();
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
@@ -65,7 +51,7 @@ export default function HolidayForm({ initialData, onSuccess }: Props) {
           onSettled: () => {
             setIsLoading(false);
           },
-        }
+        },
       );
     } else {
       await createHolidayMutate(
@@ -77,7 +63,7 @@ export default function HolidayForm({ initialData, onSuccess }: Props) {
           onSettled: () => {
             setIsLoading(false);
           },
-        }
+        },
       );
     }
   }
@@ -145,10 +131,7 @@ export default function HolidayForm({ initialData, onSuccess }: Props) {
                   <FormLabel>
                     Holiday Type<span className="text-red-500">*</span>
                   </FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger className="w-full">
                         <SelectValue placeholder="Select holiday type" />
@@ -167,9 +150,7 @@ export default function HolidayForm({ initialData, onSuccess }: Props) {
         </div>
 
         <div className="flex justify-end">
-          <LoadingButton type="submit" loading={isLoading}>
-            {isEdit ? "Update" : "Save"}
-          </LoadingButton>
+          <LoadingButton isLoading={isLoading} label={isEdit ? "Update" : "Create"} handleEvent={() => {}} />
         </div>
       </form>
     </Form>

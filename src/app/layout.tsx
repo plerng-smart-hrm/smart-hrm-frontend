@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import Providers from "@/providers/ReactQueryProvider";
 import { Toaster } from "@/components/ui/sonner";
 
 import "./globals.css";
+import { QueryClientProvider } from "@/providers/query-client-provider";
+import { ThemeProvider } from "@/components/theme-provider";
+import { NuqsAdapter } from "nuqs/adapters/react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,12 +28,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} `}>
-        <Providers>
-          <div>{children}</div>
-          <Toaster richColors position="top-center" />
-        </Providers>
+    <html lang="en" suppressHydrationWarning>
+      <body
+        suppressHydrationWarning
+        className={`${geistSans.variable} ${geistMono.variable} `}
+      >
+        <QueryClientProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme={"system"}
+            enableSystem
+            disableTransitionOnChange
+          >
+            <NuqsAdapter>{children}</NuqsAdapter>
+            <Toaster richColors position="top-center" />
+          </ThemeProvider>
+        </QueryClientProvider>
       </body>
     </html>
   );

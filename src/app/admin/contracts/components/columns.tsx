@@ -1,24 +1,25 @@
 "use client";
 import { ColumnDef } from "@tanstack/react-table";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
-import { IconDotsVertical } from "@tabler/icons-react";
-import { IContract } from "@/types/admin";
-import { createRowNumberColumn } from "@/components/data-table";
+import { Actions, IActions } from "@/components/shared/Actions";
+import { IContract } from "@/types/admin/contract";
 
-export const contractColumns = (opts?: {
-  onEdit?: (row: IContract) => void;
-  onDelete?: (row: IContract) => void;
-}): ColumnDef<IContract>[] => {
-  const { onDelete, onEdit } = opts ?? {};
+export const contractColumns = (actions: IActions[]): ColumnDef<IContract>[] => {
+  const viewAction = actions.find((action) => action.name === "View")?.event;
 
-  const cols: ColumnDef<IContract>[] = [
-    createRowNumberColumn<IContract>(),
+  return [
+    {
+      header: "ID",
+      size: 50,
+      cell: ({ row }) => (
+        <div 
+          className="cursor-pointer text-primary hover:underline hover:text-primary/80 font-medium" 
+          onClick={() => viewAction?.(row.original)}
+        >
+          {row.original.id}
+        </div>
+      ),
+    },
+
     {
       header: "Employee",
       cell: ({ row }) => (
@@ -26,9 +27,7 @@ export const contractColumns = (opts?: {
           <p className="text-md">
             {row.original.employee?.lastName} {row.original.employee?.firstName}
           </p>
-          <span className="text-muted-foreground text-sm">
-            {row.original.employee?.position}
-          </span>
+          <span className="text-muted-foreground text-sm">{row.original.employee?.position}</span>
         </div>
       ),
     },
@@ -36,7 +35,7 @@ export const contractColumns = (opts?: {
       header: "Contract Type",
       cell: ({ row }) => (
         <span className="inline-flex items-center gap-x-1.5 py-0.5 px-3 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-800/30 dark:text-blue-500">
-          {row.original.contractType?.code}
+          {row.original.contractType}
         </span>
       ),
     },
@@ -54,44 +53,13 @@ export const contractColumns = (opts?: {
     },
     {
       header: "Created",
-      cell: ({ row }) =>
-        new Date(row.original.createdAt ?? "").toLocaleDateString(),
+      cell: ({ row }) => new Date(row.original.createdAt ?? "").toLocaleDateString(),
     },
     {
       id: "actions",
-      header: "",
-      cell: ({ row }) => (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
-              size="icon"
-            >
-              <IconDotsVertical />
-              <span className="sr-only">Open menu</span>
-            </Button>
-          </DropdownMenuTrigger>
-
-          <DropdownMenuContent align="end" className="w-32">
-            <DropdownMenuItem
-              className="cursor-pointer"
-              onClick={() => onEdit?.(row.original)}
-            >
-              Edit
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              variant="destructive"
-              className="cursor-pointer"
-              onClick={() => onDelete?.(row.original)}
-            >
-              Delete
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      ),
+      header: "Actions",
+      size: 50,
+      cell: ({ row }) => <Actions row={row?.original ?? undefined} actions={actions} />,
     },
   ];
-
-  return cols;
 };

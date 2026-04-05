@@ -7,7 +7,7 @@ import {
   IUpdateSectionRequest,
   updateSection,
 } from "@/service/admin/sections.service";
-import { sectionCache } from "@/service/util/query-cache/section";
+import { sectionKeys } from "@/service/util/query-keys/section";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -22,8 +22,9 @@ export const useMutateSection = () => {
     },
     onSuccess: () => {
       toast.success(`${RESOURCE} created successfully`);
-
-      sectionCache.clearAll(queryClient);
+      queryClient.invalidateQueries({
+        queryKey: [sectionKeys.list_section],
+      });
     },
     onError: () => {
       toast.error(`Failed to create ${RESOURCE.toLowerCase()}`);
@@ -43,7 +44,9 @@ export const useMutateSection = () => {
     onSuccess: () => {
       toast.success(`${RESOURCE} updated successfully`);
 
-      sectionCache.clearAll(queryClient);
+      queryClient.invalidateQueries({
+        queryKey: [sectionKeys.list_section],
+      });
     },
     onError: () => {
       toast.error(`Failed to update ${RESOURCE.toLowerCase()}`);
@@ -57,7 +60,9 @@ export const useMutateSection = () => {
     onSuccess: () => {
       toast.success(`${RESOURCE} deleted successfully`);
 
-      sectionCache.clearAll(queryClient);
+      queryClient.invalidateQueries({
+        queryKey: [sectionKeys.list_section],
+      });
     },
     onError: () => {
       toast.error(`Failed to delete ${RESOURCE.toLowerCase()}`);
@@ -65,8 +70,8 @@ export const useMutateSection = () => {
   });
 
   return {
-    create: createMutation.mutateAsync,
-    update: updateMutation.mutateAsync,
-    delete: deleteMutation.mutateAsync,
+    createSection: createMutation.mutateAsync,
+    updateSection: updateMutation.mutateAsync,
+    deleteSection: deleteMutation.mutateAsync,
   };
 };

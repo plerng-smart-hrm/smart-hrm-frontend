@@ -1,17 +1,12 @@
 "use client";
 
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useMutateHoliday } from "@/stores/admin/useMutateHoliday";
-import { LoadingButton } from "@/components/LoadingButton";
 import { ArrowRightCircleIcon } from "lucide-react";
 import ShareUploadFile from "@/components/ShareUploadFile";
+import LoadingButton from "@/components/shared/button/LoadingButton";
 
 interface Props {
   open: boolean;
@@ -38,7 +33,7 @@ const ImportHolidayModal = ({ open, onClose }: Props) => {
         onSettled: () => {
           setIsLoading(false);
         },
-      }
+      },
     );
   };
 
@@ -62,9 +57,7 @@ const ImportHolidayModal = ({ open, onClose }: Props) => {
           <Button
             variant="outline"
             className="w-full"
-            onClick={() =>
-              window.open("/templates/Holiday_Template.xlsx", "_blank")
-            }
+            onClick={() => window.open("/templates/Holiday_Template.xlsx", "_blank")}
           >
             <ArrowRightCircleIcon className="w-4 h-4 mr-2" />
             ទាញយកកំរូវសម្រាប់ Import
@@ -81,15 +74,13 @@ const ImportHolidayModal = ({ open, onClose }: Props) => {
             description="Only .xlsx files are supported"
           />
 
-          {/* Submit */}
           <LoadingButton
-            loading={isLoading}
             className="w-full"
-            onClick={handleUpload}
+            isLoading={isLoading}
+            label={`Upload & Import`}
+            handleEvent={handleUpload}
             disabled={!files || files.length === 0}
-          >
-            Upload & Import
-          </LoadingButton>
+          />
         </div>
       </DialogContent>
     </Dialog>

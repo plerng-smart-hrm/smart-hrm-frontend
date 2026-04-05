@@ -2,37 +2,20 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { ILeaveRequest, ILeaveType } from "@/types/admin";
 import { useState } from "react";
 import { useMutateLeaveRequest } from "@/stores/admin/useMutateLeaveRequest";
-import { LoadingButton } from "@/components/LoadingButton";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
+import LoadingButton from "@/components/shared/button/LoadingButton";
 
 const formSchema = z
   .object({
@@ -53,7 +36,7 @@ const formSchema = z
     {
       message: "End date must be after start date",
       path: ["endDate"],
-    }
+    },
   );
 type FormValues = z.infer<typeof formSchema>;
 
@@ -63,11 +46,7 @@ interface Props {
   onSuccess: () => void;
 }
 
-export default function LeaveRequestForm({
-  initialData,
-  leaveTypes,
-  onSuccess,
-}: Props) {
+export default function LeaveRequestForm({ initialData, leaveTypes, onSuccess }: Props) {
   const isEdit = !!initialData;
 
   const [isLoading, setIsLoading] = useState(false);
@@ -85,8 +64,7 @@ export default function LeaveRequestForm({
     },
   });
 
-  const { create: createLeaveRequestMutate, update: updateLeaveRequestMutate } =
-    useMutateLeaveRequest();
+  const { create: createLeaveRequestMutate, update: updateLeaveRequestMutate } = useMutateLeaveRequest();
 
   async function onSubmit(values: FormValues) {
     setIsLoading(true);
@@ -100,7 +78,7 @@ export default function LeaveRequestForm({
           onSettled: () => {
             setIsLoading(false);
           },
-        }
+        },
       );
     } else {
       await createLeaveRequestMutate(
@@ -112,7 +90,7 @@ export default function LeaveRequestForm({
           onSettled: () => {
             setIsLoading(false);
           },
-        }
+        },
       );
     }
   }
@@ -201,16 +179,9 @@ export default function LeaveRequestForm({
                   <FormControl>
                     <Button
                       variant={"outline"}
-                      className={cn(
-                        "w-full pl-3 text-left font-normal",
-                        !field.value && "text-muted-foreground"
-                      )}
+                      className={cn("w-full pl-3 text-left font-normal", !field.value && "text-muted-foreground")}
                     >
-                      {field.value ? (
-                        format(new Date(field.value), "PPP")
-                      ) : (
-                        <span>Pick a date</span>
-                      )}
+                      {field.value ? format(new Date(field.value), "PPP") : <span>Pick a date</span>}
                       <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                     </Button>
                   </FormControl>
@@ -243,16 +214,9 @@ export default function LeaveRequestForm({
                   <FormControl>
                     <Button
                       variant={"outline"}
-                      className={cn(
-                        "w-full pl-3 text-left font-normal",
-                        !field.value && "text-muted-foreground"
-                      )}
+                      className={cn("w-full pl-3 text-left font-normal", !field.value && "text-muted-foreground")}
                     >
-                      {field.value ? (
-                        format(new Date(field.value), "PPP")
-                      ) : (
-                        <span>Pick a date</span>
-                      )}
+                      {field.value ? format(new Date(field.value), "PPP") : <span>Pick a date</span>}
                       <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                     </Button>
                   </FormControl>
@@ -285,16 +249,9 @@ export default function LeaveRequestForm({
                   <FormControl>
                     <Button
                       variant={"outline"}
-                      className={cn(
-                        "w-full pl-3 text-left font-normal",
-                        !field.value && "text-muted-foreground"
-                      )}
+                      className={cn("w-full pl-3 text-left font-normal", !field.value && "text-muted-foreground")}
                     >
-                      {field.value ? (
-                        format(new Date(field.value), "PPP")
-                      ) : (
-                        <span>Pick a date</span>
-                      )}
+                      {field.value ? format(new Date(field.value), "PPP") : <span>Pick a date</span>}
                       <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                     </Button>
                   </FormControl>
@@ -316,9 +273,7 @@ export default function LeaveRequestForm({
           )}
         />
 
-        <LoadingButton type="submit" loading={isLoading}>
-          {isEdit ? "Save" : "Create"}
-        </LoadingButton>
+        <LoadingButton isLoading={isLoading} label={isEdit ? "Save" : "Create"} handleEvent={() => {}} />
       </form>
     </Form>
   );

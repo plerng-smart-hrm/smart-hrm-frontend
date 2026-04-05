@@ -1,7 +1,9 @@
 "use server";
 
-import { IApiResponse, IContract, IHoliday, IPagination } from "@/types/admin";
+import { IApiResponse, IHoliday, IPagination } from "@/types/admin";
 import { api } from "../util/api";
+import { ContractValues } from "@/schemas/admin/contract";
+import { IContract } from "@/types/admin/contract";
 
 export interface IContractsRes {
   contracts?: IContract[];
@@ -36,44 +38,30 @@ export interface IUpdateContractRequest {
   isExpired?: boolean;
 }
 
-export const getAllContracts = async (
-  pageIndex: number,
-  pageSize?: number
-): Promise<IContractsRes> => {
+export const getAllContracts = async (pageIndex: number, pageSize?: number): Promise<IContractsRes> => {
   const page = pageIndex + 1;
-  const data = await api.get<IApiResponse<IContract[]>>(
-    `/contracts?page=${page}&limit=${pageSize}`
-  );
+  const data = await api.get<IApiResponse<IContract[]>>(`/v1/contracts?page=${page}&limit=${pageSize}`);
   return {
     contracts: data.data,
     pagination: data.pagination,
   };
 };
 
-export const getContractById = async (
-  contractId?: number
-): Promise<IContractRes> => {
-  const data = await api.get<IApiResponse<IContract>>(
-    `/contracts/${contractId}`
-  );
+export const getContractById = async (contractId?: number): Promise<IContractRes> => {
+  const data = await api.get<IApiResponse<IContract>>(`/v1/contracts/${contractId}`);
   return {
     contract: data.data,
   };
 };
 
-export const createContract = async (
-  request: ICreateContractRequest
-): Promise<void> => {
-  await api.post<IApiResponse<void>>(`/contracts`, request);
+export const createContract = async (request: ContractValues): Promise<void> => {
+  await api.post<IApiResponse<void>>(`/v1/contracts`, request);
 };
 
-export const updateContract = async (
-  contractId?: number,
-  request?: IUpdateContractRequest
-): Promise<void> => {
-  await api.patch<IApiResponse<void>>(`/contracts/${contractId}`, request);
+export const updateContract = async (contractId?: number, request?: ContractValues): Promise<void> => {
+  await api.patch<IApiResponse<void>>(`/v1/contracts/${contractId}`, request);
 };
 
 export const deleteContract = async (contractId?: number): Promise<void> => {
-  await api.delete<IApiResponse<void>>(`/contracts/${contractId}`);
+  await api.delete<IApiResponse<void>>(`/v1/contracts/${contractId}`);
 };

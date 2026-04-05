@@ -20,8 +20,8 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { getWorkingShiftsList } from "@/service/admin/working-shifts.service";
-import { queryKeys } from "@/service/util/query-keys/working-shift";
 import { IWorkingShiftOption } from "@/types/admin/working-shift";
+import { workingShiftKeys } from "@/service/util/query-keys/working-shift";
 
 interface Props {
   value?: number;
@@ -40,19 +40,19 @@ export function WorkingShiftCombobox({
   const [searchQuery, setSearchQuery] = React.useState("");
 
   const { data, isLoading } = useQuery({
-    queryKey: queryKeys.workingShifts.dropdown(),
+    queryKey:[ workingShiftKeys.list_working_shift],
     queryFn: () => getWorkingShiftsList(),
   });
 
   const workingShifts: IWorkingShiftOption[] = React.useMemo(
     () => data?.data ?? [],
-    [data?.data]
+    [data?.data],
   );
 
   // Find the selected working shift
   const selectedWorkingShift = React.useMemo(
     () => workingShifts.find((shift) => shift.value === value),
-    [workingShifts, value]
+    [workingShifts, value],
   );
 
   // Filter working shifts based on search query
@@ -61,7 +61,7 @@ export function WorkingShiftCombobox({
 
     const query = searchQuery.toLowerCase();
     return workingShifts.filter((shift) =>
-      shift.label?.toLowerCase().includes(query)
+      shift.label?.toLowerCase().includes(query),
     );
   }, [workingShifts, searchQuery]);
 
@@ -81,7 +81,6 @@ export function WorkingShiftCombobox({
       <PopoverTrigger asChild>
         <Button
           variant="outline"
-          role="combobox"
           aria-expanded={open}
           disabled={disabled || isLoading}
           className="w-full justify-between font-normal min-h-10 h-auto py-2"
@@ -124,7 +123,7 @@ export function WorkingShiftCombobox({
                   <Check
                     className={cn(
                       "mr-2 h-4 w-4",
-                      value === shift.value ? "opacity-100" : "opacity-0"
+                      value === shift.value ? "opacity-100" : "opacity-0",
                     )}
                   />
                   <span className="font-medium truncate">{shift.label}</span>

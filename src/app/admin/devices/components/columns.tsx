@@ -1,26 +1,17 @@
 "use client";
 import { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
-import { IconDotsVertical } from "@tabler/icons-react";
 import { IDevice } from "@/types/admin";
-import { createRowNumberColumn } from "@/components/data-table";
 import { BadgeCheckIcon, XCircleIcon } from "lucide-react";
+import { Actions, IActions } from "@/components/shared/Actions";
 
-export const deviceColumns = (opts?: {
-  onEdit?: (row: IDevice) => void;
-  onDelete?: (row: IDevice) => void;
-}): ColumnDef<IDevice>[] => {
-  const { onDelete, onEdit } = opts ?? {};
-
-  const cols: ColumnDef<IDevice>[] = [
-    createRowNumberColumn<IDevice>(),
+export const deviceColumns = (actions: IActions[]): ColumnDef<IDevice>[] => {
+  return [
+    {
+      header: "ID",
+      size: 50,
+      cell: ({ row }) => <div>{row.original.id}</div>,
+    },
     {
       header: "Name",
       cell: ({ row }) => <div>{row.original.name}</div>,
@@ -69,37 +60,11 @@ export const deviceColumns = (opts?: {
     },
     {
       id: "actions",
-      header: "",
+      header: "Actions",
+      size: 50,
       cell: ({ row }) => (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
-              size="icon"
-            >
-              <IconDotsVertical />
-              <span className="sr-only">Open menu</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-32">
-            <DropdownMenuItem
-              className="cursor-pointer"
-              onClick={() => onEdit?.(row.original)}
-            >
-              Edit
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              variant="destructive"
-              onClick={() => onDelete?.(row.original)}
-            >
-              Delete
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <Actions row={row?.original ?? undefined} actions={actions} />
       ),
     },
   ];
-
-  return cols;
 };

@@ -1,60 +1,55 @@
 "use client";
 
-import { DataTable } from "@/components/data-table";
-import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { LoadingOverlay } from "@/components/LoadingOverlay";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { useMutateDepartment } from "@/stores/admin/useMutateDepartment";
 import { IDepartment } from "@/types/admin";
-import { getAllDepartments } from "@/service/admin/departments.service";
 import { departmentColumns } from "./columns";
-import DepartmentDialog from "./DepartmentDialog";
-import { queryKeys } from "@/service/util/query-keys/department";
+import { useDataTable } from "@/hooks/use-data-table";
+import { PenIcon, PlusIcon, TrashIcon } from "lucide-react";
+import SharedDialog from "@/components/shared/SharedDialog";
+import BaseDataTable from "@/components/shared/table/BaseDataTable";
+import { ToolbarActions } from "@/components/shared/table/ToolbarActions";
+import { ToolBarDataTale } from "@/components/shared/table/ToolBarDataTale";
+import DepartmentForm from "./form/DepartmentForm";
 
-interface Props {
-  initPageIndex: number;
-  initPageSize: number;
-}
-const DepartmentClient = ({ initPageIndex, initPageSize }: Props) => {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-
+const DepartmentClient = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [pageIndex, setPageIndex] = useState(initPageIndex);
-  const [pageSize, setPageSize] = useState(initPageSize);
 
   const [isOpen, setIsOpen] = useState(false);
   const [isDelete, setIsDelete] = useState(false);
   const [department, setDepartment] = useState<IDepartment | undefined>(
-    undefined
+    undefined,
   );
 
-  const { data, isFetching } = useQuery({
-    queryKey: queryKeys.departments.list(pageIndex, pageSize),
-    queryFn: () => getAllDepartments(pageIndex, pageSize),
+  const actionButton = [
+    {
+      name: "Update",
+      icon: PenIcon,
+      event: (value: IDepartment) => {
+        setIsOpen(true);
+        setDepartment(value);
+      },
+    },
+
+    {
+      name: "Delete",
+      icon: TrashIcon,
+      event: (value: IDepartment) => {
+        setIsDelete(true);
+        setDepartment(value);
+      },
+    },
+  ];
+
+  const { table } = useDataTable({
+    columns: departmentColumns(actionButton),
   });
 
-  const departments = data?.departments ?? [];
-  const pagination = data?.pagination;
-
-  const cols = departmentColumns({
-    onEdit: (row) => {
-      setIsOpen(true);
-      setDepartment(row);
-    },
-    onDelete: (row) => {
-      setIsDelete(true);
-      setDepartment(row);
-    },
-  });
-  const { delete: deleteDepartmentMutate } = useMutateDepartment();
+  const { deleteDepartment } = useMutateDepartment();
 
   const handleDelete = async () => {
     setIsLoading(true);
-    await deleteDepartmentMutate(
+    await deleteDepartment(
       { departmentId: department?.id },
       {
         onSuccess: () => {
@@ -64,66 +59,59 @@ const DepartmentClient = ({ initPageIndex, initPageSize }: Props) => {
         onSettled: () => {
           setIsLoading(false);
         },
-      }
+      },
     );
   };
 
-  const handlePaginationChange = ({
-    pageIndex,
-    pageSize,
-  }: {
-    pageIndex: number;
-    pageSize: number;
-  }) => {
-    setPageIndex(pageIndex);
-    setPageSize(pageSize);
-    const params = new URLSearchParams(searchParams);
-    params.set("pageIndex", String(pageIndex));
-    params.set("pageSize", String(pageSize));
-    router.push(`${pathname}?${params.toString()}`);
-  };
-
-  if (isFetching) {
-    return <LoadingOverlay isLoading={isFetching} />;
-  }
-
   return (
     <div>
-      {isOpen && (
-        <DepartmentDialog
-          isOpen={isOpen}
-          setIsOpen={() => {
-            setIsOpen(false);
-            setDepartment(undefined);
-          }}
-          departmentId={department?.id}
-        />
-      )}
+      <BaseDataTable table={table}>
+        <ToolBarDataTale table={table}>
+          <ToolbarActions
+            actions={[
+              {
+                name: "Create",
+                icon: PlusIcon,
+                event: () => {
+                  setIsOpen(true);
+                },
+              },
+            ]}
+          />
+        </ToolBarDataTale>
+      </BaseDataTable>
 
-      {isDelete && (
-        <ConfirmDialog
-          open={isDelete}
-          onOpenChange={setIsDelete}
-          title="Delete Category"
-          description={`This will remove the ${department?.name}`}
-          loading={isLoading}
-          onConfirm={handleDelete}
-        />
-      )}
+      <SharedDialog
+        title={"Delete Department"}
+        setOpen={setIsDelete}
+        open={isDelete}
+        submitEvent={handleDelete}
+        isSubmit
+        submitTitle="Yes, Delete"
+        className="bg-red-500"
+        isLoading={isLoading}
+        width="50%"
+      >
+        <p>
+          This will remove department name
+          <span className="font-bold">{department?.name}</span>
+        </p>
+      </SharedDialog>
 
-      <DataTable
-        columns={cols}
-        data={departments}
-        serverMode={true}
-        pageCount={pagination?.totalPages ?? 0}
-        onPaginationChange={handlePaginationChange}
-        initialPageIndex={pageIndex}
-        initialPageSize={pageSize}
-        createLabel="Create"
-        onCreateClick={() => {
-          setIsOpen(true);
-        }}
-      />
+      <SharedDialog
+        title={`${department ? "Update" : "Create"} Department`}
+        setOpen={setIsOpen}
+        open={isOpen}
+        isSubmit={false}
+        isCancel={false}
+        isLoading={isLoading}
+        width="40%"
+      >
+        <DepartmentForm
+          initialData={department}
+          onSuccess={() => setIsOpen(false)}
+        />
+      </SharedDialog>
     </div>
   );
 };

@@ -1,27 +1,27 @@
 "use client";
 import { ColumnDef } from "@tanstack/react-table";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
-import { IconDotsVertical } from "@tabler/icons-react";
-import { createRowNumberColumn } from "@/components/data-table";
 import { IEmployee } from "@/types/admin/employee";
+import { Actions, IActions } from "@/components/shared/Actions";
 
-export const employeeColumns = (opts?: {
-  onEdit?: (row: IEmployee) => void;
-  onDelete?: (row: IEmployee) => void;
-}): ColumnDef<IEmployee>[] => {
-  const { onDelete, onEdit } = opts ?? {};
+export const employeeColumns = (actions: IActions[]): ColumnDef<IEmployee>[] => {
+  const viewAction = actions.find((action) => action.name === "View")?.event;
 
-  const cols: ColumnDef<IEmployee>[] = [
-    createRowNumberColumn<IEmployee>(),
+  return [
+    {
+      header: "ID",
+      size: 50,
+      cell: ({ row }) => (
+        <div
+          className="cursor-pointer text-primary hover:underline hover:text-primary/80 font-medium"
+          onClick={() => viewAction?.(row.original)}
+        >
+          {row.original.id}
+        </div>
+      ),
+    },
     {
       header: "Code",
-      cell: ({ row }) => <div>EMP-{row.original.empCode}</div>,
+      cell: ({ row }) => <div>{row.original.empCode}</div>,
     },
     {
       header: "Employee",
@@ -45,50 +45,23 @@ export const employeeColumns = (opts?: {
       cell: ({ row }) => <div>{row.original.position}</div>,
     },
 
-    // {
-    //   header: "Joined Date",
-    //   cell: ({ row }) =>
-    //     new Date(row.original.joinedDate ?? "").toLocaleDateString(),
-    // },
-    // {
-    //   header: "Status",
-    //   cell: ({ row }) => <div>{row.original.status}</div>,
-    // },
     {
-      header: "Created At",
-      cell: ({ row }) =>
-        new Date(row.original.createdAt ?? "").toLocaleDateString(),
+      header: "Joined Date",
+      cell: ({ row }) => new Date(row.original.startDate ?? "").toLocaleDateString(),
+    },
+    {
+      header: "Status",
+      cell: ({ row }) => <div>{row.original.workStatus}</div>,
+    },
+    {
+      header: "Updated At",
+      cell: ({ row }) => new Date(row.original.updatedAt ?? "").toLocaleDateString(),
     },
     {
       id: "actions",
-      header: "",
-      cell: ({ row }) => (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
-              size="icon"
-            >
-              <IconDotsVertical />
-              <span className="sr-only">Open menu</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-32">
-            <DropdownMenuItem onClick={() => onEdit?.(row.original)}>
-              Edit
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              variant="destructive"
-              onClick={() => onDelete?.(row.original)}
-            >
-              Delete
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      ),
+      header: "Actions",
+      size: 50,
+      cell: ({ row }) => <Actions row={row?.original ?? undefined} actions={actions} />,
     },
   ];
-
-  return cols;
 };

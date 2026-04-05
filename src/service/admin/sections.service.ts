@@ -30,7 +30,7 @@ export const getAllSections = async (
 ): Promise<ISectionsRes> => {
   const page = pageIndex + 1;
   const data = await api.get<IApiResponse<ISection[]>>(
-    `/sections?page=${page}&limit=${pageSize}`
+    `/v1/sections?page=${page}&limit=${pageSize}`
   );
   return {
     sections: data.data,
@@ -41,7 +41,7 @@ export const getAllSections = async (
 export const getSectionById = async (
   sectionId?: number
 ): Promise<ISectionRes> => {
-  const data = await api.get<IApiResponse<ISection>>(`/sections/${sectionId}`);
+  const data = await api.get<IApiResponse<ISection>>(`/v1/sections/${sectionId}`);
   return {
     section: data.data,
   };
@@ -50,16 +50,16 @@ export const getSectionById = async (
 export const createSection = async (
   request: ICreateSectionRequest
 ): Promise<void> => {
-  await api.post<IApiResponse<void>>(`/sections`, request);
+  await api.post<IApiResponse<void>>(`/v1/sections`, request);
 };
 
 export const updateSection = async (
   sectionId?: number,
   request?: IUpdateSectionRequest
 ): Promise<void> => {
-  await api.patch<IApiResponse<void>>(`/sections/${sectionId}`, request);
+  await api.patch<IApiResponse<void>>(`/v1/sections/${sectionId}`, request);
 };
 
 export const deleteSection = async (sectionId?: number): Promise<void> => {
-  await api.delete<IApiResponse<void>>(`/sections/${sectionId}`);
+  await api.delete<IApiResponse<void>>(`/v1/sections/${sectionId}`);
 };

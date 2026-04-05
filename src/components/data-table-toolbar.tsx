@@ -64,7 +64,6 @@ export function DataTableToolbar({
           <Button
             onClick={onCreateClick}
             variant="default"
-            className="cursor-pointer"
           >
             <IconPlus className="h-4 w-4" />
             {createLabel}

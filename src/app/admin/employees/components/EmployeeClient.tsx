@@ -1,56 +1,62 @@
 "use client";
 
-import { DataTable } from "@/components/data-table";
-import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { LoadingOverlay } from "@/components/LoadingOverlay";
-import { employeeColumns } from "./columns";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-
-import { ConfirmDialog } from "@/components/ConfirmDialog";
-import { useMutateEmployee } from "@/stores/admin/useMutateEmployee";
+import { useRouter } from "next/navigation";
 import { IEmployee } from "@/types/admin/employee";
-import { getAllEmployees } from "@/service/admin/employees.service";
-import { queryKeys } from "@/service/util/query-keys/employee";
+import { useDataTable } from "@/hooks/use-data-table";
+import { employeeColumns } from "./columns";
+import BaseDataTable from "@/components/shared/table/BaseDataTable";
+import { ToolBarDataTale } from "@/components/shared/table/ToolBarDataTale";
+import { useMutateEmployee } from "@/stores/admin/useMutateEmployee";
+import SharedDialog from "@/components/shared/SharedDialog";
+import EmployeeForm from "./form/EmployeeForm";
+import { EyeIcon, PenIcon, PlusIcon, TrashIcon } from "lucide-react";
+import { ToolbarActions } from "@/components/shared/table/ToolbarActions";
+import EmployeeView from "./view/EmployeeView";
 
-interface Props {
-  initPageIndex: number;
-  initPageSize: number;
-}
-const EmployeeClient = ({ initPageIndex, initPageSize }: Props) => {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-
+const EmployeeClient = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [pageIndex, setPageIndex] = useState(initPageIndex);
-  const [pageSize, setPageSize] = useState(initPageSize);
-
+  const [isEmployeeForm, setIsEmployeeForm] = useState(false);
+  const [isEmployeeView, setIsEmployeeView] = useState(false);
   const [isDelete, setIsDelete] = useState(false);
   const [employee, setEmployee] = useState<IEmployee | undefined>(undefined);
 
-  const { data, isFetching } = useQuery({
-    queryKey: queryKeys.employees.list(pageIndex, pageSize),
-    queryFn: () => getAllEmployees(pageIndex, pageSize),
+  const actionButton = [
+    {
+      name: "View",
+      icon: EyeIcon,
+      event: (value: IEmployee) => {
+        setEmployee(value);
+        setIsEmployeeView(true);
+      },
+    },
+    {
+      name: "Update",
+      icon: PenIcon,
+      event: (value: IEmployee) => {
+        setEmployee(value);
+        setIsEmployeeForm(true);
+      },
+    },
+    {
+      name: "Delete",
+      icon: TrashIcon,
+      event: (value: IEmployee) => {
+        setIsDelete(true);
+        setEmployee(value);
+      },
+    },
+  ];
+
+  const { table } = useDataTable<IEmployee, unknown>({
+    columns: employeeColumns(actionButton),
   });
 
-  const employees = data?.employees ?? [];
-  const pagination = data?.pagination;
-
-  const cols = employeeColumns({
-    onEdit: (row) => {
-      router.push(`/admin/employees/${row.id}`);
-    },
-    onDelete: (row) => {
-      setIsDelete(true);
-      setEmployee(row);
-    },
-  });
-  const { delete: deleteEmployeeMutate } = useMutateEmployee();
+  const { deleteEmployee } = useMutateEmployee();
 
   const handleDelete = async () => {
     setIsLoading(true);
-    await deleteEmployeeMutate(
+    await deleteEmployee(
       { employeeId: employee?.id },
       {
         onSuccess: () => {
@@ -60,55 +66,75 @@ const EmployeeClient = ({ initPageIndex, initPageSize }: Props) => {
         onSettled: () => {
           setIsLoading(false);
         },
-      }
+      },
     );
   };
 
-  const handlePaginationChange = ({
-    pageIndex,
-    pageSize,
-  }: {
-    pageIndex: number;
-    pageSize: number;
-  }) => {
-    setPageIndex(pageIndex);
-    setPageSize(pageSize);
-    const params = new URLSearchParams(searchParams);
-    params.set("pageIndex", String(pageIndex));
-    params.set("pageSize", String(pageSize));
-    router.push(`${pathname}?${params.toString()}`);
-  };
-
-  if (isFetching) {
-    return <LoadingOverlay isLoading={isFetching} />;
-  }
-
   return (
     <div>
-      {isDelete && (
-        <ConfirmDialog
-          open={isDelete}
-          onOpenChange={setIsDelete}
-          title="Delete Employee"
-          description={`This will remove employee name ${employee?.lastName} ${employee?.firstName}`}
-          loading={isLoading}
-          onConfirm={handleDelete}
-        />
-      )}
+      <BaseDataTable table={table}>
+        <ToolBarDataTale table={table}>
+          <ToolbarActions
+            actions={[
+              {
+                name: "Create",
+                icon: PlusIcon,
+                event: () => {
+                  setEmployee(undefined);
+                  setIsEmployeeForm(true);
+                },
+              },
+            ]}
+          />
+        </ToolBarDataTale>
+      </BaseDataTable>
 
-      <DataTable
-        columns={cols}
-        data={employees}
-        serverMode={true}
-        pageCount={pagination?.totalPages ?? 0}
-        onPaginationChange={handlePaginationChange}
-        initialPageIndex={pageIndex}
-        initialPageSize={pageSize}
-        createLabel="Create"
-        onCreateClick={() => {
-          router.push("/admin/employees/new");
+      <SharedDialog
+        title={"Delete Employee"}
+        setOpen={setIsDelete}
+        open={isDelete}
+        submitEvent={handleDelete}
+        isSubmit
+        submitTitle="Yes, Delete"
+        className="bg-red-500"
+        isLoading={isLoading}
+        width="50%"
+      >
+        <p>
+          This will remove employee name
+          <span className="font-bold">
+            {employee?.lastName} {employee?.firstName}
+          </span>
+        </p>
+      </SharedDialog>
+
+      <SharedDialog
+        setOpen={() => {
+          setIsEmployeeForm(false);
+          setEmployee(undefined);
         }}
-      />
+        open={isEmployeeForm}
+        title={employee ? "Update Employee" : "Create Employee"}
+        isCancel={false}
+        width="90%"
+        height="95%"
+      >
+        <EmployeeForm setOpen={setIsEmployeeForm} employee={employee} />
+      </SharedDialog>
+
+      <SharedDialog
+        setOpen={() => {
+          setIsEmployeeView(false);
+          setEmployee(undefined);
+        }}
+        open={isEmployeeView}
+        title="Employee Details"
+        isCancel={false}
+        width="85%"
+        height="95%"
+      >
+        <EmployeeView employee={employee ?? null} />
+      </SharedDialog>
     </div>
   );
 };
