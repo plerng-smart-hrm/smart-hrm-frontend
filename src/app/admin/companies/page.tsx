@@ -10,6 +10,7 @@ interface Props {
   }>;
 }
 
+
 const page = async ({}: Props) => {
   return (
     <ContentLayout title={"Companies"}>
