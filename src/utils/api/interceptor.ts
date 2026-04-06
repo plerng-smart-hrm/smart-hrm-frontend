@@ -8,7 +8,7 @@ const globalHeaders = {
 
 const axiosInstance: AxiosInstance = axios.create({
   timeout: 60000,
-  withCredentials: true,
+  // withCredentials: true,
   transformRequest: [
     (data) => data,
   ],
