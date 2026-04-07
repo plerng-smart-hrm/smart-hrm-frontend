@@ -14,10 +14,8 @@ export const sectionColumns = (actions: IActions[]): ColumnDef<ISection>[] => {
       header: "Name",
       cell: ({ row }) => (
         <div className="flex flex-col">
-          <p className="text-md">{row.original.name}</p>
-          <span className="text-muted-foreground text-sm">
-            {row.original.description}
-          </span>
+          <p className="text-base">{row.original.name}</p>
+          <span className="text-muted-foreground text-sm">{row.original.description}</span>
         </div>
       ),
     },
@@ -39,16 +37,13 @@ export const sectionColumns = (actions: IActions[]): ColumnDef<ISection>[] => {
     },
     {
       header: "Created At",
-      cell: ({ row }) =>
-        new Date(row.original.createdAt ?? "").toLocaleDateString(),
+      cell: ({ row }) => new Date(row.original.createdAt ?? "").toLocaleDateString(),
     },
     {
       id: "actions",
       header: "Actions",
       size: 50,
-      cell: ({ row }) => (
-        <Actions row={row?.original ?? undefined} actions={actions} />
-      ),
+      cell: ({ row }) => <Actions row={row?.original ?? undefined} actions={actions} />,
     },
   ];
 };

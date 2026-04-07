@@ -13,11 +13,13 @@ import EmployeeForm from "./form/EmployeeForm";
 import { EyeIcon, PenIcon, PlusIcon, TrashIcon } from "lucide-react";
 import { ToolbarActions } from "@/components/shared/table/ToolbarActions";
 import EmployeeView from "./view/EmployeeView";
+import TerminationForm from "./termination/TerminationForm";
 
 const EmployeeClient = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isEmployeeForm, setIsEmployeeForm] = useState(false);
   const [isEmployeeView, setIsEmployeeView] = useState(false);
+  const [isTerminate, setIsTerminate] = useState(false);
   const [isDelete, setIsDelete] = useState(false);
   const [employee, setEmployee] = useState<IEmployee | undefined>(undefined);
 
@@ -28,6 +30,14 @@ const EmployeeClient = () => {
       event: (value: IEmployee) => {
         setEmployee(value);
         setIsEmployeeView(true);
+      },
+    },
+    {
+      name: "Terminate",
+      icon: EyeIcon,
+      event: (value: IEmployee) => {
+        setEmployee(value);
+        setIsTerminate(true);
       },
     },
     {
@@ -134,6 +144,26 @@ const EmployeeClient = () => {
         height="95%"
       >
         <EmployeeView employee={employee ?? null} />
+      </SharedDialog>
+
+      <SharedDialog
+        setOpen={() => {
+          setIsTerminate(false);
+          setEmployee(undefined);
+        }}
+        open={isTerminate}
+        title="Terminate Employee"
+        isCancel={false}
+        width="85%"
+        height="95%"
+      >
+        <TerminationForm
+          setOpen={(open) => {
+            setIsTerminate(open);
+            if (!open) setEmployee(undefined);
+          }}
+          employee={employee ?? null}
+        />
       </SharedDialog>
     </div>
   );

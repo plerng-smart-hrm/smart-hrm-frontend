@@ -13,7 +13,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 
 interface MenuItem {
   name: string;
-  path: string;
+  path?: string;
   icon: React.ComponentType<{ size?: number }>;
   children?: MenuItem[];
 }
@@ -32,6 +32,18 @@ const menuItems: MenuItem[] = [
     name: "Employees",
     path: "/admin/employees",
     icon: User,
+    children: [
+      {
+        name: "Employees",
+        path: "/admin/employees",
+        icon: User,
+      },
+      {
+        name: "Terminations",
+        path: "/admin/employees/terminations",
+        icon: User,
+      },
+    ],
   },
   {
     name: "Working Shifts",
@@ -70,7 +82,6 @@ const menuItems: MenuItem[] = [
   },
   {
     name: "Attendances",
-    path: "/admin/attendances",
     icon: BookTextIcon,
     children: [
       { name: "Detail", path: "/admin/attendances/detail", icon: User },
@@ -98,9 +109,19 @@ export function Menu({ isOpen }: MenuProps) {
     setOpenSubmenus((prev) => (prev.includes(name) ? prev.filter((n) => n !== name) : [...prev, name]));
   };
 
+  const handleParentClick = (item: MenuItem) => {
+    const firstChildPath = item.children?.[0]?.path;
+    const matchedChild = item.children?.find((child) => child.path && pathname.startsWith(child.path));
+    const target = matchedChild?.path ?? item.path ?? firstChildPath;
+    if (target) router.push(target);
+    setOpenSubmenus((prev) => (prev.includes(item.name) ? prev : [...prev, item.name]));
+  };
+
   const renderMenuItem = (item: MenuItem, index: number) => {
     const hasChildren = item.children && item.children.length > 0;
-    const isActive = pathname.startsWith(item.path);
+    const isActive = item.path
+      ? pathname.startsWith(item.path)
+      : (item.children?.some((c) => c.path && pathname.startsWith(c.path)) ?? false);
     const isSubmenuOpen = openSubmenus.includes(item.name);
     const Icon = item.icon;
 
@@ -111,27 +132,33 @@ export function Menu({ isOpen }: MenuProps) {
             <TooltipProvider disableHoverableContent>
               <Tooltip delayDuration={100}>
                 <TooltipTrigger asChild>
-                  <CollapsibleTrigger asChild>
-                    <Button variant={isActive ? "secondary" : "ghost"} className="mb-1 h-10 w-full justify-start">
-                      <span className={cn(isOpen === false ? "" : "mr-2")}>
-                        <Icon size={14} />
-                      </span>
-                      <span
-                        className={cn(
-                          "flex-1 truncate text-left transition-all",
-                          isOpen === false ? "hidden opacity-0" : "block opacity-100",
-                        )}
-                      >
-                        {item.name}
-                      </span>
-                      {isOpen !== false && (
-                        <ChevronDown
-                          size={14}
-                          className={cn("transition-transform duration-200", isSubmenuOpen && "rotate-180")}
-                        />
+                  <Button
+                    variant={isActive ? "secondary" : "ghost"}
+                    className="mb-1 h-10 w-full justify-start"
+                    onClick={() => handleParentClick(item)}
+                  >
+                    <span className={cn(isOpen === false ? "" : "mr-2")}>
+                      <Icon size={14} />
+                    </span>
+                    <span
+                      className={cn(
+                        "flex-1 truncate text-left transition-all",
+                        isOpen === false ? "hidden opacity-0" : "block opacity-100",
                       )}
-                    </Button>
-                  </CollapsibleTrigger>
+                    >
+                      {item.name}
+                    </span>
+                    {isOpen !== false && (
+                      <CollapsibleTrigger asChild onClick={(e) => e.stopPropagation()}>
+                        <span className="ml-auto flex items-center">
+                          <ChevronDown
+                            size={14}
+                            className={cn("transition-transform duration-200", isSubmenuOpen && "rotate-180")}
+                          />
+                        </span>
+                      </CollapsibleTrigger>
+                    )}
+                  </Button>
                 </TooltipTrigger>
                 {isOpen === false && <TooltipContent side="right">{item.name}</TooltipContent>}
               </Tooltip>
@@ -139,7 +166,7 @@ export function Menu({ isOpen }: MenuProps) {
             <CollapsibleContent className={cn("overflow-hidden transition-all", isOpen === false && "hidden")}>
               <ul className="ml-4 space-y-1 border-l pl-2">
                 {item.children?.map((child, childIndex) => {
-                  const isChildActive = pathname === child.path;
+                  const isChildActive = child.path ? pathname === child.path : false;
                   const ChildIcon = child.icon;
 
                   return (
@@ -149,7 +176,7 @@ export function Menu({ isOpen }: MenuProps) {
                         className="h-9 w-full justify-start"
                         asChild
                       >
-                        <Link href={child.path}>
+                        <Link href={child.path ?? "#"}>
                           <span className="mr-2">
                             <ChildIcon size={12} />
                           </span>
@@ -172,7 +199,7 @@ export function Menu({ isOpen }: MenuProps) {
           <Tooltip delayDuration={100}>
             <TooltipTrigger asChild>
               <Button variant={isActive ? "secondary" : "ghost"} className="mb-1 h-10 w-full justify-start" asChild>
-                <Link href={item.path}>
+                <Link href={item.path ?? "#"}>
                   <span className={cn(isOpen === false ? "" : "mr-2")}>
                     <Icon size={14} />
                   </span>
