@@ -161,7 +161,7 @@ const FormLabel = ({
 }: IPropsLabel) => {
   return (
     <div className={className}>
-      <Label className="relative flex text-base">
+      <Label className="relative flex text-sm">
         <span className="text-gray-700 dark:text-white"> {label}</span>
         {required && <span className="text-red-600 text-sm pl-0.5">*</span>}
         {helper && (

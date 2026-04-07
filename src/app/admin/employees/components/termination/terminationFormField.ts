@@ -1,4 +1,6 @@
 import { FieldDefinition } from "@/components/shared/form/RenderField";
+import { formatToNumber, formatToString } from "@/lib/custom-format";
+import { ITermination } from "@/types/admin/termination";
 
 export const TERMINATION_TYPE_OPTIONS = [
   { label: "ឈប់ដោយកំហុស (Serious Misconduct)", value: "misconduct" },
@@ -41,36 +43,45 @@ export const terminationSalaryFields: FieldDefinition[] = [
   },
   {
     label: "ចំនួនថ្ងៃប្រាក់ខែដែលនៅសល់",
-    key: "unpaidSalaryDays",
+    key: "unpaidSalary",
     type: "number",
     required: true,
     helper: "ថ្ងៃធ្វើការដែលបានធ្វើការប៉ុន្តែមិនទាន់បានទូទាត់ | គណនា: ប្រាក់ឈ្នួលថ្ងៃ × ចំនួនថ្ងៃ",
   },
   {
     label: "ចំនួនថ្ងៃឈប់សម្រាកប្រចាំឆ្នាំនៅសល់ (AL)",
-    key: "remainingAnnualLeaveDays",
+    key: "remainingAnnualLeave",
     type: "number",
     required: true,
     helper: "ថ្ងៃឈប់សម្រាកប្រចាំឆ្នាំដែលមិនទាន់ប្រើ | គណនា: ប្រាក់ឈ្នួលថ្ងៃ × ចំនួនថ្ងៃ AL",
   },
 ];
 
+const REQUIRED_NOTICE_OPTIONS = [
+  { label: "តិចជាង 6 ខែ (< 6 months) — 7 ថ្ងៃ", value: 7 },
+  { label: "6 ខែ – 2 ឆ្នាំ (6 months – 2 years) — 15 ថ្ងៃ", value: 15 },
+  { label: "2 – 5 ឆ្នាំ (2 – 5 years) — 1 ខែ (30 ថ្ងៃ)", value: 30 },
+  { label: "5 – 10 ឆ្នាំ (5 – 10 years) — 2 ខែ (60 ថ្ងៃ)", value: 60 },
+  { label: "លើសពី 10 ឆ្នាំ (> 10 years) — 3 ខែ (90 ថ្ងៃ)", value: 90 },
+];
+
 // Only when contract type = UDC
 export const terminationUDCFields: FieldDefinition[] = [
   {
     label: "ចំនួនថ្ងៃជូនដំណឹងដែលបានផ្តល់",
-    key: "noticeDaysGiven",
+    key: "noticeDays",
     type: "number",
     required: false,
     helper: "ចំនួនថ្ងៃជូនដំណឹងដែលនិយោជកបានផ្តល់ជាក់ស្តែងមុនពេលបញ្ចប់ការងារ",
   },
   {
-    label: "ចំនួនថ្ងៃជូនដំណឹងដែលត្រូវការ",
+    label: "អាយុការងារ → ថ្ងៃជូនដំណឹងដែលត្រូវការ",
     key: "requiredNoticeDays",
-    type: "number",
+    type: "select",
+    dataType: "number",
     required: false,
-    helper:
-      "ចំនួនថ្ងៃជូនដំណឹងអប្បបរមាតាមកិច្ចសន្យា | ប្រសិនថ្ងៃផ្តល់ < ថ្ងៃត្រូវការ: សំណង = (ថ្ងៃត្រូវការ − ថ្ងៃផ្តល់) × ប្រាក់ឈ្នួលថ្ងៃ",
+    options: REQUIRED_NOTICE_OPTIONS,
+    helper: "ជ្រើសរើសតាមអាយុការងារ។ ប្រើសម្រាប់គណនាសំណងជូនដំណឹងប៉ុណ្ណោះ — មិនបញ្ជូនទៅ backend។",
   },
 ];
 
@@ -78,7 +89,7 @@ export const terminationUDCFields: FieldDefinition[] = [
 export const terminationFDCFields: FieldDefinition[] = [
   {
     label: "ប្រាក់ខែសរុបក្នុងអំឡុងកិច្ចសន្យា FDC ($)",
-    key: "totalSalaryEarnedDuringFDC",
+    key: "salaryEarnedFdc",
     type: "number",
     required: false,
     helper: "ប្រាក់ខែសរុបដែលទទួលបានក្នុងអំឡុងកិច្ចសន្យា FDC ទាំងមូល | គណនា: 5% indemnity = ប្រាក់ខែសរុប × 5%",
@@ -100,6 +111,12 @@ export const terminationAllowanceFields: FieldDefinition[] = [
     required: false,
     helper: "ចំនួនទឹកប្រាក់ត្រូវកាត់ចេញពីការទូទាត់ចុងក្រោយ ឧ. ប្រាក់កក់ ប្រាក់កម្ចី",
   },
+  {
+    label: "ចំណាំ",
+    key: "remark",
+    type: "textarea",
+    required: false,
+  },
 ];
 
 // Only when contract type = FDC + termination = without misconduct
@@ -112,3 +129,19 @@ export const terminationDamagesFields: FieldDefinition[] = [
     helper: "សំណងខូចខាតជម្រើសសម្រាប់ FDC បញ្ចប់មុនកំណត់ដោយគ្មានកំហុស | ដាក់ 0 ប្រសិនមិនអនុវត្ត",
   },
 ];
+
+export const getTerminationValues = (data?: ITermination): any => ({
+  employeeId: formatToNumber(data?.employeeId),
+  contractType: formatToString(data?.contractType),
+  terminationType: formatToString(data?.terminationType),
+  basicSalary: formatToNumber(data?.basicSalary),
+  unpaidSalary: formatToNumber(data?.unpaidSalary),
+  remainingAnnualLeave: formatToNumber(data?.remainingAnnualLeave),
+  noticeDays: formatToNumber(data?.noticeDays),
+  requiredNoticeDays: 0,
+  salaryEarnedFdc: formatToNumber(data?.salaryEarnedFdc),
+  other: formatToNumber(data?.other),
+  deduction: formatToNumber(data?.deduction),
+  damages: formatToNumber(data?.damages),
+  remark: formatToString(data?.remark),
+});
