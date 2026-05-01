@@ -99,7 +99,7 @@ export const terminationFDCFields: FieldDefinition[] = [
 export const terminationAllowanceFields: FieldDefinition[] = [
   {
     label: "ប្រាក់បន្ថែមផ្សេងៗ ($)",
-    key: "otherAllowance",
+    key: "other",
     type: "number",
     required: false,
     helper: "ប្រាក់បន្ថែមណាមួយដែលត្រូវបន្ថែមក្នុងការទូទាត់ចុងក្រោយ ឧ. ថ្លៃធ្វើដំណើរ ថ្លៃជួល",
