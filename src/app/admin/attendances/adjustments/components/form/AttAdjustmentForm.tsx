@@ -9,7 +9,7 @@ import { showValidationWarning } from "@/utils/form-validation";
 import { IAttAdjustment } from "@/types/admin/att-adjustment";
 import { attAdjustmentSchema, AttAdjustmentValues } from "@/schemas/admin/att-adjustment";
 import { useMutateAttAdjustment } from "@/stores/admin/useMutateAttAdjustment";
-import { attAdjustmentFields, getAttAdjustmentValues } from "./attAdjustmentFields";
+import { getAttAdjustmentFields, getAttAdjustmentValues } from "./attAdjustmentFields";
 
 interface Props {
   initialData?: IAttAdjustment;
@@ -28,12 +28,15 @@ export default function AttAdjustmentForm({ initialData, onSuccess }: Props) {
 
   const { createAttAdjustment, updateAttAdjustment } = useMutateAttAdjustment();
 
+  const fieldChanged = form.watch("fieldChanged");
+  const fields = getAttAdjustmentFields(fieldChanged);
+
   async function onSubmit() {
     const isValid = await form.trigger();
 
     if (!isValid) {
       showValidationWarning({
-        fields: attAdjustmentFields,
+        fields: fields,
         errors: form.formState.errors,
       });
       return;
@@ -72,7 +75,7 @@ export default function AttAdjustmentForm({ initialData, onSuccess }: Props) {
   return (
     <Form {...form}>
       <div className="flex-1 grid grid-cols-2 gap-4 content-start">
-        {attAdjustmentFields.map((item: FieldDefinition, index: number) => (
+        {fields.map((item: FieldDefinition, index: number) => (
           <FormField
             key={index}
             control={form.control as any}

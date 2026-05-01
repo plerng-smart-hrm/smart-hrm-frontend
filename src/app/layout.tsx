@@ -6,6 +6,7 @@ import "./globals.css";
 import { QueryClientProvider } from "@/providers/query-client-provider";
 import { ThemeProvider } from "@/components/theme-provider";
 import { NuqsAdapter } from "nuqs/adapters/react";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,18 +30,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body
-        suppressHydrationWarning
-        className={`${geistSans.variable} ${geistMono.variable} `}
-      >
+      <body suppressHydrationWarning className={`${geistSans.variable} ${geistMono.variable} `}>
         <QueryClientProvider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme={"system"}
-            enableSystem
-            disableTransitionOnChange
-          >
-            <NuqsAdapter>{children}</NuqsAdapter>
+          <ThemeProvider attribute="class" defaultTheme={"system"} enableSystem disableTransitionOnChange>
+            <NuqsAdapter>
+              <TooltipProvider>{children}</TooltipProvider>
+            </NuqsAdapter>
             <Toaster richColors position="top-center" />
           </ThemeProvider>
         </QueryClientProvider>

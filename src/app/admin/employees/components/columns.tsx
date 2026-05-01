@@ -27,7 +27,7 @@ export const employeeColumns = (actions: IActions[]): ColumnDef<IEmployee>[] => 
       header: "Employee",
       cell: ({ row }) => (
         <div className="flex flex-col">
-          <p className="text-md">
+          <p className="text-base">
             {row.original.lastName} {row.original.firstName}
           </p>
           <span className="text-muted-foreground text-sm">

@@ -9,6 +9,7 @@ import { companyKeys } from "./query-keys/company";
 import { attendanceLogKeys } from "./query-keys/attendance-log";
 import { attAdjustmentKeys } from "./query-keys/att-adjustment";
 import { attendanceSummaryKeys } from "./query-keys/attendance-summary";
+import { terminationKeys } from "./query-keys/termination";
 
 export const queryKeyMappingApiPath: Record<string, string> = {
   [employeeKeys.list_employee]: "/v1/employees",
@@ -22,4 +23,5 @@ export const queryKeyMappingApiPath: Record<string, string> = {
   [attendanceSummaryKeys.list_attendance_summary]: "/v1/attendance-summary",
   [attendanceLogKeys.list_attendance_log]: "/v1/attendance-logs",
   [attAdjustmentKeys.list_att_adjustment]: "/v1/att-adjustments",
+  [terminationKeys.list_termination]: "/v1/terminations",
 };
