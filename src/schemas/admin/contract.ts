@@ -1,7 +1,7 @@
 import z from "zod";
 
 export const contractSchema = z.object({
-  employeeId: z.number().min(1, "Please select an employee"),
+  empCode: z.string().min(1, "Please enter employee code"),
   contractType: z.string().min(1, "Contract type is required"),
   startDate: z.string().min(1, "Start date is required"),
   endDate: z.string().min(1, "End date is required"),

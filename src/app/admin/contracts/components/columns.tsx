@@ -24,7 +24,7 @@ export const contractColumns = (actions: IActions[]): ColumnDef<IContract>[] => 
       header: "Employee",
       cell: ({ row }) => (
         <div className="flex flex-col">
-          <p className="text-md">
+          <p className="text-sm">
             {row.original.employee?.lastName} {row.original.employee?.firstName}
           </p>
           <span className="text-muted-foreground text-sm">{row.original.employee?.position}</span>

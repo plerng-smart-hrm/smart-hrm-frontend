@@ -113,10 +113,8 @@ export const employeeFields: FieldDefinition[] = [
     type: "select",
     required: true,
     options: [
-      { label: "Single", value: "SINGLE" },
-      { label: "Married", value: "MARRIED" },
-      { label: "Divorced", value: "DIVORCED" },
-      { label: "Widowed", value: "WIDOWED" },
+      { label: "ACTIVE", value: "ACTIVE" },
+      { label: "INACTIVE", value: "INACTIVE" },
     ],
   },
   {

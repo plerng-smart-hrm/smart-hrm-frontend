@@ -4,9 +4,9 @@ import { formatToNumber, formatToString } from "@/lib/custom-format";
 
 export const contractFields: FieldDefinition[] = [
   {
-    label: "Employee",
-    key: "employeeId",
-    type: "number",
+    label: "Employee Code",
+    key: "empCode",
+    type: "text",
     required: true,
   },
   {
