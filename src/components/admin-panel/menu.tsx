@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { BookOpen, BookTextIcon, Bot, ChevronDown, LayoutDashboard, LogOut, User } from "lucide-react";
+import { BookOpen, BookTextIcon, Bot, ChevronDown, DollarSignIcon, LayoutDashboard, LogOut, User } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -97,6 +97,11 @@ const menuItems: MenuItem[] = [
         icon: User,
       },
     ],
+  },
+  {
+    name: "Payroll",
+    path: "/admin/payrolls",
+    icon: DollarSignIcon,
   },
 ];
 
