@@ -1,3 +1,5 @@
+import { IContract } from "./contract";
+
 export interface IEmployee {
   id?: number;
   empCode?: string;
@@ -32,4 +34,6 @@ export interface IEmployee {
   createdAt?: string;
   updatedAt?: string;
   deletedAt?: string;
+
+  contract?: IContract;
 }

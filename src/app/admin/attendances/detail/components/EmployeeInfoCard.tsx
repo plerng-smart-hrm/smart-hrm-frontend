@@ -5,9 +5,11 @@ import { User, Briefcase, Calendar, Hash } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { IEmployeeAttendanceSummary } from "@/types/admin/attendance-summary";
 import { RenderView } from "@/components/shared/view/RenderView";
+import { IEmployee } from "@/types/admin/employee";
+import { formatToDate } from "@/utils/custom-format";
 
 interface EmployeeInfoCardProps {
-  employee: IEmployeeAttendanceSummary | null;
+  employee?: IEmployee | null;
 }
 
 export default function EmployeeInfoCard({ employee }: EmployeeInfoCardProps) {
@@ -27,8 +29,6 @@ export default function EmployeeInfoCard({ employee }: EmployeeInfoCardProps) {
   const fullNameKh =
     employee.firstNameKh && employee.lastNameKh ? `${employee.firstNameKh} ${employee.lastNameKh}` : null;
 
-  const formattedJoinDate = employee.joinDate ? format(parseISO(employee.joinDate), "dd MMM yyyy") : "-";
-
   return (
     <div className="h-full">
       <h3 className="text-sm font-semibold mb-3 flex items-center gap-2 text-muted-foreground">
@@ -40,8 +40,8 @@ export default function EmployeeInfoCard({ employee }: EmployeeInfoCardProps) {
         <div className="flex items-center gap-3">
           <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
             <span className="text-primary font-semibold text-lg">
-              {employee.firstName.charAt(0)}
-              {employee.lastName.charAt(0)}
+              {employee.firstName?.charAt(0)}
+              {employee.lastName?.charAt(0)}
             </span>
           </div>
           <div>
@@ -51,7 +51,7 @@ export default function EmployeeInfoCard({ employee }: EmployeeInfoCardProps) {
         </div>
 
         <RenderView
-          className="grid-cols-1 pt-2"
+          className="lg:grid-cols-1 pt-2"
           fields={[
             {
               icon: <Hash className="h-4 w-4" />,
@@ -67,12 +67,18 @@ export default function EmployeeInfoCard({ employee }: EmployeeInfoCardProps) {
                 </Badge>
               ),
             },
+
+            { icon: <Calendar className="h-4 w-4" />, label: "Join Date", value: formatToDate(employee.startDate) },
             {
               icon: <Briefcase className="h-4 w-4" />,
               label: "Position",
               value: employee.position,
             },
-            { icon: <Calendar className="h-4 w-4" />, label: "Join Date", value: formattedJoinDate },
+            {
+              icon: <Briefcase className="h-4 w-4" />,
+              label: "Department",
+              value: "",
+            },
           ]}
         />
       </div>

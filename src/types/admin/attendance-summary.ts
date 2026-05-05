@@ -61,17 +61,18 @@ export interface IAttendanceTotals {
 }
 
 export interface IEmployeeAttendanceSummary {
-  empId: number;
-  empCode: string;
-  firstName: string;
-  lastName: string;
-  firstNameKh: string | null;
-  lastNameKh: string | null;
-  gender: string;
-  position: string;
-  joinDate: string;
+  // empId: number;
+  // empCode: string;
+  // firstName: string;
+  // lastName: string;
+  // firstNameKh: string | null;
+  // lastNameKh: string | null;
+  // gender: string;
+  // position: string;
+  // joinDate: string;
   attendanceSummary: IDailyAttendance[];
   totals: IAttendanceTotals;
+  employee?: IEmployee
 }
 
 

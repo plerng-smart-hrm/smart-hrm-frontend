@@ -1,21 +1,18 @@
 "use client";
 
-import {
-  Clock,
-  Timer,
-  CalendarCheck,
-  CalendarX,
-  CalendarOff,
-  CalendarDays,
-  Zap,
-} from "lucide-react";
+import { Clock, Timer, CalendarCheck, CalendarX, CalendarOff, CalendarDays, Zap } from "lucide-react";
 import { IAttendanceTotals } from "@/types/admin/attendance-summary";
+import { RenderView } from "@/components/shared/view/RenderView";
+import { IEmployee } from "@/types/admin/employee";
+import { formatToCurrency } from "@/utils/custom-format";
 
-interface MonthlyTotalsCardProps {
+interface Props {
   totals: IAttendanceTotals | null;
+  employee?: IEmployee | null;
 }
 
-export default function MonthlyTotalsCard({ totals }: MonthlyTotalsCardProps) {
+export default function MonthlyTotalsCard({ totals, employee }: Props) {
+  
   if (!totals) {
     return (
       <div className="h-full">
@@ -23,9 +20,7 @@ export default function MonthlyTotalsCard({ totals }: MonthlyTotalsCardProps) {
           <Clock className="h-4 w-4" />
           Monthly Summary
         </h3>
-        <div className="flex items-center justify-center h-40 text-muted-foreground text-sm">
-          No data available
-        </div>
+        <div className="flex items-center justify-center h-40 text-muted-foreground text-sm">No data available</div>
       </div>
     );
   }
@@ -86,9 +81,7 @@ export default function MonthlyTotalsCard({ totals }: MonthlyTotalsCardProps) {
         </div>
 
         <div className="border-t pt-3 mt-3">
-          <p className="text-xs text-muted-foreground mb-2 font-medium">
-            Attendance Days
-          </p>
+          <p className="text-xs text-muted-foreground mb-2 font-medium">Attendance Days</p>
           <div className="grid grid-cols-2 gap-2">
             <DayStatRow
               icon={<CalendarCheck className="h-3 w-3" />}
@@ -116,6 +109,44 @@ export default function MonthlyTotalsCard({ totals }: MonthlyTotalsCardProps) {
             />
           </div>
         </div>
+
+        <RenderView
+          className="lg:grid-cols-2 pt-2"
+          fields={[
+            {
+              label: "Basic Salary",
+              value: formatToCurrency(employee?.contract?.baseSalary),
+            },
+            {
+              label: "Food Allowance Per Day",
+              value: formatToCurrency(employee?.contract?.foodAllowancePerDay),
+            },
+            {
+              label: "Transport Allowance",
+              value: formatToCurrency(employee?.contract?.transportAllowance),
+            },
+            {
+              label: "Attendance Bonus",
+              value: formatToCurrency(employee?.contract?.attendanceBonus),
+            },
+            {
+              label: "Skill Level",
+              value: employee?.contract?.skillLevel,
+            },
+            {
+              label: "Skill Allowance",
+              value: formatToCurrency(employee?.contract?.skillAllowance),
+            },
+            {
+              label: "OT Rate Normal",
+              value: employee?.contract?.otRateNormal,
+            },
+            {
+              label: "OT Rate Excess",
+              value: employee?.contract?.otRateExcess,
+            },
+          ]}
+        />
       </div>
     </div>
   );

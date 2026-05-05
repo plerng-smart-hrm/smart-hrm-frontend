@@ -9,10 +9,13 @@ import { parseAsString, useQueryState } from "nuqs";
 import { formatToYYYYMM } from "@/utils/shared-format";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { SearchIcon } from "lucide-react";
+import { Briefcase, Calendar, Hash, SearchIcon, User } from "lucide-react";
 import useQueryShared from "@/stores/admin/useQuery/useQueryShared";
 import { attendanceSummaryKeys } from "@/service/util/query-keys/attendance-summary";
 import FullScreenLoading from "@/components/shared/fullscreen-loading";
+import { RenderView } from "@/components/shared/view/RenderView";
+import { IEmployee } from "@/types/admin/employee";
+import { IEmployeeAttendanceSummary } from "@/types/admin/attendance-summary";
 
 const AttendanceDetailClient = () => {
   const [yearMonth, setYearMonth] = useQueryState("yearMonth", parseAsString.withDefault(formatToYYYYMM()));
@@ -30,8 +33,9 @@ const AttendanceDetailClient = () => {
     enable: empCode && yearMonth ? true : false,
   });
 
-  const employee = attSummaryData?.data || undefined;
-  const attendanceSummary = employee?.attendanceSummary || [];
+  const attSummary = (attSummaryData?.data as IEmployeeAttendanceSummary) || undefined;
+  const attendanceSummary = attSummary?.attendanceSummary || [];
+  const employee = attSummary?.employee;
 
   const handleMonthChange = (date: Date) => {
     setSelectedMonth(date);
@@ -78,7 +82,7 @@ const AttendanceDetailClient = () => {
 
           {/* Right Panel - Monthly Totals */}
           <div className="col-span-12 lg:col-span-2 border-l pl-4">
-            <MonthlyTotalsCard totals={employee?.totals ?? null} />
+            <MonthlyTotalsCard totals={attSummary?.totals ?? null} employee={employee} />
           </div>
         </div>
       </CardContent>
