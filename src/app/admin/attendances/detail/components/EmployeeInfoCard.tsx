@@ -1,9 +1,7 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
-import { User, Briefcase, Calendar, Hash } from "lucide-react";
-import { format, parseISO } from "date-fns";
-import { IEmployeeAttendanceSummary } from "@/types/admin/attendance-summary";
+import { User } from "lucide-react";
 import { RenderView } from "@/components/shared/view/RenderView";
 import { IEmployee } from "@/types/admin/employee";
 import { formatToDate } from "@/utils/custom-format";
@@ -31,10 +29,7 @@ export default function EmployeeInfoCard({ employee }: EmployeeInfoCardProps) {
 
   return (
     <div className="h-full">
-      <h3 className="text-sm font-semibold mb-3 flex items-center gap-2 text-muted-foreground">
-        <User className="h-4 w-4" />
-        Employee Info
-      </h3>
+      <h3 className="text-sm  mb-3 flex items-center gap-2 ">Employee Info</h3>
 
       <div className="space-y-4">
         <div className="flex items-center gap-3">
@@ -51,15 +46,13 @@ export default function EmployeeInfoCard({ employee }: EmployeeInfoCardProps) {
         </div>
 
         <RenderView
-          className="lg:grid-cols-1 pt-2"
+          className="lg:grid-cols-1"
           fields={[
             {
-              icon: <Hash className="h-4 w-4" />,
               label: "Employee Code",
               value: employee.empCode,
             },
             {
-              icon: <User className="h-4 w-4" />,
               label: "Gender",
               value: (
                 <Badge variant="outline" className="font-normal">
@@ -68,14 +61,12 @@ export default function EmployeeInfoCard({ employee }: EmployeeInfoCardProps) {
               ),
             },
 
-            { icon: <Calendar className="h-4 w-4" />, label: "Join Date", value: formatToDate(employee.startDate) },
+            { label: "Join Date", value: formatToDate(employee.startDate) },
             {
-              icon: <Briefcase className="h-4 w-4" />,
               label: "Position",
               value: employee.position,
             },
             {
-              icon: <Briefcase className="h-4 w-4" />,
               label: "Department",
               value: "",
             },

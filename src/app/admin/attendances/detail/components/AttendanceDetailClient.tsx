@@ -9,13 +9,12 @@ import { parseAsString, useQueryState } from "nuqs";
 import { formatToYYYYMM } from "@/utils/shared-format";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Briefcase, Calendar, Hash, SearchIcon, User } from "lucide-react";
+import { SearchIcon } from "lucide-react";
 import useQueryShared from "@/stores/admin/useQuery/useQueryShared";
 import { attendanceSummaryKeys } from "@/service/util/query-keys/attendance-summary";
 import FullScreenLoading from "@/components/shared/fullscreen-loading";
-import { RenderView } from "@/components/shared/view/RenderView";
-import { IEmployee } from "@/types/admin/employee";
 import { IEmployeeAttendanceSummary } from "@/types/admin/attendance-summary";
+import { payrollPaymentKeys } from "@/service/util/query-keys/payroll-payment";
 
 const AttendanceDetailClient = () => {
   const [yearMonth, setYearMonth] = useQueryState("yearMonth", parseAsString.withDefault(formatToYYYYMM()));
@@ -28,6 +27,14 @@ const AttendanceDetailClient = () => {
   const { data: attSummaryData } = useQueryShared({
     url: `/v1/attendance-summary/employee`,
     key: attendanceSummaryKeys.summary_by_employee,
+    param: { empCode, yearMonth },
+    setIsLoading,
+    enable: empCode && yearMonth ? true : false,
+  });
+
+  const { data: payrollPaymentsData } = useQueryShared({
+    url: `/v1/payroll-payments/employee`,
+    key: payrollPaymentKeys.list_payroll_payment,
     param: { empCode, yearMonth },
     setIsLoading,
     enable: empCode && yearMonth ? true : false,
@@ -82,7 +89,11 @@ const AttendanceDetailClient = () => {
 
           {/* Right Panel - Monthly Totals */}
           <div className="col-span-12 lg:col-span-2 border-l pl-4">
-            <MonthlyTotalsCard totals={attSummary?.totals ?? null} employee={employee} />
+            <MonthlyTotalsCard
+              totals={attSummary?.totals ?? null}
+              employee={employee}
+              payrollPayments={payrollPaymentsData?.data}
+            />
           </div>
         </div>
       </CardContent>

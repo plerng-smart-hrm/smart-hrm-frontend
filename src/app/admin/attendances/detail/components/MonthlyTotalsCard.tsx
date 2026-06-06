@@ -1,18 +1,29 @@
 "use client";
 
-import { Clock, Timer, CalendarCheck, CalendarX, CalendarOff, CalendarDays, Zap } from "lucide-react";
+import {
+  Clock,
+  Timer,
+  CalendarCheck,
+  CalendarX,
+  CalendarOff,
+  CalendarDays,
+  Zap,
+  Calendar,
+  CircleCheck,
+} from "lucide-react";
 import { IAttendanceTotals } from "@/types/admin/attendance-summary";
 import { RenderView } from "@/components/shared/view/RenderView";
 import { IEmployee } from "@/types/admin/employee";
 import { formatToCurrency } from "@/utils/custom-format";
+import { IPayrollPayment } from "@/types/admin/payroll-payment";
 
 interface Props {
   totals: IAttendanceTotals | null;
   employee?: IEmployee | null;
+  payrollPayments?: IPayrollPayment[];
 }
 
-export default function MonthlyTotalsCard({ totals, employee }: Props) {
-  
+export default function MonthlyTotalsCard({ totals, employee, payrollPayments }: Props) {
   if (!totals) {
     return (
       <div className="h-full">
@@ -40,22 +51,19 @@ export default function MonthlyTotalsCard({ totals, employee }: Props) {
 
   return (
     <div className="h-full">
-      <h3 className="text-sm font-semibold mb-3 flex items-center gap-2 text-muted-foreground">
-        <Clock className="h-4 w-4" />
-        Monthly Summary
-      </h3>
+      <h3 className="text-sm  mb-2 flex items-center gap-2">Monthly Summary</h3>
 
-      <div className="space-y-3">
+      <div className="space-y-2">
         <div className="grid grid-cols-2 gap-2">
           <StatCard
-            icon={<Clock className="h-3.5 w-3.5" />}
+            icon={<Clock className="size-3" />}
             label="Working"
             value={formatHours(totals.totalWorkingHours)}
             color="text-blue-600"
             bgColor="bg-blue-50 dark:bg-blue-950"
           />
           <StatCard
-            icon={<Timer className="h-3.5 w-3.5" />}
+            icon={<Timer className="size-3" />}
             label="Late"
             value={formatMinutes(totals.totalLateMinutes)}
             color="text-orange-600"
@@ -65,14 +73,14 @@ export default function MonthlyTotalsCard({ totals, employee }: Props) {
 
         <div className="grid grid-cols-2 gap-2">
           <StatCard
-            icon={<Zap className="h-3.5 w-3.5" />}
+            icon={<Zap className="size-3" />}
             label="OT1"
             value={formatHours(totals.totalOt1)}
             color="text-purple-600"
             bgColor="bg-purple-50 dark:bg-purple-950"
           />
           <StatCard
-            icon={<Zap className="h-3.5 w-3.5" />}
+            icon={<Zap className="size-3" />}
             label="OT2"
             value={formatHours(totals.totalOt2)}
             color="text-indigo-600"
@@ -80,29 +88,29 @@ export default function MonthlyTotalsCard({ totals, employee }: Props) {
           />
         </div>
 
-        <div className="border-t pt-3 mt-3">
-          <p className="text-xs text-muted-foreground mb-2 font-medium">Attendance Days</p>
+        <div className="border-t pt-2 mt-2">
+          <h3 className="text-sm  mb-2 flex items-center gap-2">Attendance Days</h3>
           <div className="grid grid-cols-2 gap-2">
             <DayStatRow
-              icon={<CalendarCheck className="h-3 w-3" />}
+              icon={<CalendarCheck className="size-3" />}
               label="Present"
               value={totals.presentDays}
               color="text-green-600"
             />
             <DayStatRow
-              icon={<CalendarX className="h-3 w-3" />}
+              icon={<CalendarX className="size-3" />}
               label="Absent"
               value={totals.absentDays}
               color="text-red-600"
             />
             <DayStatRow
-              icon={<CalendarOff className="h-3 w-3" />}
+              icon={<CalendarOff className="size-3" />}
               label="Leave"
               value={totals.leaveDays}
               color="text-orange-600"
             />
             <DayStatRow
-              icon={<CalendarDays className="h-3 w-3" />}
+              icon={<CalendarDays className="size-3" />}
               label="Holiday"
               value={totals.holidayDays}
               color="text-blue-600"
@@ -147,6 +155,47 @@ export default function MonthlyTotalsCard({ totals, employee }: Props) {
             },
           ]}
         />
+      </div>
+
+      <div className="space-y-2 mt-4 pt-2 border-t">
+        <h3 className="text-sm  mb-2 flex items-center gap-2">Payments</h3>
+
+        {payrollPayments?.length === 0 ? (
+          <div>
+            <p className="text-center text-muted-foreground">No payment records</p>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {payrollPayments?.map((payment) => (
+              <div key={payment.id} className="rounded-lg border bg-blue-500/10 px-2 py-2 text-xs space-y-1.5">
+                <div className="flex items-center gap-1 font-medium">
+                  <Calendar className="h-3.5 w-3.5" />
+                  <span className="truncate">{payment.paymentPeriod ?? "-"}</span>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1 ">{formatToCurrency(payment.amount)}</div>
+
+                  <div className="flex items-center gap-1 text-muted-foreground">{payment.paymentMethod ?? "-"}</div>
+                </div>
+
+                <div className="flex items-center justify-between text-muted-foreground">
+                  <div className="flex items-center gap-1">{payment.paymentDate ?? "-"}</div>
+
+                  <div className="flex items-center gap-1">
+                    {payment.status === "PAID" ? (
+                      <CircleCheck className="h-3.5 w-3.5 text-green-600" />
+                    ) : (
+                      <Clock className="h-3.5 w-3.5 text-orange-500" />
+                    )}
+
+                    <span>{payment.status ?? "-"}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
