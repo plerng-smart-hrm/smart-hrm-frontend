@@ -4,7 +4,7 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormField } from "@/components/ui/form";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import SharedSheet from "@/components/shared/SharedSheet";
 import { Separator } from "@/components/ui/separator";
 import RenderField from "@/components/shared/form/RenderField";
 import ActionButton from "@/components/shared/button/ActionButton";
@@ -117,80 +117,77 @@ export default function ContractPanel({ open, setOpen, employee, editingContract
   const fullNameEn = `${employee.firstName ?? ""} ${employee.lastName ?? ""}`.trim();
 
   return (
-    <Sheet open={open} onOpenChange={setOpen}>
-      <SheetContent side="right" className="w-full sm:max-w-xl overflow-y-auto px-5 py-5">
-        <SheetHeader className="px-0">
-          <SheetTitle>{isEdit ? "Update Contract" : isRenewal ? "Renew Contract" : "New Contract"}</SheetTitle>
-          <SheetDescription>
-            {isEdit ? "Update" : isRenewal ? "Renewing" : "Creating"} for{" "}
-            <span className="font-medium text-foreground">{fullNameEn || "this employee"}</span>
-            {employee.empCode ? ` · ${employee.empCode}` : ""}
-          </SheetDescription>
-          {isRenewal && (
-            <p className="text-xs text-muted-foreground bg-secondary/40 rounded-md px-3 py-2 mt-1">
-              We copied the salary and allowance terms from the current contract — just confirm the new dates below.
-            </p>
-          )}
-        </SheetHeader>
+    <SharedSheet
+      open={open}
+      setOpen={setOpen}
+      title={isEdit ? "Update Contract" : isRenewal ? "Renew Contract" : "New Contract"}
+      desc={`${isEdit ? "Update" : isRenewal ? "Renewing" : "Creating"} for ${fullNameEn || "this employee"}${employee.empCode ? ` · ${employee.empCode}` : ""}`}
+      width="42rem"
+    >
+      {isRenewal && (
+        <p className="text-xs text-muted-foreground bg-secondary/40 rounded-md px-3 py-2 mb-4">
+          We copied the salary and allowance terms from the current contract — just confirm the new dates below.
+        </p>
+      )}
 
-        <Form {...form}>
-          <div className="space-y-6 pb-20">
-            <div>
-              <p className="text-sm font-medium mb-3">Contract basics</p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {fieldsByKeys(basicsKeys).map((item) => (
-                  <FormField
-                    key={item.key}
-                    control={form.control}
-                    name={item.key as keyof ContractValues}
-                    render={(field) => <RenderField form={{ ...item, field }} />}
-                  />
-                ))}
-              </div>
+      <Form {...form}>
+        <div className="space-y-6 pb-20">
+          <div>
+            <p className="text-sm font-medium mb-3">Contract basics</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {fieldsByKeys(basicsKeys).map((item) => (
+                <FormField
+                  key={item.key}
+                  control={form.control}
+                  name={item.key as keyof ContractValues}
+                  render={(field) => <RenderField form={{ ...item, field }} />}
+                />
+              ))}
             </div>
-
-            <Separator />
-
-            <div>
-              <p className="text-sm font-medium mb-3">Salary &amp; pay</p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {fieldsByKeys(salaryKeys).map((item) => (
-                  <FormField
-                    key={item.key}
-                    control={form.control}
-                    name={item.key as keyof ContractValues}
-                    render={(field) => <RenderField form={{ ...item, field }} />}
-                  />
-                ))}
-              </div>
-            </div>
-
-            <Separator />
-
-            <div>
-              <p className="text-sm font-medium mb-3">Skill &amp; overtime</p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {fieldsByKeys(skillKeys).map((item) => (
-                  <FormField
-                    key={item.key}
-                    control={form.control}
-                    name={item.key as keyof ContractValues}
-                    render={(field) => <RenderField form={{ ...item, field }} />}
-                  />
-                ))}
-              </div>
-            </div>
-
-            <ActionButton
-              setOpen={setOpen}
-              handleSubmit={onSubmit}
-              submitTitle={isEdit ? "Save Changes" : "Save Contract"}
-              isLoading={isLoading}
-              disable={isLoading}
-            />
           </div>
-        </Form>
-      </SheetContent>
-    </Sheet>
+
+          <Separator />
+
+          <div>
+            <p className="text-sm font-medium mb-3">Salary &amp; pay</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {fieldsByKeys(salaryKeys).map((item) => (
+                <FormField
+                  key={item.key}
+                  control={form.control}
+                  name={item.key as keyof ContractValues}
+                  render={(field) => <RenderField form={{ ...item, field }} />}
+                />
+              ))}
+            </div>
+          </div>
+
+          <Separator />
+
+          <div>
+            <p className="text-sm font-medium mb-3">Skill &amp; overtime</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {fieldsByKeys(skillKeys).map((item) => (
+                <FormField
+                  key={item.key}
+                  control={form.control}
+                  name={item.key as keyof ContractValues}
+                  render={(field) => <RenderField form={{ ...item, field }} />}
+                />
+              ))}
+            </div>
+          </div>
+
+          <ActionButton
+            setOpen={setOpen}
+            handleSubmit={onSubmit}
+            submitTitle={isEdit ? "Save Changes" : "Save Contract"}
+            isLoading={isLoading}
+            disable={isLoading}
+          />
+        </div>
+      </Form>
+    </SharedSheet>
   );
 }
+
