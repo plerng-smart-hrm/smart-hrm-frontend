@@ -18,12 +18,12 @@ interface Props {
   placeholder?: string;
 }
 
-function formatShiftRange(shift: ITimeShiftOption): string {
-  const isSplit = shift.fOut && shift.sIn;
+export function formatShiftRange(fIn?: string, fOut?: string | null, sIn?: string | null, sOut?: string): string {
+  const isSplit = fOut && sIn;
   if (isSplit) {
-    return `${shift.fIn}–${shift.fOut}, ${shift.sIn}–${shift.sOut}`;
+    return `${fIn}–${fOut}, ${sIn}–${sOut}`;
   }
-  return `${shift.fIn}–${shift.sOut}`;
+  return `${fIn}–${sOut}`;
 }
 
 export function TimeShiftCombobox({ value, onChange, disabled = false, placeholder = "Select time shift..." }: Props) {

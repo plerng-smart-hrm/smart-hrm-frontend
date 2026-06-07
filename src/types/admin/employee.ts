@@ -1,4 +1,5 @@
 import { IContract } from "./contract";
+import { ITimeShift } from "./time-shift";
 
 export interface IEmployee {
   id?: number;
@@ -36,4 +37,5 @@ export interface IEmployee {
   deletedAt?: string;
 
   contract?: IContract;
+  timeShift?: ITimeShift
 }
