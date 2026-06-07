@@ -28,7 +28,7 @@ export interface IEmployee {
   laborBookNo?: string;
   idCardNo?: string;
   nssfRegisterNo?: string;
-  workingShiftId?: number;
+  timeShiftId?: number;
   createdBy?: number;
   updatedBy?: number;
   createdAt?: string;

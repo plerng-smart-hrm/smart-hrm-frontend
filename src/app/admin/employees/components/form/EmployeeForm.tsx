@@ -10,7 +10,6 @@ import { employeeFields } from "./employeeFormField";
 import { User } from "lucide-react";
 import RenderField from "@/components/shared/form/RenderField";
 import { Separator } from "@/components/ui/separator";
-import { WorkingShiftCombobox } from "@/components/comboboxes/WorkingShiftCombobox";
 import { useMutateEmployee } from "@/stores/admin/useMutateEmployee";
 import { showValidationWarning } from "@/utils/form-validation";
 import { IEmployee } from "@/types/admin/employee";
@@ -49,14 +48,13 @@ export default function EmployeeForm({ setOpen, employee }: IProps) {
       employeeType: employee?.employeeType || "",
       workStatus: employee?.workStatus || "",
       employeeStatus: employee?.employeeStatus || "",
-      start: employee?.start || "",
       position: employee?.position || "",
       startDate: employee?.startDate || "",
       endDate: employee?.endDate || "",
       laborBookNo: employee?.laborBookNo || "",
       idCardNo: employee?.idCardNo || "",
       nssfRegisterNo: employee?.nssfRegisterNo || "",
-      workingShiftId: employee?.workingShiftId || 0,
+      timeShiftId: employee?.timeShiftId || 0,
     },
     mode: "onChange",
   });
@@ -100,10 +98,7 @@ export default function EmployeeForm({ setOpen, employee }: IProps) {
     };
 
     if (isEditMode) {
-      updateEmployee(
-        { employeeId: employee?.id, request: data },
-        mutationOptions,
-      );
+      updateEmployee({ employeeId: employee?.id, request: data }, mutationOptions);
     } else {
       createEmployee({ request: data }, mutationOptions);
     }
@@ -118,25 +113,13 @@ export default function EmployeeForm({ setOpen, employee }: IProps) {
             onClick={handlePhotoClick}
             className="w-40 h-40 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-gray-400 transition-colors bg-gray-50 dark:bg-gray-900 flex-shrink-0"
           >
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handlePhotoChange}
-              className="hidden"
-            />
+            <input ref={fileInputRef} type="file" accept="image/*" onChange={handlePhotoChange} className="hidden" />
             {photoPreview ? (
-              <img
-                src={photoPreview}
-                alt="Preview"
-                className="w-full h-full object-cover rounded-lg"
-              />
+              <img src={photoPreview} alt="Preview" className="w-full h-full object-cover rounded-lg" />
             ) : (
               <>
                 <User className="w-12 h-12 text-gray-400" />
-                <span className="text-sm text-gray-500 mt-2 text-center px-2">
-                  Click to upload photo
-                </span>
+                <span className="text-sm text-gray-500 mt-2 text-center px-2">Click to upload photo</span>
               </>
             )}
           </div>
@@ -185,15 +168,13 @@ export default function EmployeeForm({ setOpen, employee }: IProps) {
             ))}
 
           {/* Working Shift Combobox */}
-          <FormField
+          {/* <FormField
             control={form.control}
             name="workingShiftId"
             render={({ field }) => (
               <FormItem className="grid gap-y-2 w-full">
                 <FormLabel className="text-[13px]">
-                  <span className="text-gray-700 dark:text-white">
-                    Working Shift
-                  </span>
+                  <span className="text-gray-700 dark:text-white">Working Shift</span>
                   <span className="text-red-600 text-[11px] pl-0.5">*</span>
                 </FormLabel>
                 <WorkingShiftCombobox
@@ -202,7 +183,7 @@ export default function EmployeeForm({ setOpen, employee }: IProps) {
                 />
               </FormItem>
             )}
-          />
+          /> */}
         </div>
 
         {/* Action Buttons */}

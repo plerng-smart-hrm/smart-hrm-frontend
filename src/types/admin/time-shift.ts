@@ -1,9 +1,12 @@
 import { IAudit } from "./audit-entity";
 
-export interface IWorkingShiftOption {
+export interface ITimeShiftOption {
   value: number;
   label: string;
-  description: string;
+  fIn: string;
+  fOut: string | null;
+  sIn: string | null;
+  sOut: string;
 }
 
 export interface ITimeShift extends IAudit {

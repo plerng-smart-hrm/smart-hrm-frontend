@@ -172,7 +172,7 @@ export const employeeFields: FieldDefinition[] = [
   },
   {
     label: "working_shift",
-    key: "workingShiftId",
+    key: "timeShiftId",
     type: "select",
     required: true,
   },
