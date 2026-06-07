@@ -1,13 +1,14 @@
 "use client";
 
 import { parseAsStringEnum, useQueryState } from "nuqs";
-import { Briefcase, CalendarDays, Clock, FileSignature, User } from "lucide-react";
+import { Briefcase, CalendarClock, CalendarDays, Clock, FileSignature, User } from "lucide-react";
 import { employeeKeys } from "@/service/util/query-keys/employee";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
 import { cn } from "@/lib/utils";
 import { RenderView } from "@/components/shared/view/RenderView";
 import PersonalTab from "./tabs/PersonalTab";
 import ContractTab from "./tabs/ContractTab";
+import AttendanceTab from "./tabs/AttendanceTab";
 import useQueryShared from "@/stores/admin/useQuery/useQueryShared";
 import { IEmployee } from "@/types/admin/employee";
 import { formatToDate } from "@/utils/custom-format";
@@ -20,6 +21,7 @@ interface Props {
 const TABS = [
   { key: "personal", label: "Personal", icon: User },
   { key: "contract", label: "Contract", icon: FileSignature },
+  { key: "attendance", label: "Attendance", icon: CalendarClock },
 ] as const;
 
 type TabKey = (typeof TABS)[number]["key"];
@@ -122,6 +124,7 @@ export default function EmployeeProfileClient({ employeeId }: Props) {
       <div className="pt-2">
         {activeTab === "personal" && <PersonalTab employee={employee} />}
         {activeTab === "contract" && <ContractTab employee={employee} />}
+        {activeTab === "attendance" && <AttendanceTab employee={employee} />}
       </div>
     </div>
   );

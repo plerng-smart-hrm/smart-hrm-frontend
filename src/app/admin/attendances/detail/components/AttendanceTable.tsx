@@ -26,24 +26,27 @@ interface AttendanceTableProps {
 // Column configuration
 type ColumnKey =
   | "day"
+  | "weekday"
   | "dayStatus"
   | "workStatus"
-  | "shift"
   | "timeIn1"
   | "timeOut1"
   | "timeIn2"
   | "timeOut2"
-  | "lateIn"
-  | "earlyOut"
+  | "late"
   | "normal"
-  | "ot1"
-  | "ot2"
+  | "otX15"
+  | "otX2"
   | "night"
+  | "paymentNormal"
+  | "paymentOtX15"
+  | "paymentOtX2"
+  | "paymentNight"
   | "timeSalary"
+  | "pieceSalary"
   | "leaveHour"
   | "leavePay"
-  | "adjust"
-  | "allowance";
+  | "food";
 
 interface ColumnConfig {
   key: ColumnKey;
@@ -53,25 +56,28 @@ interface ColumnConfig {
 }
 
 const columnConfigs: ColumnConfig[] = [
-  { key: "day", label: "Day", defaultVisible: true },
+  { key: "day", label: "Date", group: "Date", defaultVisible: true },
+  { key: "weekday", label: "Weekday", group: "Date", defaultVisible: true },
   { key: "dayStatus", label: "Day Status", defaultVisible: true },
   { key: "workStatus", label: "Work Status", defaultVisible: true },
-  { key: "shift", label: "Shift", defaultVisible: true },
   { key: "timeIn1", label: "Time In 1", group: "Time", defaultVisible: true },
   { key: "timeOut1", label: "Time Out 1", group: "Time", defaultVisible: true },
   { key: "timeIn2", label: "Time In 2", group: "Time", defaultVisible: true },
   { key: "timeOut2", label: "Time Out 2", group: "Time", defaultVisible: true },
-  { key: "lateIn", label: "Late In", group: "Late", defaultVisible: true },
-  { key: "earlyOut", label: "Early Out", group: "Late", defaultVisible: true },
+  { key: "late", label: "Late", defaultVisible: true },
   { key: "normal", label: "Normal Hours", defaultVisible: true },
-  { key: "ot1", label: "OT1", group: "Overtime", defaultVisible: true },
-  { key: "ot2", label: "OT2", group: "Overtime", defaultVisible: false },
-  { key: "night", label: "Night", defaultVisible: false },
+  { key: "otX15", label: "OT x 1.5", group: "Overtime", defaultVisible: true },
+  { key: "otX2", label: "OT x 2", group: "Overtime", defaultVisible: true },
+  { key: "night", label: "Night", group: "Overtime", defaultVisible: true },
+  { key: "paymentNormal", label: "Payment Normal", group: "Payment", defaultVisible: true },
+  { key: "paymentOtX15", label: "Payment OT x 1.5", group: "Payment", defaultVisible: true },
+  { key: "paymentOtX2", label: "Payment OT x 2", group: "Payment", defaultVisible: true },
+  { key: "paymentNight", label: "Payment Night", group: "Payment", defaultVisible: true },
   { key: "timeSalary", label: "Time Salary", defaultVisible: true },
+  { key: "pieceSalary", label: "Piece Salary", defaultVisible: true },
   { key: "leaveHour", label: "Leave Hour", group: "Leave", defaultVisible: true },
-  { key: "leavePay", label: "Leave Pay", group: "Leave", defaultVisible: false },
-  { key: "adjust", label: "Adjust", defaultVisible: true },
-  { key: "allowance", label: "Allowance", defaultVisible: true },
+  { key: "leavePay", label: "Leave Pay", group: "Leave", defaultVisible: true },
+  { key: "food", label: "Food", defaultVisible: true },
 ];
 
 const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -121,6 +127,12 @@ const getDayStatusStyle = (status: AttendanceStatus, day: string) => {
   return "text-gray-700 dark:text-gray-300";
 };
 
+const getDayStatusLabel = (status: AttendanceStatus, day: string) => {
+  if (day === "Sun") return "Sunday";
+  if (status === "HOLIDAY") return "PH";
+  return "Work";
+};
+
 const getWorkStatusLabel = (status: AttendanceStatus) => {
   switch (status) {
     case "HOLIDAY":
@@ -151,6 +163,18 @@ const months = [
 
 const currentYear = new Date().getFullYear();
 const years = Array.from({ length: 10 }, (_, i) => currentYear - 5 + i);
+
+// Bilingual header label — Khmer above, English below
+function HeaderLabel({ kh, en }: { kh: string; en: string }) {
+  return (
+    <span className="flex flex-col leading-tight">
+      <span>{kh}</span>
+      <span className="text-[10px] font-normal text-muted-foreground">{en}</span>
+    </span>
+  );
+}
+
+const formatNumber = (value: number) => (value > 0 ? value : "");
 
 export default function AttendanceTable({ attendanceData, selectedMonth, onMonthChange }: AttendanceTableProps) {
   // Initialize visible columns from config
@@ -187,25 +211,30 @@ export default function AttendanceTable({ attendanceData, selectedMonth, onMonth
   const totals = fullMonthData.reduce(
     (acc, record) => ({
       normalHours: acc.normalHours + record.workingHours,
-      ot1: acc.ot1 + record.overtime.ot1,
-      ot2: acc.ot2 + record.overtime.ot2,
       lateMinutes: acc.lateMinutes + record.lateMinutes,
+      otX15: acc.otX15 + record.overtime.ot1,
+      otX2: acc.otX2 + record.overtime.ot2,
     }),
-    { normalHours: 0, ot1: 0, ot2: 0, lateMinutes: 0 },
+    { normalHours: 0, lateMinutes: 0, otX15: 0, otX2: 0 },
   );
+  const totalLateHours = totals.lateMinutes / 60;
 
-  // Calculate colSpan for Time group
+  // Calculate colSpan for each group
+  const dateColSpan = [isVisible("day"), isVisible("weekday")].filter(Boolean).length;
+
   const timeColSpan = [isVisible("timeIn1"), isVisible("timeOut1"), isVisible("timeIn2"), isVisible("timeOut2")].filter(
     Boolean,
   ).length;
 
-  // Calculate colSpan for Late group
-  const lateColSpan = [isVisible("lateIn"), isVisible("earlyOut")].filter(Boolean).length;
+  const overtimeColSpan = [isVisible("otX15"), isVisible("otX2"), isVisible("night")].filter(Boolean).length;
 
-  // Calculate colSpan for Overtime group
-  const otColSpan = [isVisible("ot1"), isVisible("ot2")].filter(Boolean).length;
+  const paymentColSpan = [
+    isVisible("paymentNormal"),
+    isVisible("paymentOtX15"),
+    isVisible("paymentOtX2"),
+    isVisible("paymentNight"),
+  ].filter(Boolean).length;
 
-  // Calculate colSpan for Leave group
   const leaveColSpan = [isVisible("leaveHour"), isVisible("leavePay")].filter(Boolean).length;
 
   const handlePreviousMonth = () => {
@@ -317,12 +346,13 @@ export default function AttendanceTable({ attendanceData, selectedMonth, onMonth
             <table className="w-full border-collapse text-xs">
               <thead className="sticky top-0 z-10">
                 <tr className="bg-slate-200 dark:bg-slate-800">
-                  {isVisible("day") && (
+                  {dateColSpan > 0 && (
                     <th
+                      colSpan={dateColSpan}
                       rowSpan={2}
-                      className="border border-slate-300 dark:border-slate-600 px-2 py-1 text-center font-semibold w-10"
+                      className="border border-slate-300 dark:border-slate-600 px-2 py-1 text-center font-semibold"
                     >
-                      Day
+                      <HeaderLabel kh="ថ្ងៃទី" en="Date" />
                     </th>
                   )}
                   {isVisible("dayStatus") && (
@@ -330,9 +360,7 @@ export default function AttendanceTable({ attendanceData, selectedMonth, onMonth
                       rowSpan={2}
                       className="border border-slate-300 dark:border-slate-600 px-2 py-1 text-center font-semibold w-16"
                     >
-                      Day
-                      <br />
-                      Status
+                      <HeaderLabel kh="ប្រភេទថ្ងៃ" en="DayStatus" />
                     </th>
                   )}
                   {isVisible("workStatus") && (
@@ -340,17 +368,7 @@ export default function AttendanceTable({ attendanceData, selectedMonth, onMonth
                       rowSpan={2}
                       className="border border-slate-300 dark:border-slate-600 px-2 py-1 text-center font-semibold w-16"
                     >
-                      Work
-                      <br />
-                      Status
-                    </th>
-                  )}
-                  {isVisible("shift") && (
-                    <th
-                      rowSpan={2}
-                      className="border border-slate-300 dark:border-slate-600 px-2 py-1 text-center font-semibold w-12"
-                    >
-                      Shift
+                      <HeaderLabel kh="ថ្ងៃធ្វើការ" en="WorkStatus" />
                     </th>
                   )}
                   {timeColSpan > 0 && (
@@ -361,12 +379,12 @@ export default function AttendanceTable({ attendanceData, selectedMonth, onMonth
                       Time
                     </th>
                   )}
-                  {lateColSpan > 0 && (
+                  {isVisible("late") && (
                     <th
-                      colSpan={lateColSpan}
-                      className="border border-slate-300 dark:border-slate-600 px-2 py-1 text-center font-semibold bg-cyan-100 dark:bg-cyan-900"
+                      rowSpan={2}
+                      className="border border-slate-300 dark:border-slate-600 px-2 py-1 text-center font-semibold bg-cyan-100 dark:bg-cyan-900 w-14"
                     >
-                      Late
+                      <HeaderLabel kh="យឺត" en="Late" />
                     </th>
                   )}
                   {isVisible("normal") && (
@@ -379,22 +397,20 @@ export default function AttendanceTable({ attendanceData, selectedMonth, onMonth
                       mal
                     </th>
                   )}
-                  {otColSpan > 0 && (
+                  {overtimeColSpan > 0 && (
                     <th
-                      colSpan={otColSpan}
+                      colSpan={overtimeColSpan}
                       className="border border-slate-300 dark:border-slate-600 px-2 py-1 text-center font-semibold bg-pink-100 dark:bg-pink-900"
                     >
-                      OverTime
+                      <HeaderLabel kh="ម៉ោងថែម" en="OverTime" />
                     </th>
                   )}
-                  {isVisible("night") && (
+                  {paymentColSpan > 0 && (
                     <th
-                      rowSpan={2}
-                      className="border border-slate-300 dark:border-slate-600 px-2 py-1 text-center font-semibold bg-purple-100 dark:bg-purple-900 w-12"
+                      colSpan={paymentColSpan}
+                      className="border border-slate-300 dark:border-slate-600 px-2 py-1 text-center font-semibold bg-amber-100 dark:bg-amber-900"
                     >
-                      Nig
-                      <br />
-                      ht
+                      <HeaderLabel kh="ប្រាក់ឈ្នួល" en="Payment" />
                     </th>
                   )}
                   {isVisible("timeSalary") && (
@@ -402,9 +418,15 @@ export default function AttendanceTable({ attendanceData, selectedMonth, onMonth
                       rowSpan={2}
                       className="border border-slate-300 dark:border-slate-600 px-2 py-1 text-center font-semibold w-20"
                     >
-                      Time
-                      <br />
-                      Salary
+                      <HeaderLabel kh="ប្រាក់សរុប" en="Time Salary" />
+                    </th>
+                  )}
+                  {isVisible("pieceSalary") && (
+                    <th
+                      rowSpan={2}
+                      className="border border-slate-300 dark:border-slate-600 px-2 py-1 text-center font-semibold w-20"
+                    >
+                      <HeaderLabel kh="ប្រាក់ថ្ងៃបុក" en="Piece Salary" />
                     </th>
                   )}
                   {leaveColSpan > 0 && (
@@ -412,23 +434,15 @@ export default function AttendanceTable({ attendanceData, selectedMonth, onMonth
                       colSpan={leaveColSpan}
                       className="border border-slate-300 dark:border-slate-600 px-2 py-1 text-center font-semibold"
                     >
-                      Leave
+                      <HeaderLabel kh="ឈប់" en="Leave" />
                     </th>
                   )}
-                  {isVisible("adjust") && (
+                  {isVisible("food") && (
                     <th
                       rowSpan={2}
-                      className="border border-slate-300 dark:border-slate-600 px-2 py-1 text-center font-semibold w-16"
+                      className="border border-slate-300 dark:border-slate-600 px-2 py-1 text-center font-semibold bg-orange-100 dark:bg-orange-900 w-16"
                     >
-                      Adjust
-                    </th>
-                  )}
-                  {isVisible("allowance") && (
-                    <th
-                      rowSpan={2}
-                      className="border border-slate-300 dark:border-slate-600 px-2 py-1 text-center font-semibold bg-lime-100 dark:bg-lime-900 w-16"
-                    >
-                      Allow
+                      <HeaderLabel kh="ប្រាក់ថ្លៃបាយ" en="Food" />
                     </th>
                   )}
                 </tr>
@@ -453,34 +467,49 @@ export default function AttendanceTable({ attendanceData, selectedMonth, onMonth
                       Out
                     </th>
                   )}
-                  {isVisible("lateIn") && (
-                    <th className="border border-slate-300 dark:border-slate-600 px-1 py-1 text-center font-semibold bg-cyan-100 dark:bg-cyan-900 w-10">
-                      In
+                  {isVisible("otX15") && (
+                    <th className="border border-slate-300 dark:border-slate-600 px-1 py-1 text-center font-semibold bg-pink-100 dark:bg-pink-900 w-14">
+                      OT x 1.5
                     </th>
                   )}
-                  {isVisible("earlyOut") && (
-                    <th className="border border-slate-300 dark:border-slate-600 px-1 py-1 text-center font-semibold bg-cyan-100 dark:bg-cyan-900 w-10">
-                      Out
+                  {isVisible("otX2") && (
+                    <th className="border border-slate-300 dark:border-slate-600 px-1 py-1 text-center font-semibold bg-pink-100 dark:bg-pink-900 w-12">
+                      OT x 2
                     </th>
                   )}
-                  {isVisible("ot1") && (
-                    <th className="border border-slate-300 dark:border-slate-600 px-1 py-1 text-center font-semibold bg-pink-100 dark:bg-pink-900 w-10">
-                      OT1
+                  {isVisible("night") && (
+                    <th className="border border-slate-300 dark:border-slate-600 px-1 py-1 text-center font-semibold bg-pink-100 dark:bg-pink-900 w-12">
+                      Night
                     </th>
                   )}
-                  {isVisible("ot2") && (
-                    <th className="border border-slate-300 dark:border-slate-600 px-1 py-1 text-center font-semibold bg-pink-100 dark:bg-pink-900 w-10">
-                      OT2
+                  {isVisible("paymentNormal") && (
+                    <th className="border border-slate-300 dark:border-slate-600 px-1 py-1 text-center font-semibold bg-amber-50 dark:bg-amber-900/40 w-16">
+                      <HeaderLabel kh="ធម្មតា" en="Normal" />
+                    </th>
+                  )}
+                  {isVisible("paymentOtX15") && (
+                    <th className="border border-slate-300 dark:border-slate-600 px-1 py-1 text-center font-semibold bg-amber-50 dark:bg-amber-900/40 w-16">
+                      OT x 1.5
+                    </th>
+                  )}
+                  {isVisible("paymentOtX2") && (
+                    <th className="border border-slate-300 dark:border-slate-600 px-1 py-1 text-center font-semibold bg-amber-50 dark:bg-amber-900/40 w-16">
+                      OT x 2
+                    </th>
+                  )}
+                  {isVisible("paymentNight") && (
+                    <th className="border border-slate-300 dark:border-slate-600 px-1 py-1 text-center font-semibold bg-amber-50 dark:bg-amber-900/40 w-16">
+                      Night
                     </th>
                   )}
                   {isVisible("leaveHour") && (
                     <th className="border border-slate-300 dark:border-slate-600 px-1 py-1 text-center font-semibold w-12">
-                      Hour
+                      <HeaderLabel kh="ម៉ោង" en="Hour" />
                     </th>
                   )}
                   {isVisible("leavePay") && (
-                    <th className="border border-slate-300 dark:border-slate-600 px-1 py-1 text-center font-semibold w-12">
-                      Pay
+                    <th className="border border-slate-300 dark:border-slate-600 px-1 py-1 text-center font-semibold w-14">
+                      <HeaderLabel kh="ទឹកប្រាក់" en="Pay" />
                     </th>
                   )}
                 </tr>
@@ -490,15 +519,22 @@ export default function AttendanceTable({ attendanceData, selectedMonth, onMonth
                   const dayNum = parseInt(record.date.split("-")[2]);
                   const rowBg = getRowBackground(record.status, record.day);
                   const dayStatusStyle = getDayStatusStyle(record.status, record.day);
+                  const dayStatusLabel = getDayStatusLabel(record.status, record.day);
                   const workStatus = getWorkStatusLabel(record.status);
                   const hasData = record.status === "PRESENT" || record.status === "LEAVE";
                   const isFutureOrEmpty = !record.time.fi && record.status !== "HOLIDAY" && record.status !== "LEAVE";
+                  const lateHours = record.lateMinutes / 60;
 
                   return (
                     <tr key={index} className={cn(rowBg, "hover:brightness-95")}>
                       {isVisible("day") && (
                         <td className="border border-slate-300 dark:border-slate-600 px-2 py-1 text-center font-medium">
-                          {dayNum}
+                          {dayNum.toString().padStart(2, "0")}
+                        </td>
+                      )}
+                      {isVisible("weekday") && (
+                        <td className="border border-slate-300 dark:border-slate-600 px-2 py-1 text-center font-medium">
+                          {record.day}
                         </td>
                       )}
                       {isVisible("dayStatus") && (
@@ -508,7 +544,7 @@ export default function AttendanceTable({ attendanceData, selectedMonth, onMonth
                             dayStatusStyle,
                           )}
                         >
-                          {record.status === "HOLIDAY" ? "PH" : record.day}
+                          {dayStatusLabel}
                         </td>
                       )}
                       {isVisible("workStatus") && (
@@ -523,9 +559,6 @@ export default function AttendanceTable({ attendanceData, selectedMonth, onMonth
                             {workStatus}
                           </span>
                         </td>
-                      )}
-                      {isVisible("shift") && (
-                        <td className="border border-slate-300 dark:border-slate-600 px-2 py-1 text-center">1</td>
                       )}
                       {isVisible("timeIn1") && (
                         <td
@@ -568,24 +601,14 @@ export default function AttendanceTable({ attendanceData, selectedMonth, onMonth
                           {formatTime(record.time.so)}
                         </td>
                       )}
-                      {isVisible("lateIn") && (
+                      {isVisible("late") && (
                         <td
                           className={cn(
                             "border border-slate-300 dark:border-slate-600 px-1 py-1 text-center bg-cyan-50 dark:bg-cyan-900/30",
                             isFutureOrEmpty && "bg-green-200 dark:bg-green-800",
                           )}
                         >
-                          {record.lateMinutes > 0 ? record.lateMinutes : ""}
-                        </td>
-                      )}
-                      {isVisible("earlyOut") && (
-                        <td
-                          className={cn(
-                            "border border-slate-300 dark:border-slate-600 px-1 py-1 text-center bg-cyan-50 dark:bg-cyan-900/30",
-                            isFutureOrEmpty && "bg-green-200 dark:bg-green-800",
-                          )}
-                        >
-                          {/* Early out placeholder */}
+                          {lateHours > 0 ? lateHours.toFixed(2) : ""}
                         </td>
                       )}
                       {isVisible("normal") && (
@@ -598,7 +621,7 @@ export default function AttendanceTable({ attendanceData, selectedMonth, onMonth
                           {record.workingHours > 0 ? record.workingHours : ""}
                         </td>
                       )}
-                      {isVisible("ot1") && (
+                      {isVisible("otX15") && (
                         <td
                           className={cn(
                             "border border-slate-300 dark:border-slate-600 px-1 py-1 text-center bg-pink-50 dark:bg-pink-900/30",
@@ -606,10 +629,10 @@ export default function AttendanceTable({ attendanceData, selectedMonth, onMonth
                             isFutureOrEmpty && "bg-pink-200 dark:bg-pink-800",
                           )}
                         >
-                          {record.overtime.ot1 > 0 ? record.overtime.ot1 : ""}
+                          {formatNumber(record.overtime.ot1)}
                         </td>
                       )}
-                      {isVisible("ot2") && (
+                      {isVisible("otX2") && (
                         <td
                           className={cn(
                             "border border-slate-300 dark:border-slate-600 px-1 py-1 text-center bg-pink-50 dark:bg-pink-900/30",
@@ -617,22 +640,47 @@ export default function AttendanceTable({ attendanceData, selectedMonth, onMonth
                             isFutureOrEmpty && "bg-pink-200 dark:bg-pink-800",
                           )}
                         >
-                          {record.overtime.ot2 > 0 ? record.overtime.ot2 : ""}
+                          {formatNumber(record.overtime.ot2)}
                         </td>
                       )}
                       {isVisible("night") && (
                         <td
                           className={cn(
-                            "border border-slate-300 dark:border-slate-600 px-1 py-1 text-center bg-purple-50 dark:bg-purple-900/30",
-                            isFutureOrEmpty && "bg-purple-200 dark:bg-purple-800",
+                            "border border-slate-300 dark:border-slate-600 px-1 py-1 text-center bg-pink-50 dark:bg-pink-900/30",
+                            isFutureOrEmpty && "bg-pink-200 dark:bg-pink-800",
                           )}
                         >
-                          {/* Night hours placeholder */}
+                          {/* Night overtime hours — not yet provided by the API */}
+                        </td>
+                      )}
+                      {isVisible("paymentNormal") && (
+                        <td className="border border-slate-300 dark:border-slate-600 px-1 py-1 text-right bg-amber-50 dark:bg-amber-900/20">
+                          {record.workingHours > 0 ? `$${(record.workingHours * 1).toFixed(2)}` : ""}
+                        </td>
+                      )}
+                      {isVisible("paymentOtX15") && (
+                        <td className="border border-slate-300 dark:border-slate-600 px-1 py-1 text-right bg-amber-50 dark:bg-amber-900/20">
+                          {record.overtime.ot1 > 0 ? `$${(record.overtime.ot1 * 1.5).toFixed(2)}` : ""}
+                        </td>
+                      )}
+                      {isVisible("paymentOtX2") && (
+                        <td className="border border-slate-300 dark:border-slate-600 px-1 py-1 text-right bg-amber-50 dark:bg-amber-900/20">
+                          {record.overtime.ot2 > 0 ? `$${(record.overtime.ot2 * 2).toFixed(2)}` : ""}
+                        </td>
+                      )}
+                      {isVisible("paymentNight") && (
+                        <td className="border border-slate-300 dark:border-slate-600 px-1 py-1 text-right bg-amber-50 dark:bg-amber-900/20">
+                          {/* Night overtime payment — not yet provided by the API */}
                         </td>
                       )}
                       {isVisible("timeSalary") && (
                         <td className="border border-slate-300 dark:border-slate-600 px-1 py-1 text-right">
                           {record.workingHours > 0 ? `$${(record.workingHours * 1).toFixed(3)}` : ""}
+                        </td>
+                      )}
+                      {isVisible("pieceSalary") && (
+                        <td className="border border-slate-300 dark:border-slate-600 px-1 py-1 text-right">
+                          {/* Piece-rate salary — not yet provided by the API */}
                         </td>
                       )}
                       {isVisible("leaveHour") && (
@@ -641,23 +689,18 @@ export default function AttendanceTable({ attendanceData, selectedMonth, onMonth
                         </td>
                       )}
                       {isVisible("leavePay") && (
-                        <td className="border border-slate-300 dark:border-slate-600 px-1 py-1 text-center">
+                        <td className="border border-slate-300 dark:border-slate-600 px-1 py-1 text-right">
                           {/* Leave pay placeholder */}
                         </td>
                       )}
-                      {isVisible("adjust") && (
-                        <td className="border border-slate-300 dark:border-slate-600 px-1 py-1 text-center text-xs truncate max-w-16">
-                          {record.adjust || ""}
-                        </td>
-                      )}
-                      {isVisible("allowance") && (
+                      {isVisible("food") && (
                         <td
                           className={cn(
-                            "border border-slate-300 dark:border-slate-600 px-1 py-1 text-right bg-lime-50 dark:bg-lime-900/30",
-                            isFutureOrEmpty && "bg-lime-200 dark:bg-lime-800",
+                            "border border-slate-300 dark:border-slate-600 px-1 py-1 text-right bg-orange-50 dark:bg-orange-900/30",
+                            isFutureOrEmpty && "bg-orange-200 dark:bg-orange-800",
                           )}
                         >
-                          {hasData ? "2,000" : isFutureOrEmpty ? "" : "$0.000"}
+                          {hasData ? "$1.000" : ""}
                         </td>
                       )}
                     </tr>
@@ -674,22 +717,25 @@ export default function AttendanceTable({ attendanceData, selectedMonth, onMonth
           <table className="w-full border-collapse text-xs">
             <tfoot>
               <tr className="bg-slate-300 dark:bg-slate-700 font-semibold">
-                {isVisible("day") && (
+                {(isVisible("day") || isVisible("weekday")) && (
                   <td
                     colSpan={
-                      [isVisible("day"), isVisible("dayStatus"), isVisible("workStatus"), isVisible("shift")].filter(
-                        Boolean,
-                      ).length
+                      [
+                        isVisible("day"),
+                        isVisible("weekday"),
+                        isVisible("dayStatus"),
+                        isVisible("workStatus"),
+                      ].filter(Boolean).length
                     }
                     className="border border-slate-400 dark:border-slate-500 px-2 py-2 text-center w-[calc(10px+16px+16px+12px)]"
                   >
                     Total
                   </td>
                 )}
-                {!isVisible("day") && isVisible("dayStatus") && (
+                {!isVisible("day") && !isVisible("weekday") && isVisible("dayStatus") && (
                   <td
                     colSpan={
-                      [isVisible("dayStatus"), isVisible("workStatus"), isVisible("shift")].filter(Boolean).length
+                      [isVisible("dayStatus"), isVisible("workStatus")].filter(Boolean).length
                     }
                     className="border border-slate-400 dark:border-slate-500 px-2 py-2 text-center"
                   >
@@ -704,14 +750,9 @@ export default function AttendanceTable({ attendanceData, selectedMonth, onMonth
                     {/* Time totals */}
                   </td>
                 )}
-                {isVisible("lateIn") && (
-                  <td className="border border-slate-400 dark:border-slate-500 px-1 py-2 text-center bg-cyan-100 dark:bg-cyan-900 w-10">
-                    {totals.lateMinutes > 0 ? totals.lateMinutes : ""}
-                  </td>
-                )}
-                {isVisible("earlyOut") && (
-                  <td className="border border-slate-400 dark:border-slate-500 px-1 py-2 text-center bg-cyan-100 dark:bg-cyan-900 w-10">
-                    {/* Early out total */}
+                {isVisible("late") && (
+                  <td className="border border-slate-400 dark:border-slate-500 px-1 py-2 text-center bg-cyan-100 dark:bg-cyan-900 w-14">
+                    {totalLateHours > 0 ? totalLateHours.toFixed(2) : ""}
                   </td>
                 )}
                 {isVisible("normal") && (
@@ -719,24 +760,49 @@ export default function AttendanceTable({ attendanceData, selectedMonth, onMonth
                     {totals.normalHours}
                   </td>
                 )}
-                {isVisible("ot1") && (
-                  <td className="border border-slate-400 dark:border-slate-500 px-1 py-2 text-center bg-pink-200 dark:bg-pink-800 font-bold w-10">
-                    {totals.ot1 > 0 ? totals.ot1 : ""}
+                {isVisible("otX15") && (
+                  <td className="border border-slate-400 dark:border-slate-500 px-1 py-2 text-center bg-pink-200 dark:bg-pink-800 font-bold w-14">
+                    {formatNumber(totals.otX15)}
                   </td>
                 )}
-                {isVisible("ot2") && (
-                  <td className="border border-slate-400 dark:border-slate-500 px-1 py-2 text-center bg-pink-200 dark:bg-pink-800 font-bold w-10">
-                    {totals.ot2 > 0 ? totals.ot2 : ""}
+                {isVisible("otX2") && (
+                  <td className="border border-slate-400 dark:border-slate-500 px-1 py-2 text-center bg-pink-200 dark:bg-pink-800 font-bold w-12">
+                    {formatNumber(totals.otX2)}
                   </td>
                 )}
                 {isVisible("night") && (
-                  <td className="border border-slate-400 dark:border-slate-500 px-1 py-2 text-center bg-purple-200 dark:bg-purple-800 w-12">
+                  <td className="border border-slate-400 dark:border-slate-500 px-1 py-2 text-center bg-pink-200 dark:bg-pink-800 font-bold w-12">
                     {/* Night total */}
+                  </td>
+                )}
+                {isVisible("paymentNormal") && (
+                  <td className="border border-slate-400 dark:border-slate-500 px-1 py-2 text-right bg-amber-200 dark:bg-amber-800 font-bold w-16">
+                    ${(totals.normalHours * 1).toFixed(2)}
+                  </td>
+                )}
+                {isVisible("paymentOtX15") && (
+                  <td className="border border-slate-400 dark:border-slate-500 px-1 py-2 text-right bg-amber-200 dark:bg-amber-800 font-bold w-16">
+                    ${(totals.otX15 * 1.5).toFixed(2)}
+                  </td>
+                )}
+                {isVisible("paymentOtX2") && (
+                  <td className="border border-slate-400 dark:border-slate-500 px-1 py-2 text-right bg-amber-200 dark:bg-amber-800 font-bold w-16">
+                    ${(totals.otX2 * 2).toFixed(2)}
+                  </td>
+                )}
+                {isVisible("paymentNight") && (
+                  <td className="border border-slate-400 dark:border-slate-500 px-1 py-2 text-right bg-amber-200 dark:bg-amber-800 font-bold w-16">
+                    {/* Night payment total */}
                   </td>
                 )}
                 {isVisible("timeSalary") && (
                   <td className="border border-slate-400 dark:border-slate-500 px-1 py-2 text-right font-bold w-20">
                     ${totals.normalHours.toFixed(2)}
+                  </td>
+                )}
+                {isVisible("pieceSalary") && (
+                  <td className="border border-slate-400 dark:border-slate-500 px-1 py-2 text-right font-bold w-20">
+                    {/* Piece salary total */}
                   </td>
                 )}
                 {isVisible("leaveHour") && (
@@ -745,18 +811,13 @@ export default function AttendanceTable({ attendanceData, selectedMonth, onMonth
                   </td>
                 )}
                 {isVisible("leavePay") && (
-                  <td className="border border-slate-400 dark:border-slate-500 px-1 py-2 text-center w-12">
+                  <td className="border border-slate-400 dark:border-slate-500 px-1 py-2 text-right w-14">
                     {/* Leave pay total */}
                   </td>
                 )}
-                {isVisible("adjust") && (
-                  <td className="border border-slate-400 dark:border-slate-500 px-1 py-2 text-center w-16">
-                    {/* Adjust total */}
-                  </td>
-                )}
-                {isVisible("allowance") && (
-                  <td className="border border-slate-400 dark:border-slate-500 px-1 py-2 text-right bg-lime-200 dark:bg-lime-800 font-bold w-16">
-                    26,000
+                {isVisible("food") && (
+                  <td className="border border-slate-400 dark:border-slate-500 px-1 py-2 text-right bg-orange-200 dark:bg-orange-800 font-bold w-16">
+                    {/* Food total */}
                   </td>
                 )}
               </tr>
