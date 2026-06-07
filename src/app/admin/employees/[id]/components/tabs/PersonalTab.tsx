@@ -7,7 +7,7 @@ import { Calendar, FileText, GraduationCap, Globe, Heart, MapPin, Phone, SquareP
 import { format, parseISO } from "date-fns";
 import { IEmployee } from "@/types/admin/employee";
 import { RenderView, Section } from "@/components/shared/view/RenderView";
-import PersonalInfoPanel from "./PersonalInfoPanel";
+import PersonalInfoPanel from "../panels/PersonalInfoPanel";
 
 interface Props {
   employee: IEmployee;
