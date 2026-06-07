@@ -19,7 +19,7 @@ export interface IEmployee {
   phone?: string;
   currentAddress?: string;
   education?: string;
-  employeeType?:string;
+  employeeType?: string;
   workStatus?: string;
   employeeStatus?: string;
   start?: string;
@@ -36,6 +36,6 @@ export interface IEmployee {
   updatedAt?: string;
   deletedAt?: string;
 
-  contract?: IContract;
-  timeShift?: ITimeShift
+  activeContract?: IContract;
+  timeShift?: ITimeShift;
 }

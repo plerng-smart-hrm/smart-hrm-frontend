@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { parseAsStringEnum, useQueryState } from "nuqs";
 import { Briefcase, CalendarDays, Clock, FileSignature, User } from "lucide-react";
 import { employeeKeys } from "@/service/util/query-keys/employee";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
@@ -24,8 +24,13 @@ const TABS = [
 
 type TabKey = (typeof TABS)[number]["key"];
 
+const tabKeys = TABS.map((tab) => tab.key) as TabKey[];
+
 export default function EmployeeProfileClient({ employeeId }: Props) {
-  const [activeTab, setActiveTab] = useState<TabKey>("personal");
+  const [activeTab, setActiveTab] = useQueryState(
+    "tab",
+    parseAsStringEnum<TabKey>(tabKeys).withDefault("personal"),
+  );
 
   const { data, isLoading } = useQueryShared({
     url: `/v1/employees/${employeeId}`,
