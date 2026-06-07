@@ -13,8 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ChevronLeft, ChevronRight, Settings2 } from "lucide-react";
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay } from "date-fns";
-import { IDailyAttendance, AttendanceStatus } from "@/types/admin/attendance-summary";
+import { IDailyAttendance } from "@/types/admin/attendance-summary";
 import { cn } from "@/lib/utils";
 
 interface AttendanceTableProps {
@@ -80,66 +79,11 @@ const columnConfigs: ColumnConfig[] = [
   { key: "food", label: "Food", defaultVisible: true },
 ];
 
-const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
-const generateMonthDays = (month: Date): IDailyAttendance[] => {
-  const start = startOfMonth(month);
-  const end = endOfMonth(month);
-  const days = eachDayOfInterval({ start, end });
-
-  return days.map((date) => {
-    const dayOfWeek = getDay(date);
-    const isSunday = dayOfWeek === 0;
-
-    return {
-      date: format(date, "yyyy-MM-dd"),
-      day: dayNames[dayOfWeek],
-      time: { fi: null, fo: null, si: null, so: null },
-      lateMinutes: 0,
-      workingHours: 0,
-      status: isSunday ? "HOLIDAY" : "PRESENT",
-      reason: null,
-      overtime: { ot1: 0, ot2: 0 },
-      adjust: null,
-    } as IDailyAttendance;
-  });
-};
-
-const mergeAttendanceData = (monthDays: IDailyAttendance[], attendanceData: IDailyAttendance[]): IDailyAttendance[] => {
-  const attendanceMap = new Map(attendanceData.map((item) => [item.date, item]));
-
-  return monthDays.map((day) => {
-    const existingData = attendanceMap.get(day.date);
-    return existingData || day;
-  });
-};
-
-const isSpecialRow = (status: AttendanceStatus, day: string) => status === "HOLIDAY" || day === "Sun";
-
 const getStatusTextStyle = (label: string): React.CSSProperties => {
   if (label === "PH" || label === "Sunday") return { color: "var(--ph-text)", fontWeight: 700 };
   if (label === "Absent") return { color: "var(--absent-text)", fontWeight: 700 };
   if (label === "Work") return { color: "var(--work-text)", fontWeight: 600 };
   return { color: "var(--text-main)" };
-};
-
-const getDayStatusLabel = (status: AttendanceStatus, day: string) => {
-  if (day === "Sun") return "Sunday";
-  if (status === "HOLIDAY") return "PH";
-  return "Work";
-};
-
-const getWorkStatusLabel = (status: AttendanceStatus) => {
-  switch (status) {
-    case "HOLIDAY":
-      return "PH";
-    case "LEAVE":
-      return "Leave";
-    case "ABSENT":
-      return "Absent";
-    default:
-      return "Work";
-  }
 };
 
 const months = [
@@ -261,8 +205,7 @@ export default function AttendanceTable({ attendanceData, selectedMonth, onMonth
     return time;
   };
 
-  const monthDays = generateMonthDays(selectedMonth);
-  const fullMonthData = mergeAttendanceData(monthDays, attendanceData);
+  const fullMonthData = attendanceData;
 
   const totals = fullMonthData.reduce(
     (acc, record) => ({
@@ -627,12 +570,12 @@ export default function AttendanceTable({ attendanceData, selectedMonth, onMonth
               <tbody>
                 {fullMonthData.map((record, index) => {
                   const dayNum = parseInt(record.date.split("-")[2]);
-                  const dayStatusLabel = getDayStatusLabel(record.status, record.day);
-                  const workStatus = getWorkStatusLabel(record.status);
-                  const hasData = record.status === "PRESENT" || record.status === "LEAVE";
-                  const isFutureOrEmpty = !record.time.fi && record.status !== "HOLIDAY" && record.status !== "LEAVE";
+                  const dayStatusLabel = record.dayStatus;
+                  const workStatus = record.workStatus;
+                  const hasData = record.time.fi !== null;
+                  const isFutureOrEmpty = !record.time.fi && record.dayStatus !== "Sunday" && record.dayStatus !== "PH";
                   const lateHours = record.lateMinutes / 60;
-                  const special = isSpecialRow(record.status, record.day);
+                  const special = record.dayStatus === "Sunday" || record.dayStatus === "PH";
                   const cellBorder = "border [border-color:var(--grid-line)]";
 
                   return (
@@ -815,10 +758,7 @@ export default function AttendanceTable({ attendanceData, selectedMonth, onMonth
         </ScrollArea>
 
         {/* Sticky Footer Totals */}
-        <div
-          className="flex-shrink-0  overflow-hidden"
-          style={{ borderColor: "var(--grid-line)" }}
-        >
+        <div className="flex-shrink-0  overflow-hidden" style={{ borderColor: "var(--grid-line)" }}>
           <table className="w-full border-collapse text-xs">
             <tfoot>
               <tr className="font-semibold" style={{ color: "var(--text-main)" }}>

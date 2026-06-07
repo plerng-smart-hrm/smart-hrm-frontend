@@ -25,12 +25,14 @@ const AttendanceDetailClient = () => {
   const [selectedMonth, setSelectedMonth] = useState(new Date());
 
   const { data: attSummaryData } = useQueryShared({
-    url: `/v1/attendance-summary/employee`,
+    url: `/v1/att-summaries/employee`,
     key: attendanceSummaryKeys.summary_by_employee,
     param: { empCode, yearMonth },
     setIsLoading,
     enable: empCode && yearMonth ? true : false,
   });
+
+  console.log("attSummaryData", attSummaryData);
 
   const { data: payrollPaymentsData } = useQueryShared({
     url: `/v1/payroll-payments/employee`,

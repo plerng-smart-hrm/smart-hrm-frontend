@@ -2,16 +2,7 @@
 
 import React from "react";
 import { parseAsString, useQueryState } from "nuqs";
-import {
-  CalendarCheck,
-  CalendarClock,
-  CalendarDays,
-  CalendarOff,
-  CalendarX,
-  Clock,
-  Timer,
-  Zap,
-} from "lucide-react";
+import { CalendarCheck, CalendarClock, CalendarDays, CalendarOff, CalendarX, Clock, Timer, Zap } from "lucide-react";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
 import { RenderView, Section } from "@/components/shared/view/RenderView";
 import useQueryShared from "@/stores/admin/useQuery/useQueryShared";
@@ -40,10 +31,10 @@ export default function AttendanceTab({ employee }: Props) {
   const [selectedMonth, setSelectedMonth] = React.useState(() => new Date(`${formatToYYYYMM()}-01`));
 
   const { data, isFetching } = useQueryShared({
-    url: `/v1/attendance-summary/employee`,
-    key: attendanceSummaryKeys.summary_by_employee,
-    param: { empCode: employee.empCode, yearMonth },
-    enable: !!employee.empCode,
+    url: `/v1/att-summaries/employee`,
+    key: `${attendanceSummaryKeys.summary_by_employee}_${employee?.id}_${yearMonth}`,
+    param: { employeeId: employee?.id, yearMonth },
+    enable: !!employee.id,
   });
 
   const attSummary = (data?.data as IEmployeeAttendanceSummary) ?? undefined;
@@ -74,8 +65,16 @@ export default function AttendanceTab({ employee }: Props) {
             <RenderView
               className="grid grid-cols-1 gap-4"
               fields={[
-                { icon: <Clock className="h-4 w-4" />, label: "Working Hours", value: formatHours(totals?.totalWorkingHours) },
-                { icon: <Timer className="h-4 w-4" />, label: "Late Minutes", value: formatMinutes(totals?.totalLateMinutes) },
+                {
+                  icon: <Clock className="h-4 w-4" />,
+                  label: "Working Hours",
+                  value: formatHours(totals?.totalWorkingHours),
+                },
+                {
+                  icon: <Timer className="h-4 w-4" />,
+                  label: "Late Minutes",
+                  value: formatMinutes(totals?.totalLateMinutes),
+                },
                 { icon: <Zap className="h-4 w-4" />, label: "OT1", value: formatHours(totals?.totalOt1) },
                 { icon: <Zap className="h-4 w-4" />, label: "OT2", value: formatHours(totals?.totalOt2) },
                 { icon: <CalendarCheck className="h-4 w-4" />, label: "Present Days", value: totals?.presentDays },

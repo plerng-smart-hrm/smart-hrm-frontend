@@ -40,6 +40,8 @@ export interface IAttendanceOvertime {
 export interface IDailyAttendance {
   date: string;
   day: string;
+  dayStatus: string;
+  workStatus: string;
   time: IAttendanceTime;
   lateMinutes: number;
   workingHours: number;
