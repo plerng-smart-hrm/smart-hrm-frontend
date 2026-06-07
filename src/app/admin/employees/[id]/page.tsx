@@ -1,7 +1,3 @@
-import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
-import { getQueryClient } from "@/lib/query-client";
-import { getEmployeeById } from "@/service/admin/employees.service";
-import { employeeDetailKey, employeeKeys } from "@/service/util/query-keys/employee";
 import EmployeeProfileClient from "./components/EmployeeProfileClient";
 import { ContentLayout } from "@/components/admin-panel/content-layout";
 import ContentWrapper from "@/components/content/content-wrapper";
