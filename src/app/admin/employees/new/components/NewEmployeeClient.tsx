@@ -2,9 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Heading from "@/components/Heading";
 import EmployeeOnboardingWizard from "../../components/wizard/EmployeeOnboardingWizard";
-import { Card, CardContent } from "@/components/ui/card";
 
 export default function NewEmployeeClient() {
   const router = useRouter();
@@ -14,11 +12,5 @@ export default function NewEmployeeClient() {
     if (!open) router.push("/admin/employees");
   }, [open, router]);
 
-  return (
-    <Card className="h-full">
-      <CardContent>
-        <EmployeeOnboardingWizard setOpen={setOpen} />
-      </CardContent>
-    </Card>
-  );
+  return <EmployeeOnboardingWizard setOpen={setOpen} />;
 }

@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Briefcase, FileSignature, User } from "lucide-react";
+import { Briefcase, Cake, CalendarDays, FileSignature, Phone, User } from "lucide-react";
 import { getEmployeeById } from "@/service/admin/employees.service";
-import { employeeDetailKey } from "@/service/util/query-keys/employee";
+import { employeeDetailKey, employeeKeys } from "@/service/util/query-keys/employee";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
 import Heading from "@/components/Heading";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +13,10 @@ import { cn } from "@/lib/utils";
 import PersonalTab from "./tabs/PersonalTab";
 import JobTab from "./tabs/JobTab";
 import ContractTab from "./tabs/ContractTab";
+import useQueryShared from "@/stores/admin/useQuery/useQueryShared";
+import { IEmployee } from "@/types/admin/employee";
+import { formatDate } from "date-fns";
+import { formatToDate } from "@/utils/custom-format";
 
 interface Props {
   employeeId: string;
@@ -46,20 +50,15 @@ const getStatusColor = (status?: string) => {
 export default function EmployeeProfileClient({ employeeId }: Props) {
   const [activeTab, setActiveTab] = useState<TabKey>("personal");
 
-  const { data, isFetching } = useQuery({
-    queryKey: employeeDetailKey(Number(employeeId)),
-    queryFn: () => getEmployeeById(Number(employeeId)),
-    enabled: !!employeeId,
+  const { data, isLoading } = useQueryShared({
+    url: `/v1/employees/${employeeId}`,
+    key: `${employeeKeys.list_employee}_${employeeId}`,
   });
 
-  const employee = data?.employee;
+  const employee = (data?.data as IEmployee) ?? undefined;
 
-  if (isFetching && !employee) {
+  if (isLoading) {
     return <LoadingOverlay isLoading fullScreen />;
-  }
-
-  if (!employee) {
-    return <div className="flex items-center justify-center h-60 text-muted-foreground">Employee not found</div>;
   }
 
   const fullNameEn = `${employee.firstName ?? ""} ${employee.lastName ?? ""}`.trim();
@@ -68,39 +67,42 @@ export default function EmployeeProfileClient({ employeeId }: Props) {
 
   return (
     <div className="space-y-6">
-      <Heading title={fullNameEn || "Employee"} description={employee.position || "Employee profile"} backButtonHref="/admin/employees" />
+      <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5">
+        {/* Avatar */}
+        <div className="h-24 w-24 shrink-0 rounded-xl bg-secondary/30 flex items-center justify-center overflow-hidden border shadow-sm">
+          <img src={employee.profileUrl || "/no-profile.png"} alt="Profile" className="h-full w-full object-cover" />
+        </div>
 
-      <Card>
-        <CardContent className="flex flex-col sm:flex-row items-center sm:items-start gap-5 py-5">
-          <div className="h-24 w-24 shrink-0 rounded-xl bg-secondary/30 flex items-center justify-center overflow-hidden border shadow-sm">
-            <img src={employee.profileUrl || "/no-profile.png"} alt="Profile" className="h-full w-full object-cover" />
+        {/* Identity + meta */}
+        <div className="text-center sm:text-left flex-1 min-w-0">
+          <h2 className="text-xl font-semibold truncate">{fullNameEn || "N/A"}</h2>
+          {fullNameKh && <p className="text-muted-foreground">{fullNameKh}</p>}
+
+          {employee.position && <p className="text-sm text-muted-foreground mt-0.5">{employee.position}</p>}
+
+          {/* Quick facts */}
+          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-5 gap-y-1.5 mt-4 text-sm">
+            {employee.phone && (
+              <span className="flex items-center gap-1.5 text-muted-foreground">
+                <Phone className="h-3.5 w-3.5 shrink-0" />
+                {employee.phone}
+              </span>
+            )}
+            {employee.dateOfBirth && (
+              <span className="flex items-center gap-1.5 text-muted-foreground">
+                <Cake className="h-3.5 w-3.5 shrink-0" />
+                {formatToDate(employee.dateOfBirth)}
+              </span>
+            )}
+            {employee.startDate && (
+              <span className="flex items-center gap-1.5 text-muted-foreground">
+                <CalendarDays className="h-3.5 w-3.5 shrink-0" />
+                Joined {formatToDate(employee.startDate)}
+              </span>
+            )}
           </div>
-          <div className="text-center sm:text-left flex-1">
-            <h2 className="text-xl font-semibold">{fullNameEn || "N/A"}</h2>
-            {fullNameKh && <p className="text-muted-foreground">{fullNameKh}</p>}
-            <div className="flex items-center justify-center sm:justify-start gap-2 mt-3 flex-wrap">
-              <Badge variant="outline" className="font-normal shadow-sm">
-                {employee.empCode || "N/A"}
-              </Badge>
-              {employee.gender && (
-                <Badge className="font-normal shadow-sm bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300">
-                  {employee.gender}
-                </Badge>
-              )}
-              {employee.employeeStatus && (
-                <Badge className={cn("font-normal shadow-sm", getStatusColor(employee.employeeStatus))}>
-                  {employee.employeeStatus}
-                </Badge>
-              )}
-              {employee.workStatus && (
-                <Badge className={cn("font-normal shadow-sm", getStatusColor(employee.workStatus))}>
-                  {employee.workStatus}
-                </Badge>
-              )}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       <div className="flex gap-1 border-b">
         {TABS.map((tab) => {

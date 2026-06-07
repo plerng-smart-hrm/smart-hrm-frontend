@@ -63,7 +63,7 @@ export function InfoItem({
       {icon && <div className="text-muted-foreground mt-0.5 shrink-0">{icon}</div>}
       <div className="flex-1 min-w-0">
         <p className="text-xs text-muted-foreground">{label}</p>
-        <div className="text-sm font-medium wrap-break-word">{displayValue}</div>
+        <div className="text-sm font-medium wrap-break-word text-blank">{displayValue}</div>
       </div>
     </div>
   );
