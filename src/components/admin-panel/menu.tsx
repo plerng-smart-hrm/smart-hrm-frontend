@@ -1,7 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { BookOpen, BookTextIcon, Bot, ChevronDown, DollarSignIcon, LayoutDashboard, LogOut, User } from "lucide-react";
+import {
+  BookOpen,
+  BookTextIcon,
+  Bot,
+  ChevronDown,
+  DollarSignIcon,
+  LayoutDashboard,
+  LogOut,
+  SettingsIcon,
+  User,
+} from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -23,11 +33,11 @@ interface MenuProps {
 }
 
 const menuItems: MenuItem[] = [
-  {
-    name: "Dashboard",
-    path: "/dashboard",
-    icon: LayoutDashboard,
-  },
+  // {
+  //   name: "Dashboard",
+  //   path: "/dashboard",
+  //   icon: LayoutDashboard,
+  // },
   {
     name: "Employees",
     path: "/admin/employees",
@@ -44,36 +54,6 @@ const menuItems: MenuItem[] = [
         icon: User,
       },
     ],
-  },
-  {
-    name: "Working Shifts",
-    path: "/admin/working-shifts",
-    icon: User,
-  },
-  {
-    name: "Departments",
-    path: "/admin/departments",
-    icon: User,
-  },
-  {
-    name: "Sections",
-    path: "/admin/sections",
-    icon: User,
-  },
-  {
-    name: "Companies",
-    path: "/admin/companies",
-    icon: Bot,
-  },
-  {
-    name: "Devices",
-    path: "/admin/devices",
-    icon: Bot,
-  },
-  {
-    name: "Holidays",
-    path: "/admin/holidays",
-    icon: BookOpen,
   },
   {
     name: "Contract",
@@ -100,8 +80,50 @@ const menuItems: MenuItem[] = [
   },
   {
     name: "Payroll",
-    path: "/admin/payrolls",
     icon: DollarSignIcon,
+    children: [
+      {
+        name: "Time Shifts",
+        path: "/admin/payrolls",
+        icon: User,
+      },
+    ],
+  },
+  {
+    name: "Settings",
+    icon: SettingsIcon,
+    children: [
+      {
+        name: "Time Shifts",
+        path: "/admin/time-shifts",
+        icon: User,
+      },
+      {
+        name: "Departments",
+        path: "/admin/departments",
+        icon: User,
+      },
+      {
+        name: "Sections",
+        path: "/admin/sections",
+        icon: User,
+      },
+      {
+        name: "Devices",
+        path: "/admin/devices",
+        icon: Bot,
+      },
+      {
+        name: "Holidays",
+        path: "/admin/holidays",
+        icon: BookOpen,
+      },
+      {
+        name: "Companies",
+        path: "/admin/companies",
+        icon: Bot,
+      },
+    ],
   },
 ];
 
