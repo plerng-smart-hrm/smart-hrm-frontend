@@ -1,24 +1,11 @@
 "use client";
 import * as React from "react";
-import {
-  BookOpen,
-  BookTextIcon,
-  Bot,
-  GalleryVerticalEnd,
-  SettingsIcon,
-  SquareTerminal,
-} from "lucide-react";
+import { BookOpen, BookTextIcon, Bot, GalleryVerticalEnd, SettingsIcon, SquareTerminal } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
 import { NavUser } from "@/components/nav-user";
 import { TeamSwitcher } from "@/components/team-switcher";
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarHeader,
-  SidebarRail,
-} from "@/components/ui/sidebar";
+import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail } from "@/components/ui/sidebar";
 
 // This is sample data.
 const data = {
@@ -108,8 +95,8 @@ const data = {
           url: "/admin/sections",
         },
         {
-          title: "Working Shifts",
-          url: "/admin/working-shifts",
+          title: "Time Shifts",
+          url: "/admin/time-shifts",
         },
       ],
     },

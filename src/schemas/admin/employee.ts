@@ -19,14 +19,13 @@ export const employeeSchema = z.object({
   employeeType: z.string(),
   workStatus: z.string(),
   employeeStatus: z.string(),
-  start: z.string().min(1, "Start date is required"),
   position: z.string().min(1, "Position is required"),
   startDate: z.string().min(1, "Start date is required"),
   endDate: z.string().optional(),
   laborBookNo: z.string().optional(),
   idCardNo: z.string().optional(),
   nssfRegisterNo: z.string().optional(),
-  workingShiftId: z.number().min(1, "Please select a working shift"),
+  timeShiftId: z.number().min(1, "Please select a working shift"),
 });
 
 export type EmployeeValues = z.infer<typeof employeeSchema>;

@@ -13,6 +13,8 @@ import { SearchIcon } from "lucide-react";
 import useQueryShared from "@/stores/admin/useQuery/useQueryShared";
 import { attendanceSummaryKeys } from "@/service/util/query-keys/attendance-summary";
 import FullScreenLoading from "@/components/shared/fullscreen-loading";
+import { IEmployeeAttendanceSummary } from "@/types/admin/attendance-summary";
+import { payrollPaymentKeys } from "@/service/util/query-keys/payroll-payment";
 
 const AttendanceDetailClient = () => {
   const [yearMonth, setYearMonth] = useQueryState("yearMonth", parseAsString.withDefault(formatToYYYYMM()));
@@ -23,15 +25,26 @@ const AttendanceDetailClient = () => {
   const [selectedMonth, setSelectedMonth] = useState(new Date());
 
   const { data: attSummaryData } = useQueryShared({
-    url: `/v1/attendance-summary/employee`,
+    url: `/v1/att-summaries/employee`,
     key: attendanceSummaryKeys.summary_by_employee,
     param: { empCode, yearMonth },
     setIsLoading,
     enable: empCode && yearMonth ? true : false,
   });
 
-  const employee = attSummaryData?.data || undefined;
-  const attendanceSummary = employee?.attendanceSummary || [];
+  console.log("attSummaryData", attSummaryData);
+
+  const { data: payrollPaymentsData } = useQueryShared({
+    url: `/v1/payroll-payments/employee`,
+    key: payrollPaymentKeys.list_payroll_payment,
+    param: { empCode, yearMonth },
+    setIsLoading,
+    enable: empCode && yearMonth ? true : false,
+  });
+
+  const attSummary = (attSummaryData?.data as IEmployeeAttendanceSummary) || undefined;
+  const attendanceSummary = attSummary?.attendanceSummary || [];
+  const employee = attSummary?.employee;
 
   const handleMonthChange = (date: Date) => {
     setSelectedMonth(date);
@@ -78,7 +91,11 @@ const AttendanceDetailClient = () => {
 
           {/* Right Panel - Monthly Totals */}
           <div className="col-span-12 lg:col-span-2 border-l pl-4">
-            <MonthlyTotalsCard totals={employee?.totals ?? null} />
+            <MonthlyTotalsCard
+              totals={attSummary?.totals ?? null}
+              employee={employee}
+              payrollPayments={payrollPaymentsData?.data}
+            />
           </div>
         </div>
       </CardContent>

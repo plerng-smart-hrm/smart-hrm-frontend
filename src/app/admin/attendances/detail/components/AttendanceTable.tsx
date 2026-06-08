@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { CSSProperties, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -13,37 +13,61 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ChevronLeft, ChevronRight, Settings2 } from "lucide-react";
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay } from "date-fns";
-import { IDailyAttendance, AttendanceStatus } from "@/types/admin/attendance-summary";
+import { IDailyAttendance } from "@/types/admin/attendance-summary";
 import { cn } from "@/lib/utils";
+
+export enum AdjustmentField {
+  STATUS = "STATUS",
+  F_IN = "F_IN",
+  F_OUT = "F_OUT",
+  S_IN = "S_IN",
+  S_OUT = "S_OUT",
+  OT1 = "OT1",
+  OT2 = "OT2",
+  BONUS_TARGET = "BONUS_TARGET",
+  BONUS_LUNCH = "BONUS_LUNCH",
+  BONUS_OT_FOOD = "BONUS_OT_FOOD",
+}
+
+export interface AttCellClickInfo {
+  record: IDailyAttendance;
+  fieldChanged: string;
+  oldValue: string;
+}
 
 interface AttendanceTableProps {
   attendanceData: IDailyAttendance[];
   selectedMonth: Date;
   onMonthChange: (date: Date) => void;
+  onCellClick?: (info: AttCellClickInfo) => void;
 }
 
 // Column configuration
 type ColumnKey =
   | "day"
+  | "weekday"
   | "dayStatus"
   | "workStatus"
-  | "shift"
   | "timeIn1"
   | "timeOut1"
   | "timeIn2"
   | "timeOut2"
-  | "lateIn"
-  | "earlyOut"
+  | "late"
   | "normal"
-  | "ot1"
-  | "ot2"
+  | "otX15"
+  | "otX2"
   | "night"
+  | "paymentNormal"
+  | "paymentOtX15"
+  | "paymentOtX2"
+  | "paymentNight"
   | "timeSalary"
+  | "pieceSalary"
   | "leaveHour"
   | "leavePay"
-  | "adjust"
-  | "allowance";
+  | "foodLunch"
+  | "foodOt"
+  | "total";
 
 interface ColumnConfig {
   key: ColumnKey;
@@ -53,85 +77,37 @@ interface ColumnConfig {
 }
 
 const columnConfigs: ColumnConfig[] = [
-  { key: "day", label: "Day", defaultVisible: true },
+  { key: "day", label: "Date", group: "Date", defaultVisible: true },
+  { key: "weekday", label: "Weekday", group: "Date", defaultVisible: true },
   { key: "dayStatus", label: "Day Status", defaultVisible: true },
   { key: "workStatus", label: "Work Status", defaultVisible: true },
-  { key: "shift", label: "Shift", defaultVisible: true },
   { key: "timeIn1", label: "Time In 1", group: "Time", defaultVisible: true },
   { key: "timeOut1", label: "Time Out 1", group: "Time", defaultVisible: true },
   { key: "timeIn2", label: "Time In 2", group: "Time", defaultVisible: true },
   { key: "timeOut2", label: "Time Out 2", group: "Time", defaultVisible: true },
-  { key: "lateIn", label: "Late In", group: "Late", defaultVisible: true },
-  { key: "earlyOut", label: "Early Out", group: "Late", defaultVisible: true },
+  { key: "late", label: "Late", defaultVisible: true },
   { key: "normal", label: "Normal Hours", defaultVisible: true },
-  { key: "ot1", label: "OT1", group: "Overtime", defaultVisible: true },
-  { key: "ot2", label: "OT2", group: "Overtime", defaultVisible: false },
-  { key: "night", label: "Night", defaultVisible: false },
+  { key: "otX15", label: "OT x 1.5", group: "Overtime", defaultVisible: true },
+  { key: "otX2", label: "OT x 2", group: "Overtime", defaultVisible: true },
+  { key: "night", label: "Night", group: "Overtime", defaultVisible: true },
+  { key: "paymentNormal", label: "Payment Normal", group: "Payment", defaultVisible: true },
+  { key: "paymentOtX15", label: "Payment OT x 1.5", group: "Payment", defaultVisible: true },
+  { key: "paymentOtX2", label: "Payment OT x 2", group: "Payment", defaultVisible: true },
+  { key: "paymentNight", label: "Payment Night", group: "Payment", defaultVisible: true },
   { key: "timeSalary", label: "Time Salary", defaultVisible: true },
+  { key: "pieceSalary", label: "Piece Salary", defaultVisible: true },
   { key: "leaveHour", label: "Leave Hour", group: "Leave", defaultVisible: true },
-  { key: "leavePay", label: "Leave Pay", group: "Leave", defaultVisible: false },
-  { key: "adjust", label: "Adjust", defaultVisible: true },
-  { key: "allowance", label: "Allowance", defaultVisible: true },
+  { key: "leavePay", label: "Leave Pay", group: "Leave", defaultVisible: true },
+  { key: "foodLunch", label: "Food Lunch", group: "Food", defaultVisible: true },
+  { key: "foodOt", label: "Food OT", group: "Food", defaultVisible: true },
+  { key: "total", label: "Total", defaultVisible: true },
 ];
 
-const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
-const generateMonthDays = (month: Date): IDailyAttendance[] => {
-  const start = startOfMonth(month);
-  const end = endOfMonth(month);
-  const days = eachDayOfInterval({ start, end });
-
-  return days.map((date) => {
-    const dayOfWeek = getDay(date);
-    const isSunday = dayOfWeek === 0;
-
-    return {
-      date: format(date, "yyyy-MM-dd"),
-      day: dayNames[dayOfWeek],
-      time: { fi: null, fo: null, si: null, so: null },
-      lateMinutes: 0,
-      workingHours: 0,
-      status: isSunday ? "HOLIDAY" : "PRESENT",
-      reason: null,
-      overtime: { ot1: 0, ot2: 0 },
-      adjust: null,
-    } as IDailyAttendance;
-  });
-};
-
-const mergeAttendanceData = (monthDays: IDailyAttendance[], attendanceData: IDailyAttendance[]): IDailyAttendance[] => {
-  const attendanceMap = new Map(attendanceData.map((item) => [item.date, item]));
-
-  return monthDays.map((day) => {
-    const existingData = attendanceMap.get(day.date);
-    return existingData || day;
-  });
-};
-
-const getRowBackground = (status: AttendanceStatus, day: string) => {
-  if (status === "HOLIDAY") return "bg-blue-100 dark:bg-blue-900/40";
-  if (day === "Sun") return "bg-orange-50 dark:bg-orange-900/20";
-  if (day === "Sat") return "bg-amber-50 dark:bg-amber-900/20";
-  return "bg-yellow-50 dark:bg-yellow-900/20";
-};
-
-const getDayStatusStyle = (status: AttendanceStatus, day: string) => {
-  if (status === "HOLIDAY") return "text-blue-700 dark:text-blue-300 font-semibold";
-  if (day === "Sun" || day === "Sat") return "text-red-600 dark:text-red-400 font-semibold";
-  return "text-gray-700 dark:text-gray-300";
-};
-
-const getWorkStatusLabel = (status: AttendanceStatus) => {
-  switch (status) {
-    case "HOLIDAY":
-      return "PH";
-    case "LEAVE":
-      return "Leave";
-    case "ABSENT":
-      return "Absent";
-    default:
-      return "Work";
-  }
+const getStatusTextStyle = (label: string): React.CSSProperties => {
+  if (label === "PH" || label === "Sunday") return { color: "var(--ph-text)", fontWeight: 700 };
+  if (label === "Absent") return { color: "var(--absent-text)", fontWeight: 700 };
+  if (label === "Work") return { color: "var(--work-text)", fontWeight: 600 };
+  return { color: "var(--text-main)" };
 };
 
 const months = [
@@ -152,7 +128,87 @@ const months = [
 const currentYear = new Date().getFullYear();
 const years = Array.from({ length: 10 }, (_, i) => currentYear - 5 + i);
 
-export default function AttendanceTable({ attendanceData, selectedMonth, onMonthChange }: AttendanceTableProps) {
+// Bilingual header label — Khmer above, English below
+function HeaderLabel({ kh, en }: { kh: string; en: string }) {
+  return (
+    <span className="flex flex-col leading-tight">
+      <span>{kh}</span>
+      <span className="text-[10px] font-normal">{en}</span>
+    </span>
+  );
+}
+
+const formatNumber = (value: number) => (value > 0 ? value : "");
+
+// Vivid Excel-style color tokens — one hue per cell FUNCTION
+const tableColorVars = {
+  "--time-in-body": "#b3ecff",
+  "--time-in-head": "#99e0f7",
+  "--time-out-body": "#ffcc99",
+  "--time-out-head": "#ffba80",
+  "--late-body": "#ff9ed6",
+  "--late-head": "#ff85cc",
+  "--normal-body": "#fff34d",
+  "--normal-head": "#ffe924",
+  "--overtime-body": "#33dd33",
+  "--overtime-head": "#1fd11f",
+  "--payment-body": "#ffffff",
+  "--payment-head": "#f1f3f6",
+  "--salary-body": "#ffffff",
+  "--salary-head": "#f1f3f6",
+  "--piece-body": "#ffffff",
+  "--piece-head": "#f1f3f6",
+  "--leave-body": "#b3ecff",
+  "--leave-head": "#99e0f7",
+  "--food-body": "#ccffcc",
+  "--food-head": "#b3f5b3",
+  "--total-body": "#ffe4b5",
+  "--total-head": "#ffd07a",
+  "--idcol-body": "#ffffff",
+  "--idcol-head": "#f1f3f6",
+  "--grid-line": "#000000",
+  "--text-main": "#1a1d21",
+  "--text-muted": "#9aa0a6",
+  "--ph-row": "#eef2f7",
+  "--ph-text": "#1d4ed8",
+  "--work-text": "#1d4ed8",
+  "--absent-text": "#dc2626",
+} as unknown as CSSProperties;
+
+type GroupKey =
+  | "idcol"
+  | "timeIn"
+  | "timeOut"
+  | "late"
+  | "normal"
+  | "overtime"
+  | "payment"
+  | "salary"
+  | "piece"
+  | "leave"
+  | "food"
+  | "total";
+
+const headBg = (group: GroupKey): CSSProperties => ({
+  backgroundColor: `var(--${group}-head)`,
+  color: "var(--text-main)",
+  fontWeight: 700,
+});
+
+// Body cell background: group wash, muted toward the PH/Sunday row tint when the
+// row carries that meaning, with a subtle zebra overlay blended in on alternate rows
+const cellBg = (group: GroupKey, rowIndex: number, special: boolean, emphasize = false): CSSProperties => {
+  const base = `var(--${group}-${emphasize ? "head" : "body"})`;
+  const color = special ? `color-mix(in srgb, ${base} 30%, var(--ph-row) 70%)` : base;
+  return { backgroundColor: rowIndex % 2 === 1 ? `color-mix(in srgb, black 2.5%, ${color})` : color };
+};
+
+export default function AttendanceTable({
+  attendanceData,
+  selectedMonth,
+  onMonthChange,
+  onCellClick,
+}: AttendanceTableProps) {
   // Initialize visible columns from config
   const [visibleColumns, setVisibleColumns] = useState<Set<ColumnKey>>(() => {
     const initial = new Set<ColumnKey>();
@@ -181,32 +237,40 @@ export default function AttendanceTable({ attendanceData, selectedMonth, onMonth
     return time;
   };
 
-  const monthDays = generateMonthDays(selectedMonth);
-  const fullMonthData = mergeAttendanceData(monthDays, attendanceData);
+  const fullMonthData = attendanceData;
 
   const totals = fullMonthData.reduce(
     (acc, record) => ({
       normalHours: acc.normalHours + record.workingHours,
-      ot1: acc.ot1 + record.overtime.ot1,
-      ot2: acc.ot2 + record.overtime.ot2,
       lateMinutes: acc.lateMinutes + record.lateMinutes,
+      otX15: acc.otX15 + record.overtime.ot1,
+      otX2: acc.otX2 + record.overtime.ot2,
+      grandTotal: acc.grandTotal + (record.total ?? 0),
+      bonusLunch: acc.bonusLunch + (record.bonusLunch ?? 0),
+      bonusOtFood: acc.bonusOtFood + (record.bonusOtFood ?? 0),
     }),
-    { normalHours: 0, ot1: 0, ot2: 0, lateMinutes: 0 },
+    { normalHours: 0, lateMinutes: 0, otX15: 0, otX2: 0, grandTotal: 0, bonusLunch: 0, bonusOtFood: 0 },
   );
+  const totalLateHours = totals.lateMinutes / 60;
 
-  // Calculate colSpan for Time group
+  // Calculate colSpan for each group
+  const dateColSpan = [isVisible("day"), isVisible("weekday")].filter(Boolean).length;
+
   const timeColSpan = [isVisible("timeIn1"), isVisible("timeOut1"), isVisible("timeIn2"), isVisible("timeOut2")].filter(
     Boolean,
   ).length;
 
-  // Calculate colSpan for Late group
-  const lateColSpan = [isVisible("lateIn"), isVisible("earlyOut")].filter(Boolean).length;
+  const overtimeColSpan = [isVisible("otX15"), isVisible("otX2"), isVisible("night")].filter(Boolean).length;
 
-  // Calculate colSpan for Overtime group
-  const otColSpan = [isVisible("ot1"), isVisible("ot2")].filter(Boolean).length;
+  const paymentColSpan = [
+    isVisible("paymentNormal"),
+    isVisible("paymentOtX15"),
+    isVisible("paymentOtX2"),
+    isVisible("paymentNight"),
+  ].filter(Boolean).length;
 
-  // Calculate colSpan for Leave group
   const leaveColSpan = [isVisible("leaveHour"), isVisible("leavePay")].filter(Boolean).length;
+  const foodColSpan = [isVisible("foodLunch"), isVisible("foodOt")].filter(Boolean).length;
 
   const handlePreviousMonth = () => {
     const newDate = new Date(selectedMonth);
@@ -233,7 +297,7 @@ export default function AttendanceTable({ attendanceData, selectedMonth, onMonth
   };
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col" style={tableColorVars}>
       <div className="pb-2 flex-shrink-0 flex items-center justify-between">
         {/* Month Selector */}
         <div className="flex items-center gap-1">
@@ -311,176 +375,255 @@ export default function AttendanceTable({ attendanceData, selectedMonth, onMonth
         </DropdownMenu>
       </div>
 
-      <div className="flex-1 overflow-hidden flex flex-col">
+      <div
+        className="flex-1 overflow-hidden flex flex-col"
+        style={{ borderColor: "var(--grid-line)", boxShadow: "0 1px 3px rgba(0,0,0,0.06)" }}
+      >
         <ScrollArea className="flex-1">
           <div>
-            <table className="w-full border-collapse text-xs">
+            <table className="w-full border-collapse text-xs" style={{ color: "var(--text-main)" }}>
               <thead className="sticky top-0 z-10">
-                <tr className="bg-slate-200 dark:bg-slate-800">
-                  {isVisible("day") && (
+                <tr>
+                  {dateColSpan > 0 && (
                     <th
+                      colSpan={dateColSpan}
                       rowSpan={2}
-                      className="border border-slate-300 dark:border-slate-600 px-2 py-1 text-center font-semibold w-10"
+                      style={headBg("idcol")}
+                      className="border border-b px-2 py-1 text-center font-semibold [border-color:var(--grid-line)]"
                     >
-                      Day
+                      <HeaderLabel kh="ថ្ងៃទី" en="Date" />
                     </th>
                   )}
                   {isVisible("dayStatus") && (
                     <th
                       rowSpan={2}
-                      className="border border-slate-300 dark:border-slate-600 px-2 py-1 text-center font-semibold w-16"
+                      style={headBg("idcol")}
+                      className="border border-b px-2 py-1 text-center font-semibold w-16 [border-color:var(--grid-line)]"
                     >
-                      Day
-                      <br />
-                      Status
+                      <HeaderLabel kh="ប្រភេទថ្ងៃ" en="DayStatus" />
                     </th>
                   )}
                   {isVisible("workStatus") && (
                     <th
                       rowSpan={2}
-                      className="border border-slate-300 dark:border-slate-600 px-2 py-1 text-center font-semibold w-16"
+                      style={headBg("idcol")}
+                      className="border border-b px-2 py-1 text-center font-semibold w-12 [border-color:var(--grid-line)]"
                     >
-                      Work
-                      <br />
-                      Status
-                    </th>
-                  )}
-                  {isVisible("shift") && (
-                    <th
-                      rowSpan={2}
-                      className="border border-slate-300 dark:border-slate-600 px-2 py-1 text-center font-semibold w-12"
-                    >
-                      Shift
+                      <HeaderLabel kh="ថ្ងៃធ្វើការ" en="WorkStatus" />
                     </th>
                   )}
                   {timeColSpan > 0 && (
                     <th
                       colSpan={timeColSpan}
-                      className="border border-slate-300 dark:border-slate-600 px-2 py-1 text-center font-semibold bg-slate-100 dark:bg-slate-700"
+                      style={headBg("idcol")}
+                      className="border border-b px-2 py-1 text-center font-semibold [border-color:var(--grid-line)]"
                     >
                       Time
                     </th>
                   )}
-                  {lateColSpan > 0 && (
+                  {isVisible("late") && (
                     <th
-                      colSpan={lateColSpan}
-                      className="border border-slate-300 dark:border-slate-600 px-2 py-1 text-center font-semibold bg-cyan-100 dark:bg-cyan-900"
+                      rowSpan={2}
+                      style={headBg("late")}
+                      className="border border-b px-2 py-1 text-center font-semibold w-14 [border-color:var(--grid-line)]"
                     >
-                      Late
+                      <HeaderLabel kh="យឺត" en="Late" />
                     </th>
                   )}
                   {isVisible("normal") && (
                     <th
                       rowSpan={2}
-                      className="border border-slate-300 dark:border-slate-600 px-2 py-1 text-center font-semibold bg-green-100 dark:bg-green-900 w-12"
+                      style={headBg("normal")}
+                      className="border border-b px-2 py-1 text-center font-semibold w-12 [border-color:var(--grid-line)]"
                     >
                       Nor
                       <br />
                       mal
                     </th>
                   )}
-                  {otColSpan > 0 && (
+                  {overtimeColSpan > 0 && (
                     <th
-                      colSpan={otColSpan}
-                      className="border border-slate-300 dark:border-slate-600 px-2 py-1 text-center font-semibold bg-pink-100 dark:bg-pink-900"
+                      colSpan={overtimeColSpan}
+                      style={headBg("overtime")}
+                      className="border border-b px-2 py-1 text-center font-semibold [border-color:var(--grid-line)]"
                     >
-                      OverTime
+                      <HeaderLabel kh="ម៉ោងថែម" en="OverTime" />
                     </th>
                   )}
-                  {isVisible("night") && (
+                  {paymentColSpan > 0 && (
                     <th
-                      rowSpan={2}
-                      className="border border-slate-300 dark:border-slate-600 px-2 py-1 text-center font-semibold bg-purple-100 dark:bg-purple-900 w-12"
+                      colSpan={paymentColSpan}
+                      style={headBg("payment")}
+                      className="border border-b px-2 py-1 text-center font-semibold [border-color:var(--grid-line)]"
                     >
-                      Nig
-                      <br />
-                      ht
+                      <HeaderLabel kh="ប្រាក់ឈ្នួល" en="Payment" />
                     </th>
                   )}
                   {isVisible("timeSalary") && (
                     <th
                       rowSpan={2}
-                      className="border border-slate-300 dark:border-slate-600 px-2 py-1 text-center font-semibold w-20"
+                      style={headBg("salary")}
+                      className="border border-b px-2 py-1 text-center font-semibold w-20 [border-color:var(--grid-line)]"
                     >
-                      Time
-                      <br />
-                      Salary
+                      <HeaderLabel kh="ប្រាក់សរុប" en="Time Salary" />
+                    </th>
+                  )}
+                  {isVisible("pieceSalary") && (
+                    <th
+                      rowSpan={2}
+                      style={headBg("piece")}
+                      className="border border-b px-2 py-1 text-center font-semibold w-20 [border-color:var(--grid-line)]"
+                    >
+                      <HeaderLabel kh="ប្រាក់ថ្ងៃបុក" en="Piece Salary" />
                     </th>
                   )}
                   {leaveColSpan > 0 && (
                     <th
                       colSpan={leaveColSpan}
-                      className="border border-slate-300 dark:border-slate-600 px-2 py-1 text-center font-semibold"
+                      style={headBg("leave")}
+                      className="border border-b px-2 py-1 text-center font-semibold [border-color:var(--grid-line)]"
                     >
-                      Leave
+                      <HeaderLabel kh="ឈប់" en="Leave" />
                     </th>
                   )}
-                  {isVisible("adjust") && (
+                  {foodColSpan > 0 && (
                     <th
-                      rowSpan={2}
-                      className="border border-slate-300 dark:border-slate-600 px-2 py-1 text-center font-semibold w-16"
+                      colSpan={foodColSpan}
+                      style={headBg("food")}
+                      className="border border-b px-2 py-1 text-center font-semibold [border-color:var(--grid-line)]"
                     >
-                      Adjust
+                      <HeaderLabel kh="ប្រាក់ថ្លៃបាយ" en="Food" />
                     </th>
                   )}
-                  {isVisible("allowance") && (
+                  {isVisible("total") && (
                     <th
                       rowSpan={2}
-                      className="border border-slate-300 dark:border-slate-600 px-2 py-1 text-center font-semibold bg-lime-100 dark:bg-lime-900 w-16"
+                      style={headBg("total")}
+                      className="border border-b px-2 py-1 text-center font-semibold w-12 [border-color:var(--grid-line)]"
                     >
-                      Allow
+                      <HeaderLabel kh="សរុប" en="Total" />
                     </th>
                   )}
                 </tr>
-                <tr className="bg-slate-200 dark:bg-slate-800">
+                <tr>
                   {isVisible("timeIn1") && (
-                    <th className="border border-slate-300 dark:border-slate-600 px-1 py-1 text-center font-semibold bg-slate-100 dark:bg-slate-700 w-12">
+                    <th
+                      style={headBg("timeIn")}
+                      className="border border-b px-1 py-1 text-center font-semibold w-12 [border-color:var(--grid-line)]"
+                    >
                       In
                     </th>
                   )}
                   {isVisible("timeOut1") && (
-                    <th className="border border-slate-300 dark:border-slate-600 px-1 py-1 text-center font-semibold bg-slate-100 dark:bg-slate-700 w-12">
+                    <th
+                      style={headBg("timeOut")}
+                      className="border border-b px-1 py-1 text-center font-semibold w-12 [border-color:var(--grid-line)]"
+                    >
                       Out
                     </th>
                   )}
                   {isVisible("timeIn2") && (
-                    <th className="border border-slate-300 dark:border-slate-600 px-1 py-1 text-center font-semibold bg-slate-100 dark:bg-slate-700 w-12">
+                    <th
+                      style={headBg("timeIn")}
+                      className="border border-b px-1 py-1 text-center font-semibold w-12 [border-color:var(--grid-line)]"
+                    >
                       In
                     </th>
                   )}
                   {isVisible("timeOut2") && (
-                    <th className="border border-slate-300 dark:border-slate-600 px-1 py-1 text-center font-semibold bg-slate-100 dark:bg-slate-700 w-12">
+                    <th
+                      style={headBg("timeOut")}
+                      className="border border-b px-1 py-1 text-center font-semibold w-12 [border-color:var(--grid-line)]"
+                    >
                       Out
                     </th>
                   )}
-                  {isVisible("lateIn") && (
-                    <th className="border border-slate-300 dark:border-slate-600 px-1 py-1 text-center font-semibold bg-cyan-100 dark:bg-cyan-900 w-10">
-                      In
+                  {isVisible("otX15") && (
+                    <th
+                      style={headBg("overtime")}
+                      className="border border-b px-1 py-1 text-center font-semibold w-14 [border-color:var(--grid-line)]"
+                    >
+                      OT x 1.5
                     </th>
                   )}
-                  {isVisible("earlyOut") && (
-                    <th className="border border-slate-300 dark:border-slate-600 px-1 py-1 text-center font-semibold bg-cyan-100 dark:bg-cyan-900 w-10">
-                      Out
+                  {isVisible("otX2") && (
+                    <th
+                      style={headBg("overtime")}
+                      className="border border-b px-1 py-1 text-center font-semibold w-12 [border-color:var(--grid-line)]"
+                    >
+                      OT x 2
                     </th>
                   )}
-                  {isVisible("ot1") && (
-                    <th className="border border-slate-300 dark:border-slate-600 px-1 py-1 text-center font-semibold bg-pink-100 dark:bg-pink-900 w-10">
-                      OT1
+                  {isVisible("night") && (
+                    <th
+                      style={headBg("overtime")}
+                      className="border border-b px-1 py-1 text-center font-semibold w-12 [border-color:var(--grid-line)]"
+                    >
+                      Night
                     </th>
                   )}
-                  {isVisible("ot2") && (
-                    <th className="border border-slate-300 dark:border-slate-600 px-1 py-1 text-center font-semibold bg-pink-100 dark:bg-pink-900 w-10">
-                      OT2
+                  {isVisible("paymentNormal") && (
+                    <th
+                      style={headBg("payment")}
+                      className="border border-b px-1 py-1 text-center font-semibold w-16 [border-color:var(--grid-line)]"
+                    >
+                      <HeaderLabel kh="ធម្មតា" en="Normal" />
+                    </th>
+                  )}
+                  {isVisible("paymentOtX15") && (
+                    <th
+                      style={headBg("payment")}
+                      className="border border-b px-1 py-1 text-center font-semibold w-16 [border-color:var(--grid-line)]"
+                    >
+                      OT x 1.5
+                    </th>
+                  )}
+                  {isVisible("paymentOtX2") && (
+                    <th
+                      style={headBg("payment")}
+                      className="border border-b px-1 py-1 text-center font-semibold w-16 [border-color:var(--grid-line)]"
+                    >
+                      OT x 2
+                    </th>
+                  )}
+                  {isVisible("paymentNight") && (
+                    <th
+                      style={headBg("payment")}
+                      className="border border-b px-1 py-1 text-center font-semibold w-16 [border-color:var(--grid-line)]"
+                    >
+                      Night
                     </th>
                   )}
                   {isVisible("leaveHour") && (
-                    <th className="border border-slate-300 dark:border-slate-600 px-1 py-1 text-center font-semibold w-12">
-                      Hour
+                    <th
+                      style={headBg("leave")}
+                      className="border border-b px-1 py-1 text-center font-semibold w-12 [border-color:var(--grid-line)]"
+                    >
+                      <HeaderLabel kh="ម៉ោង" en="Hour" />
                     </th>
                   )}
                   {isVisible("leavePay") && (
-                    <th className="border border-slate-300 dark:border-slate-600 px-1 py-1 text-center font-semibold w-12">
-                      Pay
+                    <th
+                      style={headBg("leave")}
+                      className="border border-b px-1 py-1 text-center font-semibold w-14 [border-color:var(--grid-line)]"
+                    >
+                      <HeaderLabel kh="ទឹកប្រាក់" en="Pay" />
+                    </th>
+                  )}
+                  {isVisible("foodLunch") && (
+                    <th
+                      style={headBg("food")}
+                      className="border border-b px-1 py-1 text-center font-semibold w-14 [border-color:var(--grid-line)]"
+                    >
+                      <HeaderLabel kh="ថ្ងៃ" en="Lunch" />
+                    </th>
+                  )}
+                  {isVisible("foodOt") && (
+                    <th
+                      style={headBg("food")}
+                      className="border border-b px-1 py-1 text-center font-semibold w-14 [border-color:var(--grid-line)]"
+                    >
+                      <HeaderLabel kh="ថែមម៉ោង" en="OT" />
                     </th>
                   )}
                 </tr>
@@ -488,176 +631,260 @@ export default function AttendanceTable({ attendanceData, selectedMonth, onMonth
               <tbody>
                 {fullMonthData.map((record, index) => {
                   const dayNum = parseInt(record.date.split("-")[2]);
-                  const rowBg = getRowBackground(record.status, record.day);
-                  const dayStatusStyle = getDayStatusStyle(record.status, record.day);
-                  const workStatus = getWorkStatusLabel(record.status);
-                  const hasData = record.status === "PRESENT" || record.status === "LEAVE";
-                  const isFutureOrEmpty = !record.time.fi && record.status !== "HOLIDAY" && record.status !== "LEAVE";
+                  const dayStatusLabel = record.dayStatus;
+                  const workStatus = record.workStatus;
+                  const isFutureOrEmpty = !record.time.fi && record.dayStatus !== "Sunday" && record.dayStatus !== "PH";
+                  const lateHours = record.lateMinutes / 60;
+                  const special = record.dayStatus === "Sunday" || record.dayStatus === "PH";
+                  const cellBorder = "border [border-color:var(--grid-line)]";
 
                   return (
-                    <tr key={index} className={cn(rowBg, "hover:brightness-95")}>
+                    <tr key={index} className="hover:brightness-[0.97]">
                       {isVisible("day") && (
-                        <td className="border border-slate-300 dark:border-slate-600 px-2 py-1 text-center font-medium">
-                          {dayNum}
+                        <td
+                          style={cellBg("idcol", index, special)}
+                          className={cn(cellBorder, "px-2 py-1 text-center font-medium")}
+                        >
+                          {dayNum.toString().padStart(2, "0")}
+                        </td>
+                      )}
+                      {isVisible("weekday") && (
+                        <td
+                          style={cellBg("idcol", index, special)}
+                          className={cn(cellBorder, "px-2 py-1 text-center font-medium")}
+                        >
+                          {record.day}
                         </td>
                       )}
                       {isVisible("dayStatus") && (
                         <td
-                          className={cn(
-                            "border border-slate-300 dark:border-slate-600 px-2 py-1 text-center",
-                            dayStatusStyle,
-                          )}
+                          style={{ ...cellBg("idcol", index, special), ...getStatusTextStyle(dayStatusLabel) }}
+                          className={cn(cellBorder, "px-2 py-1 text-start")}
                         >
-                          {record.status === "HOLIDAY" ? "PH" : record.day}
+                          {dayStatusLabel}
                         </td>
                       )}
                       {isVisible("workStatus") && (
-                        <td className="border border-slate-300 dark:border-slate-600 px-1 py-1 text-center">
-                          <span
-                            className={cn(
-                              "text-xs",
-                              record.status === "ABSENT" && "text-red-600 font-semibold",
-                              record.status === "LEAVE" && "text-orange-600 font-semibold",
-                            )}
-                          >
-                            {workStatus}
-                          </span>
+                        <td
+                          style={{ ...cellBg("idcol", index, special), ...getStatusTextStyle(workStatus) }}
+                          className={cn(cellBorder, "px-1 py-1 text-start")}
+                        >
+                          {workStatus}
                         </td>
-                      )}
-                      {isVisible("shift") && (
-                        <td className="border border-slate-300 dark:border-slate-600 px-2 py-1 text-center">1</td>
                       )}
                       {isVisible("timeIn1") && (
                         <td
+                          style={cellBg("timeIn", index, special, isFutureOrEmpty)}
                           className={cn(
-                            "border border-slate-300 dark:border-slate-600 px-1 py-1 text-center font-mono",
-                            isFutureOrEmpty && "bg-green-200 dark:bg-green-800",
+                            cellBorder,
+                            "px-1 py-1 text-center font-mono",
+                            onCellClick && "cursor-pointer hover:brightness-90",
                           )}
+                          onClick={() =>
+                            onCellClick?.({ record, fieldChanged: AdjustmentField.F_IN, oldValue: record.time.fi ?? "" })
+                          }
                         >
                           {formatTime(record.time.fi)}
                         </td>
                       )}
                       {isVisible("timeOut1") && (
                         <td
+                          style={cellBg("timeOut", index, special, isFutureOrEmpty)}
                           className={cn(
-                            "border border-slate-300 dark:border-slate-600 px-1 py-1 text-center font-mono",
-                            isFutureOrEmpty && "bg-green-200 dark:bg-green-800",
+                            cellBorder,
+                            "px-1 py-1 text-center font-mono",
+                            onCellClick && "cursor-pointer hover:brightness-90",
                           )}
+                          onClick={() =>
+                            onCellClick?.({ record, fieldChanged: AdjustmentField.F_OUT, oldValue: record.time.fo ?? "" })
+                          }
                         >
                           {formatTime(record.time.fo)}
                         </td>
                       )}
                       {isVisible("timeIn2") && (
                         <td
+                          style={cellBg("timeIn", index, special, isFutureOrEmpty)}
                           className={cn(
-                            "border border-slate-300 dark:border-slate-600 px-1 py-1 text-center font-mono",
-                            isFutureOrEmpty && "bg-green-200 dark:bg-green-800",
+                            cellBorder,
+                            "px-1 py-1 text-center font-mono",
+                            onCellClick && "cursor-pointer hover:brightness-90",
                           )}
+                          onClick={() =>
+                            onCellClick?.({ record, fieldChanged: AdjustmentField.S_IN, oldValue: record.time.si ?? "" })
+                          }
                         >
                           {formatTime(record.time.si)}
                         </td>
                       )}
                       {isVisible("timeOut2") && (
                         <td
+                          style={cellBg("timeOut", index, special, isFutureOrEmpty)}
                           className={cn(
-                            "border border-slate-300 dark:border-slate-600 px-1 py-1 text-center font-mono",
-                            isFutureOrEmpty && "bg-green-200 dark:bg-green-800",
-                            record.overtime.ot1 > 0 && "text-red-600 font-bold",
+                            cellBorder,
+                            "px-1 py-1 text-center font-mono",
+                            record.overtime.ot1 > 0 && "font-bold",
+                            onCellClick && "cursor-pointer hover:brightness-90",
                           )}
+                          onClick={() =>
+                            onCellClick?.({ record, fieldChanged: AdjustmentField.S_OUT, oldValue: record.time.so ?? "" })
+                          }
                         >
                           {formatTime(record.time.so)}
                         </td>
                       )}
-                      {isVisible("lateIn") && (
+                      {isVisible("late") && (
                         <td
-                          className={cn(
-                            "border border-slate-300 dark:border-slate-600 px-1 py-1 text-center bg-cyan-50 dark:bg-cyan-900/30",
-                            isFutureOrEmpty && "bg-green-200 dark:bg-green-800",
-                          )}
+                          style={cellBg("late", index, special, isFutureOrEmpty)}
+                          className={cn(cellBorder, "px-1 py-1 text-center")}
                         >
-                          {record.lateMinutes > 0 ? record.lateMinutes : ""}
-                        </td>
-                      )}
-                      {isVisible("earlyOut") && (
-                        <td
-                          className={cn(
-                            "border border-slate-300 dark:border-slate-600 px-1 py-1 text-center bg-cyan-50 dark:bg-cyan-900/30",
-                            isFutureOrEmpty && "bg-green-200 dark:bg-green-800",
-                          )}
-                        >
-                          {/* Early out placeholder */}
+                          {lateHours > 0 ? lateHours.toFixed(2) : ""}
                         </td>
                       )}
                       {isVisible("normal") && (
                         <td
-                          className={cn(
-                            "border border-slate-300 dark:border-slate-600 px-1 py-1 text-center font-medium bg-green-100 dark:bg-green-900/30",
-                            isFutureOrEmpty && "bg-green-200 dark:bg-green-800",
-                          )}
+                          style={cellBg("normal", index, special, isFutureOrEmpty)}
+                          className={cn(cellBorder, "px-1 py-1 text-center font-medium")}
                         >
-                          {record.workingHours > 0 ? record.workingHours : ""}
+                          {record.normalHours && record.normalHours > 0 ? record.normalHours : ""}
                         </td>
                       )}
-                      {isVisible("ot1") && (
+                      {isVisible("otX15") && (
                         <td
+                          style={cellBg("overtime", index, special, isFutureOrEmpty)}
                           className={cn(
-                            "border border-slate-300 dark:border-slate-600 px-1 py-1 text-center bg-pink-50 dark:bg-pink-900/30",
+                            cellBorder,
+                            "px-1 py-1 text-center",
                             record.overtime.ot1 > 0 && "font-bold",
-                            isFutureOrEmpty && "bg-pink-200 dark:bg-pink-800",
+                            onCellClick && "cursor-pointer hover:brightness-90",
                           )}
+                          onClick={() =>
+                            onCellClick?.({
+                              record,
+                              fieldChanged: AdjustmentField.OT1,
+                              oldValue: record.overtime.ot1 > 0 ? String(record.overtime.ot1) : "",
+                            })
+                          }
                         >
-                          {record.overtime.ot1 > 0 ? record.overtime.ot1 : ""}
+                          {formatNumber(record.overtime.ot1)}
                         </td>
                       )}
-                      {isVisible("ot2") && (
+                      {isVisible("otX2") && (
                         <td
+                          style={cellBg("overtime", index, special, isFutureOrEmpty)}
                           className={cn(
-                            "border border-slate-300 dark:border-slate-600 px-1 py-1 text-center bg-pink-50 dark:bg-pink-900/30",
+                            cellBorder,
+                            "px-1 py-1 text-center",
                             record.overtime.ot2 > 0 && "font-bold",
-                            isFutureOrEmpty && "bg-pink-200 dark:bg-pink-800",
+                            onCellClick && "cursor-pointer hover:brightness-90",
                           )}
+                          onClick={() =>
+                            onCellClick?.({
+                              record,
+                              fieldChanged: AdjustmentField.OT2,
+                              oldValue: record.overtime.ot2 > 0 ? String(record.overtime.ot2) : "",
+                            })
+                          }
                         >
-                          {record.overtime.ot2 > 0 ? record.overtime.ot2 : ""}
+                          {formatNumber(record.overtime.ot2)}
                         </td>
                       )}
                       {isVisible("night") && (
                         <td
-                          className={cn(
-                            "border border-slate-300 dark:border-slate-600 px-1 py-1 text-center bg-purple-50 dark:bg-purple-900/30",
-                            isFutureOrEmpty && "bg-purple-200 dark:bg-purple-800",
-                          )}
+                          style={cellBg("overtime", index, special, isFutureOrEmpty)}
+                          className={cn(cellBorder, "px-1 py-1 text-center")}
                         >
-                          {/* Night hours placeholder */}
+                          {/* Night overtime hours — not yet provided by the API */}
+                        </td>
+                      )}
+                      {isVisible("paymentNormal") && (
+                        <td
+                          style={cellBg("payment", index, special)}
+                          className={cn(cellBorder, "px-1 py-1 text-right")}
+                        >
+                          {record.wageNormal && record.wageNormal > 0 ? `$${record.wageNormal}` : ""}
+                        </td>
+                      )}
+                      {isVisible("paymentOtX15") && (
+                        <td
+                          style={cellBg("payment", index, special)}
+                          className={cn(cellBorder, "px-1 py-1 text-right")}
+                        >
+                          {record.wageOT1 && record.wageOT1 > 0 ? `$${record.wageOT1}` : ""}
+                        </td>
+                      )}
+                      {isVisible("paymentOtX2") && (
+                        <td
+                          style={cellBg("payment", index, special)}
+                          className={cn(cellBorder, "px-1 py-1 text-right")}
+                        >
+                          {record.wageOT2 && record.wageOT2 > 0 ? `$${record.wageOT2}` : ""}
+                        </td>
+                      )}
+                      {isVisible("paymentNight") && (
+                        <td
+                          style={cellBg("payment", index, special)}
+                          className={cn(cellBorder, "px-1 py-1 text-right")}
+                        >
+                          {/* Night overtime payment — not yet provided by the API */}
                         </td>
                       )}
                       {isVisible("timeSalary") && (
-                        <td className="border border-slate-300 dark:border-slate-600 px-1 py-1 text-right">
-                          {record.workingHours > 0 ? `$${(record.workingHours * 1).toFixed(3)}` : ""}
+                        <td style={cellBg("salary", index, special)} className={cn(cellBorder, "px-1 py-1 text-right")}>
+                          {record.timeSalary && record.timeSalary > 0 ? `$${record.timeSalary}` : ""}
+                        </td>
+                      )}
+                      {isVisible("pieceSalary") && (
+                        <td
+                          style={cellBg("piece", index, special)}
+                          className={cn(
+                            cellBorder,
+                            "px-1 py-1 text-right",
+                            onCellClick && "cursor-pointer hover:brightness-90",
+                          )}
+                          onClick={() =>
+                            onCellClick?.({
+                              record,
+                              fieldChanged: AdjustmentField.BONUS_TARGET,
+                              oldValue: record.bonusTarget && record.bonusTarget > 0 ? String(record.bonusTarget) : "",
+                            })
+                          }
+                        >
+                          {record.bonusTarget && record.bonusTarget > 0 ? `$${record.bonusTarget}` : ""}
                         </td>
                       )}
                       {isVisible("leaveHour") && (
-                        <td className="border border-slate-300 dark:border-slate-600 px-1 py-1 text-center">
+                        <td style={cellBg("leave", index, special)} className={cn(cellBorder, "px-1 py-1 text-center")}>
                           {record.status === "LEAVE" ? "8" : ""}
                         </td>
                       )}
                       {isVisible("leavePay") && (
-                        <td className="border border-slate-300 dark:border-slate-600 px-1 py-1 text-center">
+                        <td style={cellBg("leave", index, special)} className={cn(cellBorder, "px-1 py-1 text-right")}>
                           {/* Leave pay placeholder */}
                         </td>
                       )}
-                      {isVisible("adjust") && (
-                        <td className="border border-slate-300 dark:border-slate-600 px-1 py-1 text-center text-xs truncate max-w-16">
-                          {record.adjust || ""}
+                      {isVisible("foodLunch") && (
+                        <td
+                          style={cellBg("food", index, special, isFutureOrEmpty)}
+                          className={cn(cellBorder, "px-1 py-1 text-right")}
+                        >
+                          {record.bonusLunch && record.bonusLunch > 0 ? `$${record.bonusLunch}` : ""}
                         </td>
                       )}
-                      {isVisible("allowance") && (
+                      {isVisible("foodOt") && (
                         <td
-                          className={cn(
-                            "border border-slate-300 dark:border-slate-600 px-1 py-1 text-right bg-lime-50 dark:bg-lime-900/30",
-                            isFutureOrEmpty && "bg-lime-200 dark:bg-lime-800",
-                          )}
+                          style={cellBg("food", index, special, isFutureOrEmpty)}
+                          className={cn(cellBorder, "px-1 py-1 text-right")}
                         >
-                          {hasData ? "2,000" : isFutureOrEmpty ? "" : "$0.000"}
+                          {record.bonusOtFood && record.bonusOtFood > 0 ? `$${record.bonusOtFood}` : ""}
+                        </td>
+                      )}
+                      {isVisible("total") && (
+                        <td
+                          style={cellBg("total", index, special, isFutureOrEmpty)}
+                          className={cn(cellBorder, "px-1 py-1 text-right font-semibold")}
+                        >
+                          {record.total ? `$${record.total}` : ""}
                         </td>
                       )}
                     </tr>
@@ -670,28 +897,28 @@ export default function AttendanceTable({ attendanceData, selectedMonth, onMonth
         </ScrollArea>
 
         {/* Sticky Footer Totals */}
-        <div className="flex-shrink-0 border-t-2 border-slate-400">
+        <div className="flex-shrink-0  overflow-hidden" style={{ borderColor: "var(--grid-line)" }}>
           <table className="w-full border-collapse text-xs">
             <tfoot>
-              <tr className="bg-slate-300 dark:bg-slate-700 font-semibold">
-                {isVisible("day") && (
+              <tr className="font-semibold" style={{ color: "var(--text-main)" }}>
+                {(isVisible("day") || isVisible("weekday")) && (
                   <td
                     colSpan={
-                      [isVisible("day"), isVisible("dayStatus"), isVisible("workStatus"), isVisible("shift")].filter(
+                      [isVisible("day"), isVisible("weekday"), isVisible("dayStatus"), isVisible("workStatus")].filter(
                         Boolean,
                       ).length
                     }
-                    className="border border-slate-400 dark:border-slate-500 px-2 py-2 text-center w-[calc(10px+16px+16px+12px)]"
+                    style={headBg("idcol")}
+                    className="border [border-color:var(--grid-line)] px-2 py-2 text-center"
                   >
                     Total
                   </td>
                 )}
-                {!isVisible("day") && isVisible("dayStatus") && (
+                {!isVisible("day") && !isVisible("weekday") && isVisible("dayStatus") && (
                   <td
-                    colSpan={
-                      [isVisible("dayStatus"), isVisible("workStatus"), isVisible("shift")].filter(Boolean).length
-                    }
-                    className="border border-slate-400 dark:border-slate-500 px-2 py-2 text-center"
+                    colSpan={[isVisible("dayStatus"), isVisible("workStatus")].filter(Boolean).length}
+                    style={headBg("idcol")}
+                    className="border [border-color:var(--grid-line)] px-2 py-2 text-center"
                   >
                     Total
                   </td>
@@ -699,64 +926,138 @@ export default function AttendanceTable({ attendanceData, selectedMonth, onMonth
                 {timeColSpan > 0 && (
                   <td
                     colSpan={timeColSpan}
-                    className="border border-slate-400 dark:border-slate-500 px-1 py-2 text-center"
+                    style={headBg("idcol")}
+                    className="border [border-color:var(--grid-line)] px-1 py-2 text-center"
                   >
                     {/* Time totals */}
                   </td>
                 )}
-                {isVisible("lateIn") && (
-                  <td className="border border-slate-400 dark:border-slate-500 px-1 py-2 text-center bg-cyan-100 dark:bg-cyan-900 w-10">
-                    {totals.lateMinutes > 0 ? totals.lateMinutes : ""}
-                  </td>
-                )}
-                {isVisible("earlyOut") && (
-                  <td className="border border-slate-400 dark:border-slate-500 px-1 py-2 text-center bg-cyan-100 dark:bg-cyan-900 w-10">
-                    {/* Early out total */}
+                {isVisible("late") && (
+                  <td
+                    style={headBg("late")}
+                    className="border [border-color:var(--grid-line)] px-1 py-2 text-center w-14"
+                  >
+                    {totalLateHours > 0 ? totalLateHours.toFixed(2) : ""}
                   </td>
                 )}
                 {isVisible("normal") && (
-                  <td className="border border-slate-400 dark:border-slate-500 px-1 py-2 text-center bg-green-200 dark:bg-green-800 font-bold w-12">
+                  <td
+                    style={headBg("normal")}
+                    className="border [border-color:var(--grid-line)] px-1 py-2 text-center w-12"
+                  >
                     {totals.normalHours}
                   </td>
                 )}
-                {isVisible("ot1") && (
-                  <td className="border border-slate-400 dark:border-slate-500 px-1 py-2 text-center bg-pink-200 dark:bg-pink-800 font-bold w-10">
-                    {totals.ot1 > 0 ? totals.ot1 : ""}
+                {isVisible("otX15") && (
+                  <td
+                    style={headBg("overtime")}
+                    className="border [border-color:var(--grid-line)] px-1 py-2 text-center w-14"
+                  >
+                    {formatNumber(totals.otX15)}
                   </td>
                 )}
-                {isVisible("ot2") && (
-                  <td className="border border-slate-400 dark:border-slate-500 px-1 py-2 text-center bg-pink-200 dark:bg-pink-800 font-bold w-10">
-                    {totals.ot2 > 0 ? totals.ot2 : ""}
+                {isVisible("otX2") && (
+                  <td
+                    style={headBg("overtime")}
+                    className="border [border-color:var(--grid-line)] px-1 py-2 text-center w-12"
+                  >
+                    {formatNumber(totals.otX2)}
                   </td>
                 )}
                 {isVisible("night") && (
-                  <td className="border border-slate-400 dark:border-slate-500 px-1 py-2 text-center bg-purple-200 dark:bg-purple-800 w-12">
+                  <td
+                    style={headBg("overtime")}
+                    className="border [border-color:var(--grid-line)] px-1 py-2 text-center w-12"
+                  >
                     {/* Night total */}
                   </td>
                 )}
+                {isVisible("paymentNormal") && (
+                  <td
+                    style={headBg("payment")}
+                    className="border [border-color:var(--grid-line)] px-1 py-2 text-right w-16"
+                  >
+                    ${(totals.normalHours * 1).toFixed(2)}
+                  </td>
+                )}
+                {isVisible("paymentOtX15") && (
+                  <td
+                    style={headBg("payment")}
+                    className="border [border-color:var(--grid-line)] px-1 py-2 text-right w-16"
+                  >
+                    ${(totals.otX15 * 1.5).toFixed(2)}
+                  </td>
+                )}
+                {isVisible("paymentOtX2") && (
+                  <td
+                    style={headBg("payment")}
+                    className="border [border-color:var(--grid-line)] px-1 py-2 text-right w-16"
+                  >
+                    ${(totals.otX2 * 2).toFixed(2)}
+                  </td>
+                )}
+                {isVisible("paymentNight") && (
+                  <td
+                    style={headBg("payment")}
+                    className="border [border-color:var(--grid-line)] px-1 py-2 text-right w-16"
+                  >
+                    {/* Night payment total */}
+                  </td>
+                )}
                 {isVisible("timeSalary") && (
-                  <td className="border border-slate-400 dark:border-slate-500 px-1 py-2 text-right font-bold w-20">
+                  <td
+                    style={headBg("salary")}
+                    className="border [border-color:var(--grid-line)] px-1 py-2 text-right w-20"
+                  >
                     ${totals.normalHours.toFixed(2)}
                   </td>
                 )}
+                {isVisible("pieceSalary") && (
+                  <td
+                    style={headBg("piece")}
+                    className="border [border-color:var(--grid-line)] px-1 py-2 text-right w-20"
+                  >
+                    {/* Piece salary total */}
+                  </td>
+                )}
                 {isVisible("leaveHour") && (
-                  <td className="border border-slate-400 dark:border-slate-500 px-1 py-2 text-center w-12">
+                  <td
+                    style={headBg("leave")}
+                    className="border [border-color:var(--grid-line)] px-1 py-2 text-center w-12"
+                  >
                     {/* Leave hour total */}
                   </td>
                 )}
                 {isVisible("leavePay") && (
-                  <td className="border border-slate-400 dark:border-slate-500 px-1 py-2 text-center w-12">
+                  <td
+                    style={headBg("leave")}
+                    className="border [border-color:var(--grid-line)] px-1 py-2 text-right w-14"
+                  >
                     {/* Leave pay total */}
                   </td>
                 )}
-                {isVisible("adjust") && (
-                  <td className="border border-slate-400 dark:border-slate-500 px-1 py-2 text-center w-16">
-                    {/* Adjust total */}
+                {isVisible("foodLunch") && (
+                  <td
+                    style={headBg("food")}
+                    className="border [border-color:var(--grid-line)] px-1 py-2 text-right w-14"
+                  >
+                    {totals.bonusLunch > 0 ? `$${totals.bonusLunch.toFixed(2)}` : ""}
                   </td>
                 )}
-                {isVisible("allowance") && (
-                  <td className="border border-slate-400 dark:border-slate-500 px-1 py-2 text-right bg-lime-200 dark:bg-lime-800 font-bold w-16">
-                    26,000
+                {isVisible("foodOt") && (
+                  <td
+                    style={headBg("food")}
+                    className="border [border-color:var(--grid-line)] px-1 py-2 text-right w-14"
+                  >
+                    {totals.bonusOtFood > 0 ? `$${totals.bonusOtFood.toFixed(2)}` : ""}
+                  </td>
+                )}
+                {isVisible("total") && (
+                  <td
+                    style={headBg("total")}
+                    className="border [border-color:var(--grid-line)] px-1 py-2 text-right w-20 font-bold"
+                  >
+                    {totals.grandTotal > 0 ? `$${totals.grandTotal}` : ""}
                   </td>
                 )}
               </tr>

@@ -38,7 +38,7 @@ export default function EmployeeHeader({ employee }: Props) {
             { label: "Phone Number", value: employee.phone },
             { label: "Start Date", value: formatToDate(employee.startDate) },
             { label: "Position", value: employee.position },
-            { label: "Working Shift", value: employee.workingShiftId?.toString() },
+            { label: "Working Shift", value: employee.timeShiftId?.toString() },
 
             { label: "Work Status", value: employee.workStatus },
             { label: "Department", value: department },

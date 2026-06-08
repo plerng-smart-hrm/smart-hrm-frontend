@@ -40,13 +40,24 @@ export interface IAttendanceOvertime {
 export interface IDailyAttendance {
   date: string;
   day: string;
+  dayStatus: string;
+  workStatus: string;
   time: IAttendanceTime;
   lateMinutes: number;
   workingHours: number;
+  normalHours?: number;
   status: AttendanceStatus;
   reason: string | null;
   overtime: IAttendanceOvertime;
   adjust: string | null;
+  bonusTarget?: number;
+  wageNormal?: number;
+  wageOT1?: number;
+  wageOT2?: number;
+  timeSalary?: number;
+  total?: number;
+  bonusOtFood?: number;
+  bonusLunch?: number;
 }
 
 export interface IAttendanceTotals {
@@ -61,24 +72,24 @@ export interface IAttendanceTotals {
 }
 
 export interface IEmployeeAttendanceSummary {
-  empId: number;
-  empCode: string;
-  firstName: string;
-  lastName: string;
-  firstNameKh: string | null;
-  lastNameKh: string | null;
-  gender: string;
-  position: string;
-  joinDate: string;
+  // empId: number;
+  // empCode: string;
+  // firstName: string;
+  // lastName: string;
+  // firstNameKh: string | null;
+  // lastNameKh: string | null;
+  // gender: string;
+  // position: string;
+  // joinDate: string;
   attendanceSummary: IDailyAttendance[];
   totals: IAttendanceTotals;
+  employee?: IEmployee;
 }
-
 
 export interface ITriggerAttendanceSummaryResponse {
   date?: string;
   total?: number;
-  succeeded?: number; 
-  failed?: number; 
-  failedEmployeeIds?: number[]; 
+  succeeded?: number;
+  failed?: number;
+  failedEmployeeIds?: number[];
 }

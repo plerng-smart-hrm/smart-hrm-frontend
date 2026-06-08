@@ -26,8 +26,11 @@ export const employeeColumns = (actions: IActions[]): ColumnDef<IEmployee>[] => 
     {
       header: "Employee",
       cell: ({ row }) => (
-        <div className="flex flex-col">
-          <p className="text-base">
+        <div
+          className="flex flex-col cursor-pointer group"
+          onClick={() => viewAction?.(row.original)}
+        >
+          <p className="text-base group-hover:text-primary group-hover:underline">
             {row.original.lastName} {row.original.firstName}
           </p>
           <span className="text-muted-foreground text-sm">

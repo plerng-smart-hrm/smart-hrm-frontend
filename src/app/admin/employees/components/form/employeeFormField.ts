@@ -113,10 +113,8 @@ export const employeeFields: FieldDefinition[] = [
     type: "select",
     required: true,
     options: [
-      { label: "Single", value: "SINGLE" },
-      { label: "Married", value: "MARRIED" },
-      { label: "Divorced", value: "DIVORCED" },
-      { label: "Widowed", value: "WIDOWED" },
+      { label: "ACTIVE", value: "ACTIVE" },
+      { label: "INACTIVE", value: "INACTIVE" },
     ],
   },
   {
@@ -174,7 +172,7 @@ export const employeeFields: FieldDefinition[] = [
   },
   {
     label: "working_shift",
-    key: "workingShiftId",
+    key: "timeShiftId",
     type: "select",
     required: true,
   },

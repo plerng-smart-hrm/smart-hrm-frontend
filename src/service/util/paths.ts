@@ -10,12 +10,14 @@ import { attendanceLogKeys } from "./query-keys/attendance-log";
 import { attAdjustmentKeys } from "./query-keys/att-adjustment";
 import { attendanceSummaryKeys } from "./query-keys/attendance-summary";
 import { terminationKeys } from "./query-keys/termination";
+import { payrollKeys } from "./query-keys/payroll";
+import { timeShiftKeys } from "./query-keys/time-shift";
 
 export const queryKeyMappingApiPath: Record<string, string> = {
   [employeeKeys.list_employee]: "/v1/employees",
   [departmentKeys.list_department]: "/v1/departments",
   [sectionKeys.list_section]: "/v1/sections",
-  [workingShiftKeys.list_working_shift]: "/v1/working-shifts",
+  [timeShiftKeys.list_time_shift]: "/v1/time-shifts",
   [deviceKeys.list_device]: "/v1/devices",
   [holidayKeys.list_holiday]: "/v1/holidays",
   [contractKeys.list_contract]: "/v1/contracts",
@@ -24,4 +26,5 @@ export const queryKeyMappingApiPath: Record<string, string> = {
   [attendanceLogKeys.list_attendance_log]: "/v1/attendance-logs",
   [attAdjustmentKeys.list_att_adjustment]: "/v1/att-adjustments",
   [terminationKeys.list_termination]: "/v1/terminations",
+  [payrollKeys.list_payroll]: "/v1/payrolls",
 };

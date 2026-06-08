@@ -1,3 +1,6 @@
+import { IContract } from "./contract";
+import { ITimeShift } from "./time-shift";
+
 export interface IEmployee {
   id?: number;
   empCode?: string;
@@ -16,7 +19,7 @@ export interface IEmployee {
   phone?: string;
   currentAddress?: string;
   education?: string;
-  employeeType?:string;
+  employeeType?: string;
   workStatus?: string;
   employeeStatus?: string;
   start?: string;
@@ -26,10 +29,13 @@ export interface IEmployee {
   laborBookNo?: string;
   idCardNo?: string;
   nssfRegisterNo?: string;
-  workingShiftId?: number;
+  timeShiftId?: number;
   createdBy?: number;
   updatedBy?: number;
   createdAt?: string;
   updatedAt?: string;
   deletedAt?: string;
+
+  activeContract?: IContract;
+  timeShift?: ITimeShift;
 }
