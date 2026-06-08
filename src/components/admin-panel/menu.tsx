@@ -94,6 +94,11 @@ const menuItems: MenuItem[] = [
     icon: SettingsIcon,
     children: [
       {
+        name: "Payroll Setting",
+        path: "/admin/payroll-settings",
+        icon: User,
+      },
+      {
         name: "Time Shifts",
         path: "/admin/time-shifts",
         icon: User,
