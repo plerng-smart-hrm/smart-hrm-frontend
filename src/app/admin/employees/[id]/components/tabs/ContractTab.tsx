@@ -166,7 +166,7 @@ export default function ContractTab({ employee }: Props) {
                 <SquarePen className="size-4 mr-2" /> Edit
               </Button>
               <Button className="flex items-center" size={"sm"}>
-                <DownloadIcon className="size-4 mr-2" /> Download
+                <DownloadIcon className="size-4 mr-2" /> Contract
               </Button>
             </div>
           </div>
