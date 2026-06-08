@@ -45,10 +45,16 @@ export interface IDailyAttendance {
   time: IAttendanceTime;
   lateMinutes: number;
   workingHours: number;
+  normalHours?: number;
   status: AttendanceStatus;
   reason: string | null;
   overtime: IAttendanceOvertime;
   adjust: string | null;
+  targetBonus?: number;
+  wageNormal?: number;
+  wageOT1?: number;
+  wageOT2?: number;
+  timeSalary?: number;
 }
 
 export interface IAttendanceTotals {
@@ -74,14 +80,13 @@ export interface IEmployeeAttendanceSummary {
   // joinDate: string;
   attendanceSummary: IDailyAttendance[];
   totals: IAttendanceTotals;
-  employee?: IEmployee
+  employee?: IEmployee;
 }
-
 
 export interface ITriggerAttendanceSummaryResponse {
   date?: string;
   total?: number;
-  succeeded?: number; 
-  failed?: number; 
-  failedEmployeeIds?: number[]; 
+  succeeded?: number;
+  failed?: number;
+  failedEmployeeIds?: number[];
 }

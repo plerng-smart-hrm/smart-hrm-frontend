@@ -183,7 +183,12 @@ const cellBg = (group: GroupKey, rowIndex: number, special: boolean, emphasize =
   return { backgroundColor: rowIndex % 2 === 1 ? `color-mix(in srgb, black 2.5%, ${color})` : color };
 };
 
-export default function AttendanceTable({ attendanceData, selectedMonth, onMonthChange, onCellClick }: AttendanceTableProps) {
+export default function AttendanceTable({
+  attendanceData,
+  selectedMonth,
+  onMonthChange,
+  onCellClick,
+}: AttendanceTableProps) {
   // Initialize visible columns from config
   const [visibleColumns, setVisibleColumns] = useState<Set<ColumnKey>>(() => {
     const initial = new Set<ColumnKey>();
@@ -622,8 +627,14 @@ export default function AttendanceTable({ attendanceData, selectedMonth, onMonth
                       {isVisible("timeIn1") && (
                         <td
                           style={cellBg("timeIn", index, special, isFutureOrEmpty)}
-                          className={cn(cellBorder, "px-1 py-1 text-center font-mono", onCellClick && "cursor-pointer hover:brightness-90")}
-                          onClick={() => onCellClick?.({ record, fieldChanged: "F_IN", oldValue: record.time.fi ?? "" })}
+                          className={cn(
+                            cellBorder,
+                            "px-1 py-1 text-center font-mono",
+                            onCellClick && "cursor-pointer hover:brightness-90",
+                          )}
+                          onClick={() =>
+                            onCellClick?.({ record, fieldChanged: "F_IN", oldValue: record.time.fi ?? "" })
+                          }
                         >
                           {formatTime(record.time.fi)}
                         </td>
@@ -631,8 +642,14 @@ export default function AttendanceTable({ attendanceData, selectedMonth, onMonth
                       {isVisible("timeOut1") && (
                         <td
                           style={cellBg("timeOut", index, special, isFutureOrEmpty)}
-                          className={cn(cellBorder, "px-1 py-1 text-center font-mono", onCellClick && "cursor-pointer hover:brightness-90")}
-                          onClick={() => onCellClick?.({ record, fieldChanged: "F_OUT", oldValue: record.time.fo ?? "" })}
+                          className={cn(
+                            cellBorder,
+                            "px-1 py-1 text-center font-mono",
+                            onCellClick && "cursor-pointer hover:brightness-90",
+                          )}
+                          onClick={() =>
+                            onCellClick?.({ record, fieldChanged: "F_OUT", oldValue: record.time.fo ?? "" })
+                          }
                         >
                           {formatTime(record.time.fo)}
                         </td>
@@ -640,8 +657,14 @@ export default function AttendanceTable({ attendanceData, selectedMonth, onMonth
                       {isVisible("timeIn2") && (
                         <td
                           style={cellBg("timeIn", index, special, isFutureOrEmpty)}
-                          className={cn(cellBorder, "px-1 py-1 text-center font-mono", onCellClick && "cursor-pointer hover:brightness-90")}
-                          onClick={() => onCellClick?.({ record, fieldChanged: "S_IN", oldValue: record.time.si ?? "" })}
+                          className={cn(
+                            cellBorder,
+                            "px-1 py-1 text-center font-mono",
+                            onCellClick && "cursor-pointer hover:brightness-90",
+                          )}
+                          onClick={() =>
+                            onCellClick?.({ record, fieldChanged: "S_IN", oldValue: record.time.si ?? "" })
+                          }
                         >
                           {formatTime(record.time.si)}
                         </td>
@@ -655,7 +678,9 @@ export default function AttendanceTable({ attendanceData, selectedMonth, onMonth
                             record.overtime.ot1 > 0 && "font-bold",
                             onCellClick && "cursor-pointer hover:brightness-90",
                           )}
-                          onClick={() => onCellClick?.({ record, fieldChanged: "S_OUT", oldValue: record.time.so ?? "" })}
+                          onClick={() =>
+                            onCellClick?.({ record, fieldChanged: "S_OUT", oldValue: record.time.so ?? "" })
+                          }
                         >
                           {formatTime(record.time.so)}
                         </td>
@@ -673,14 +698,25 @@ export default function AttendanceTable({ attendanceData, selectedMonth, onMonth
                           style={cellBg("normal", index, special, isFutureOrEmpty)}
                           className={cn(cellBorder, "px-1 py-1 text-center font-medium")}
                         >
-                          {record.workingHours > 0 ? record.workingHours : ""}
+                          {record.normalHours && record.normalHours > 0 ? record.normalHours : ""}
                         </td>
                       )}
                       {isVisible("otX15") && (
                         <td
                           style={cellBg("overtime", index, special, isFutureOrEmpty)}
-                          className={cn(cellBorder, "px-1 py-1 text-center", record.overtime.ot1 > 0 && "font-bold", onCellClick && "cursor-pointer hover:brightness-90")}
-                          onClick={() => onCellClick?.({ record, fieldChanged: "OT1", oldValue: record.overtime.ot1 > 0 ? String(record.overtime.ot1) : "" })}
+                          className={cn(
+                            cellBorder,
+                            "px-1 py-1 text-center",
+                            record.overtime.ot1 > 0 && "font-bold",
+                            onCellClick && "cursor-pointer hover:brightness-90",
+                          )}
+                          onClick={() =>
+                            onCellClick?.({
+                              record,
+                              fieldChanged: "OT1",
+                              oldValue: record.overtime.ot1 > 0 ? String(record.overtime.ot1) : "",
+                            })
+                          }
                         >
                           {formatNumber(record.overtime.ot1)}
                         </td>
@@ -688,8 +724,19 @@ export default function AttendanceTable({ attendanceData, selectedMonth, onMonth
                       {isVisible("otX2") && (
                         <td
                           style={cellBg("overtime", index, special, isFutureOrEmpty)}
-                          className={cn(cellBorder, "px-1 py-1 text-center", record.overtime.ot2 > 0 && "font-bold", onCellClick && "cursor-pointer hover:brightness-90")}
-                          onClick={() => onCellClick?.({ record, fieldChanged: "OT2", oldValue: record.overtime.ot2 > 0 ? String(record.overtime.ot2) : "" })}
+                          className={cn(
+                            cellBorder,
+                            "px-1 py-1 text-center",
+                            record.overtime.ot2 > 0 && "font-bold",
+                            onCellClick && "cursor-pointer hover:brightness-90",
+                          )}
+                          onClick={() =>
+                            onCellClick?.({
+                              record,
+                              fieldChanged: "OT2",
+                              oldValue: record.overtime.ot2 > 0 ? String(record.overtime.ot2) : "",
+                            })
+                          }
                         >
                           {formatNumber(record.overtime.ot2)}
                         </td>
@@ -707,7 +754,7 @@ export default function AttendanceTable({ attendanceData, selectedMonth, onMonth
                           style={cellBg("payment", index, special)}
                           className={cn(cellBorder, "px-1 py-1 text-right")}
                         >
-                          {record.workingHours > 0 ? `$${(record.workingHours * 1).toFixed(2)}` : ""}
+                          {record.wageNormal && record.wageNormal > 0 ? `$${record.wageNormal}` : ""}
                         </td>
                       )}
                       {isVisible("paymentOtX15") && (
@@ -715,7 +762,7 @@ export default function AttendanceTable({ attendanceData, selectedMonth, onMonth
                           style={cellBg("payment", index, special)}
                           className={cn(cellBorder, "px-1 py-1 text-right")}
                         >
-                          {record.overtime.ot1 > 0 ? `$${(record.overtime.ot1 * 1.5).toFixed(2)}` : ""}
+                          {record.wageOT1 && record.wageOT1 > 0 ? `$${record.wageOT1}` : ""}
                         </td>
                       )}
                       {isVisible("paymentOtX2") && (
@@ -723,7 +770,7 @@ export default function AttendanceTable({ attendanceData, selectedMonth, onMonth
                           style={cellBg("payment", index, special)}
                           className={cn(cellBorder, "px-1 py-1 text-right")}
                         >
-                          {record.overtime.ot2 > 0 ? `$${(record.overtime.ot2 * 2).toFixed(2)}` : ""}
+                          {record.wageOT2 && record.wageOT2 > 0 ? `$${record.wageOT2}` : ""}
                         </td>
                       )}
                       {isVisible("paymentNight") && (
@@ -736,12 +783,26 @@ export default function AttendanceTable({ attendanceData, selectedMonth, onMonth
                       )}
                       {isVisible("timeSalary") && (
                         <td style={cellBg("salary", index, special)} className={cn(cellBorder, "px-1 py-1 text-right")}>
-                          {record.workingHours > 0 ? `$${(record.workingHours * 1).toFixed(3)}` : ""}
+                          {record.timeSalary && record.timeSalary > 0 ? `$${record.timeSalary}` : ""}
                         </td>
                       )}
                       {isVisible("pieceSalary") && (
-                        <td style={cellBg("piece", index, special)} className={cn(cellBorder, "px-1 py-1 text-right")}>
-                          {/* Piece-rate salary — not yet provided by the API */}
+                        <td
+                          style={cellBg("piece", index, special)}
+                          className={cn(
+                            cellBorder,
+                            "px-1 py-1 text-right",
+                            onCellClick && "cursor-pointer hover:brightness-90",
+                          )}
+                          onClick={() =>
+                            onCellClick?.({
+                              record,
+                              fieldChanged: "TARGET_BONUS",
+                              oldValue: record.targetBonus && record.targetBonus > 0 ? String(record.targetBonus) : "",
+                            })
+                          }
+                        >
+                          {record.targetBonus && record.targetBonus > 0 ? `$${record.targetBonus}` : ""}
                         </td>
                       )}
                       {isVisible("leaveHour") && (
