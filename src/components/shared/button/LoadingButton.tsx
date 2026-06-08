@@ -9,6 +9,8 @@ export type TypeVariant =
   | "secondary"
   | "ghost"
   | "link"
+  | "warning"
+  | "success"
   | null
   | undefined;
 

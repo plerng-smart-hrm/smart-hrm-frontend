@@ -1,7 +1,7 @@
 "use client";
 
-import { PayrollRequest, RunPayrollValues } from "@/schemas/admin/payroll";
-import { payrollFirstPayment, payrollSecondPayment } from "@/service/admin/payroll.service";
+import { RunPayrollValues } from "@/schemas/admin/payroll";
+import { payrollSalaryAdvance, payrollSalaryBalance } from "@/service/admin/payroll.service";
 import { payrollKeys } from "@/service/util/query-keys/payroll";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -12,9 +12,9 @@ const RESOURCE = "Payroll";
 export const useMutatePayroll = () => {
   const queryClient = useQueryClient();
 
-  const payrollFirstPaymentMutation = useMutation({
-    mutationFn: async ({ request }: { request: PayrollRequest }) => {
-      return await payrollFirstPayment(request);
+  const payrollSalaryAdvanceMutation = useMutation({
+    mutationFn: async ({ request }: { request: RunPayrollValues }) => {
+      return await payrollSalaryAdvance(request);
     },
     onSuccess: () => {
       toast.success(`${RESOURCE} first payment successfully`);
@@ -28,9 +28,9 @@ export const useMutatePayroll = () => {
     },
   });
 
-  const payrollSecondPaymentMutation = useMutation({
-    mutationFn: async ({ request }: { request: PayrollRequest }) => {
-      return await payrollSecondPayment(request);
+  const payrollSalaryBalanceMutation = useMutation({
+    mutationFn: async ({ request }: { request: RunPayrollValues }) => {
+      return await payrollSalaryBalance(request);
     },
     onSuccess: () => {
       toast.success(`${RESOURCE} second payment successfully`);
@@ -45,7 +45,7 @@ export const useMutatePayroll = () => {
   });
 
   return {
-    payrollFirstPayment: payrollFirstPaymentMutation.mutateAsync,
-    payrollSecondPayment: payrollSecondPaymentMutation.mutateAsync,
+    payrollSalaryAdvance: payrollSalaryAdvanceMutation.mutateAsync,
+    payrollSalaryBalance: payrollSalaryBalanceMutation.mutateAsync,
   };
 };

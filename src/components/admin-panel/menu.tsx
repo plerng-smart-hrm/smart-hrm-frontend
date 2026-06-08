@@ -83,7 +83,7 @@ const menuItems: MenuItem[] = [
     icon: DollarSignIcon,
     children: [
       {
-        name: "Time Shifts",
+        name: "Payrolls",
         path: "/admin/payrolls",
         icon: User,
       },
