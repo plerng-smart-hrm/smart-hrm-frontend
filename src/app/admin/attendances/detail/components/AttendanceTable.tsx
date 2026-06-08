@@ -16,6 +16,19 @@ import { ChevronLeft, ChevronRight, Settings2 } from "lucide-react";
 import { IDailyAttendance } from "@/types/admin/attendance-summary";
 import { cn } from "@/lib/utils";
 
+export enum AdjustmentField {
+  STATUS = "STATUS",
+  F_IN = "F_IN",
+  F_OUT = "F_OUT",
+  S_IN = "S_IN",
+  S_OUT = "S_OUT",
+  OT1 = "OT1",
+  OT2 = "OT2",
+  BONUS_TARGET = "BONUS_TARGET",
+  BONUS_LUNCH = "BONUS_LUNCH",
+  BONUS_OT_FOOD = "BONUS_OT_FOOD",
+}
+
 export interface AttCellClickInfo {
   record: IDailyAttendance;
   fieldChanged: string;
@@ -175,7 +188,6 @@ type GroupKey =
   | "leave"
   | "food"
   | "total";
-
 
 const headBg = (group: GroupKey): CSSProperties => ({
   backgroundColor: `var(--${group}-head)`,
@@ -621,7 +633,6 @@ export default function AttendanceTable({
                   const dayNum = parseInt(record.date.split("-")[2]);
                   const dayStatusLabel = record.dayStatus;
                   const workStatus = record.workStatus;
-                  const hasData = record.time.fi !== null;
                   const isFutureOrEmpty = !record.time.fi && record.dayStatus !== "Sunday" && record.dayStatus !== "PH";
                   const lateHours = record.lateMinutes / 60;
                   const special = record.dayStatus === "Sunday" || record.dayStatus === "PH";
@@ -670,7 +681,7 @@ export default function AttendanceTable({
                             onCellClick && "cursor-pointer hover:brightness-90",
                           )}
                           onClick={() =>
-                            onCellClick?.({ record, fieldChanged: "F_IN", oldValue: record.time.fi ?? "" })
+                            onCellClick?.({ record, fieldChanged: AdjustmentField.F_IN, oldValue: record.time.fi ?? "" })
                           }
                         >
                           {formatTime(record.time.fi)}
@@ -685,7 +696,7 @@ export default function AttendanceTable({
                             onCellClick && "cursor-pointer hover:brightness-90",
                           )}
                           onClick={() =>
-                            onCellClick?.({ record, fieldChanged: "F_OUT", oldValue: record.time.fo ?? "" })
+                            onCellClick?.({ record, fieldChanged: AdjustmentField.F_OUT, oldValue: record.time.fo ?? "" })
                           }
                         >
                           {formatTime(record.time.fo)}
@@ -700,7 +711,7 @@ export default function AttendanceTable({
                             onCellClick && "cursor-pointer hover:brightness-90",
                           )}
                           onClick={() =>
-                            onCellClick?.({ record, fieldChanged: "S_IN", oldValue: record.time.si ?? "" })
+                            onCellClick?.({ record, fieldChanged: AdjustmentField.S_IN, oldValue: record.time.si ?? "" })
                           }
                         >
                           {formatTime(record.time.si)}
@@ -716,7 +727,7 @@ export default function AttendanceTable({
                             onCellClick && "cursor-pointer hover:brightness-90",
                           )}
                           onClick={() =>
-                            onCellClick?.({ record, fieldChanged: "S_OUT", oldValue: record.time.so ?? "" })
+                            onCellClick?.({ record, fieldChanged: AdjustmentField.S_OUT, oldValue: record.time.so ?? "" })
                           }
                         >
                           {formatTime(record.time.so)}
@@ -750,7 +761,7 @@ export default function AttendanceTable({
                           onClick={() =>
                             onCellClick?.({
                               record,
-                              fieldChanged: "OT1",
+                              fieldChanged: AdjustmentField.OT1,
                               oldValue: record.overtime.ot1 > 0 ? String(record.overtime.ot1) : "",
                             })
                           }
@@ -770,7 +781,7 @@ export default function AttendanceTable({
                           onClick={() =>
                             onCellClick?.({
                               record,
-                              fieldChanged: "OT2",
+                              fieldChanged: AdjustmentField.OT2,
                               oldValue: record.overtime.ot2 > 0 ? String(record.overtime.ot2) : "",
                             })
                           }
@@ -834,7 +845,7 @@ export default function AttendanceTable({
                           onClick={() =>
                             onCellClick?.({
                               record,
-                              fieldChanged: "BONUS_TARGET",
+                              fieldChanged: AdjustmentField.BONUS_TARGET,
                               oldValue: record.bonusTarget && record.bonusTarget > 0 ? String(record.bonusTarget) : "",
                             })
                           }
