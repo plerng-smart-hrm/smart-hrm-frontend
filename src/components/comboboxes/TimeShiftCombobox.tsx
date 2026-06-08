@@ -35,7 +35,6 @@ export function TimeShiftCombobox({ value, onChange, disabled = false, placehold
     key: timeShiftKeys.option_time_shift,
   });
 
-  console.log("data", data);
   const timeShifts: ITimeShiftOption[] = React.useMemo(() => (data?.data as ITimeShiftOption[]) ?? [], [data?.data]);
 
   const selectedTimeShift = React.useMemo(() => timeShifts.find((shift) => shift.value === value), [timeShifts, value]);
@@ -46,7 +45,9 @@ export function TimeShiftCombobox({ value, onChange, disabled = false, placehold
 
     const query = searchQuery.toLowerCase();
     return timeShifts.filter(
-      (shift) => shift.label?.toLowerCase().includes(query) || formatShiftRange(shift).toLowerCase().includes(query),
+      (shift: ITimeShiftOption) =>
+        shift.label?.toLowerCase().includes(query) ||
+        formatShiftRange(shift.fIn, shift.fOut, shift.sIn, shift.sOut).toLowerCase().includes(query),
     );
   }, [timeShifts, searchQuery]);
 
@@ -78,7 +79,14 @@ export function TimeShiftCombobox({ value, onChange, disabled = false, placehold
             ) : selectedTimeShift ? (
               <span className="flex flex-col">
                 <span className="font-medium">{selectedTimeShift.label}</span>
-                <span className="text-xs text-muted-foreground">{formatShiftRange(selectedTimeShift)}</span>
+                <span className="text-xs text-muted-foreground">
+                  {formatShiftRange(
+                    selectedTimeShift.fIn,
+                    selectedTimeShift.fOut,
+                    selectedTimeShift.sIn,
+                    selectedTimeShift.sOut,
+                  )}
+                </span>
               </span>
             ) : (
               <span className="text-muted-foreground">{placeholder}</span>
@@ -106,7 +114,7 @@ export function TimeShiftCombobox({ value, onChange, disabled = false, placehold
                   <Check className={cn("mr-2 h-4 w-4 shrink-0", value === shift.value ? "opacity-100" : "opacity-0")} />
                   <span className="flex flex-col min-w-0">
                     <span className="font-medium truncate">{shift.label}</span>
-                    <span className="text-xs text-muted-foreground truncate">{formatShiftRange(shift)}</span>
+                    <span className="text-xs text-muted-foreground truncate">{formatShiftRange(shift.fIn, shift.fOut, shift.sIn, shift.sOut)}</span>
                   </span>
                 </CommandItem>
               ))}

@@ -118,7 +118,7 @@ export default function MonthlyTotalsCard({ totals, employee, payrollPayments }:
           </div>
         </div>
 
-        <RenderView
+        {/* <RenderView
           className="lg:grid-cols-2 pt-2"
           fields={[
             {
@@ -154,7 +154,7 @@ export default function MonthlyTotalsCard({ totals, employee, payrollPayments }:
               value: employee?.contract?.otRateExcess,
             },
           ]}
-        />
+        /> */}
       </div>
 
       <div className="space-y-2 mt-4 pt-2 border-t">
