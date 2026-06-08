@@ -55,6 +55,7 @@ export interface IDailyAttendance {
   wageOT1?: number;
   wageOT2?: number;
   timeSalary?: number;
+  total?: number;
 }
 
 export interface IAttendanceTotals {

@@ -52,7 +52,8 @@ type ColumnKey =
   | "pieceSalary"
   | "leaveHour"
   | "leavePay"
-  | "food";
+  | "food"
+  | "total";
 
 interface ColumnConfig {
   key: ColumnKey;
@@ -84,6 +85,7 @@ const columnConfigs: ColumnConfig[] = [
   { key: "leaveHour", label: "Leave Hour", group: "Leave", defaultVisible: true },
   { key: "leavePay", label: "Leave Pay", group: "Leave", defaultVisible: true },
   { key: "food", label: "Food", defaultVisible: true },
+  { key: "total", label: "Total", defaultVisible: true },
 ];
 
 const getStatusTextStyle = (label: string): React.CSSProperties => {
@@ -116,7 +118,7 @@ function HeaderLabel({ kh, en }: { kh: string; en: string }) {
   return (
     <span className="flex flex-col leading-tight">
       <span>{kh}</span>
-      <span className="text-[10px] font-normal text-muted-foreground">{en}</span>
+      <span className="text-[10px] font-normal">{en}</span>
     </span>
   );
 }
@@ -145,6 +147,8 @@ const tableColorVars = {
   "--leave-head": "#99e0f7",
   "--food-body": "#ccffcc",
   "--food-head": "#b3f5b3",
+  "--total-body": "#ffe4b5",
+  "--total-head": "#ffd07a",
   "--idcol-body": "#ffffff",
   "--idcol-head": "#f1f3f6",
   "--grid-line": "#000000",
@@ -167,7 +171,8 @@ type GroupKey =
   | "salary"
   | "piece"
   | "leave"
-  | "food";
+  | "food"
+  | "total";
 
 const headBg = (group: GroupKey): CSSProperties => ({
   backgroundColor: `var(--${group}-head)`,
@@ -225,8 +230,9 @@ export default function AttendanceTable({
       lateMinutes: acc.lateMinutes + record.lateMinutes,
       otX15: acc.otX15 + record.overtime.ot1,
       otX2: acc.otX2 + record.overtime.ot2,
+      grandTotal: acc.grandTotal + (record.total ?? 0),
     }),
-    { normalHours: 0, lateMinutes: 0, otX15: 0, otX2: 0 },
+    { normalHours: 0, lateMinutes: 0, otX15: 0, otX2: 0, grandTotal: 0 },
   );
   const totalLateHours = totals.lateMinutes / 60;
 
@@ -471,6 +477,15 @@ export default function AttendanceTable({
                       <HeaderLabel kh="ប្រាក់ថ្លៃបាយ" en="Food" />
                     </th>
                   )}
+                  {isVisible("total") && (
+                    <th
+                      rowSpan={2}
+                      style={headBg("total")}
+                      className="border border-b px-2 py-1 text-center font-semibold w-20 [border-color:var(--grid-line)]"
+                    >
+                      <HeaderLabel kh="សរុប" en="Total" />
+                    </th>
+                  )}
                 </tr>
                 <tr>
                   {isVisible("timeIn1") && (
@@ -611,7 +626,7 @@ export default function AttendanceTable({
                       {isVisible("dayStatus") && (
                         <td
                           style={{ ...cellBg("idcol", index, special), ...getStatusTextStyle(dayStatusLabel) }}
-                          className={cn(cellBorder, "px-2 py-1 text-center")}
+                          className={cn(cellBorder, "px-2 py-1 text-start")}
                         >
                           {dayStatusLabel}
                         </td>
@@ -619,7 +634,7 @@ export default function AttendanceTable({
                       {isVisible("workStatus") && (
                         <td
                           style={{ ...cellBg("idcol", index, special), ...getStatusTextStyle(workStatus) }}
-                          className={cn(cellBorder, "px-1 py-1 text-center")}
+                          className={cn(cellBorder, "px-1 py-1 text-start")}
                         >
                           {workStatus}
                         </td>
@@ -823,6 +838,14 @@ export default function AttendanceTable({
                           {hasData ? "$1.000" : ""}
                         </td>
                       )}
+                      {isVisible("total") && (
+                        <td
+                          style={cellBg("total", index, special, isFutureOrEmpty)}
+                          className={cn(cellBorder, "px-1 py-1 text-right font-semibold")}
+                        >
+                          {record.total ? `$${record.total}` : ""}
+                        </td>
+                      )}
                     </tr>
                   );
                 })}
@@ -978,6 +1001,14 @@ export default function AttendanceTable({
                     className="border [border-color:var(--grid-line)] px-1 py-2 text-right w-16"
                   >
                     {/* Food total */}
+                  </td>
+                )}
+                {isVisible("total") && (
+                  <td
+                    style={headBg("total")}
+                    className="border [border-color:var(--grid-line)] px-1 py-2 text-right w-20 font-bold"
+                  >
+                    {totals.grandTotal > 0 ? `$${totals.grandTotal}` : ""}
                   </td>
                 )}
               </tr>
