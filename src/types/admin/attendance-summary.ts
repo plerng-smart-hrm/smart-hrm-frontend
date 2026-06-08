@@ -50,12 +50,14 @@ export interface IDailyAttendance {
   reason: string | null;
   overtime: IAttendanceOvertime;
   adjust: string | null;
-  targetBonus?: number;
+  bonusTarget?: number;
   wageNormal?: number;
   wageOT1?: number;
   wageOT2?: number;
   timeSalary?: number;
   total?: number;
+  bonusOtFood?: number;
+  bonusLunch?: number;
 }
 
 export interface IAttendanceTotals {

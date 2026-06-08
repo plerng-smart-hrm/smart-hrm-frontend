@@ -52,7 +52,8 @@ type ColumnKey =
   | "pieceSalary"
   | "leaveHour"
   | "leavePay"
-  | "food"
+  | "foodLunch"
+  | "foodOt"
   | "total";
 
 interface ColumnConfig {
@@ -84,7 +85,8 @@ const columnConfigs: ColumnConfig[] = [
   { key: "pieceSalary", label: "Piece Salary", defaultVisible: true },
   { key: "leaveHour", label: "Leave Hour", group: "Leave", defaultVisible: true },
   { key: "leavePay", label: "Leave Pay", group: "Leave", defaultVisible: true },
-  { key: "food", label: "Food", defaultVisible: true },
+  { key: "foodLunch", label: "Food Lunch", group: "Food", defaultVisible: true },
+  { key: "foodOt", label: "Food OT", group: "Food", defaultVisible: true },
   { key: "total", label: "Total", defaultVisible: true },
 ];
 
@@ -174,6 +176,7 @@ type GroupKey =
   | "food"
   | "total";
 
+
 const headBg = (group: GroupKey): CSSProperties => ({
   backgroundColor: `var(--${group}-head)`,
   color: "var(--text-main)",
@@ -231,8 +234,10 @@ export default function AttendanceTable({
       otX15: acc.otX15 + record.overtime.ot1,
       otX2: acc.otX2 + record.overtime.ot2,
       grandTotal: acc.grandTotal + (record.total ?? 0),
+      bonusLunch: acc.bonusLunch + (record.bonusLunch ?? 0),
+      bonusOtFood: acc.bonusOtFood + (record.bonusOtFood ?? 0),
     }),
-    { normalHours: 0, lateMinutes: 0, otX15: 0, otX2: 0, grandTotal: 0 },
+    { normalHours: 0, lateMinutes: 0, otX15: 0, otX2: 0, grandTotal: 0, bonusLunch: 0, bonusOtFood: 0 },
   );
   const totalLateHours = totals.lateMinutes / 60;
 
@@ -253,6 +258,7 @@ export default function AttendanceTable({
   ].filter(Boolean).length;
 
   const leaveColSpan = [isVisible("leaveHour"), isVisible("leavePay")].filter(Boolean).length;
+  const foodColSpan = [isVisible("foodLunch"), isVisible("foodOt")].filter(Boolean).length;
 
   const handlePreviousMonth = () => {
     const newDate = new Date(selectedMonth);
@@ -389,7 +395,7 @@ export default function AttendanceTable({
                     <th
                       rowSpan={2}
                       style={headBg("idcol")}
-                      className="border border-b px-2 py-1 text-center font-semibold w-16 [border-color:var(--grid-line)]"
+                      className="border border-b px-2 py-1 text-center font-semibold w-12 [border-color:var(--grid-line)]"
                     >
                       <HeaderLabel kh="ថ្ងៃធ្វើការ" en="WorkStatus" />
                     </th>
@@ -468,11 +474,11 @@ export default function AttendanceTable({
                       <HeaderLabel kh="ឈប់" en="Leave" />
                     </th>
                   )}
-                  {isVisible("food") && (
+                  {foodColSpan > 0 && (
                     <th
-                      rowSpan={2}
+                      colSpan={foodColSpan}
                       style={headBg("food")}
-                      className="border border-b px-2 py-1 text-center font-semibold w-16 [border-color:var(--grid-line)]"
+                      className="border border-b px-2 py-1 text-center font-semibold [border-color:var(--grid-line)]"
                     >
                       <HeaderLabel kh="ប្រាក់ថ្លៃបាយ" en="Food" />
                     </th>
@@ -481,7 +487,7 @@ export default function AttendanceTable({
                     <th
                       rowSpan={2}
                       style={headBg("total")}
-                      className="border border-b px-2 py-1 text-center font-semibold w-20 [border-color:var(--grid-line)]"
+                      className="border border-b px-2 py-1 text-center font-semibold w-12 [border-color:var(--grid-line)]"
                     >
                       <HeaderLabel kh="សរុប" en="Total" />
                     </th>
@@ -590,6 +596,22 @@ export default function AttendanceTable({
                       className="border border-b px-1 py-1 text-center font-semibold w-14 [border-color:var(--grid-line)]"
                     >
                       <HeaderLabel kh="ទឹកប្រាក់" en="Pay" />
+                    </th>
+                  )}
+                  {isVisible("foodLunch") && (
+                    <th
+                      style={headBg("food")}
+                      className="border border-b px-1 py-1 text-center font-semibold w-14 [border-color:var(--grid-line)]"
+                    >
+                      <HeaderLabel kh="ថ្ងៃ" en="Lunch" />
+                    </th>
+                  )}
+                  {isVisible("foodOt") && (
+                    <th
+                      style={headBg("food")}
+                      className="border border-b px-1 py-1 text-center font-semibold w-14 [border-color:var(--grid-line)]"
+                    >
+                      <HeaderLabel kh="ថែមម៉ោង" en="OT" />
                     </th>
                   )}
                 </tr>
@@ -812,12 +834,12 @@ export default function AttendanceTable({
                           onClick={() =>
                             onCellClick?.({
                               record,
-                              fieldChanged: "TARGET_BONUS",
-                              oldValue: record.targetBonus && record.targetBonus > 0 ? String(record.targetBonus) : "",
+                              fieldChanged: "BONUS_TARGET",
+                              oldValue: record.bonusTarget && record.bonusTarget > 0 ? String(record.bonusTarget) : "",
                             })
                           }
                         >
-                          {record.targetBonus && record.targetBonus > 0 ? `$${record.targetBonus}` : ""}
+                          {record.bonusTarget && record.bonusTarget > 0 ? `$${record.bonusTarget}` : ""}
                         </td>
                       )}
                       {isVisible("leaveHour") && (
@@ -830,12 +852,20 @@ export default function AttendanceTable({
                           {/* Leave pay placeholder */}
                         </td>
                       )}
-                      {isVisible("food") && (
+                      {isVisible("foodLunch") && (
                         <td
                           style={cellBg("food", index, special, isFutureOrEmpty)}
                           className={cn(cellBorder, "px-1 py-1 text-right")}
                         >
-                          {hasData ? "$1.000" : ""}
+                          {record.bonusLunch && record.bonusLunch > 0 ? `$${record.bonusLunch}` : ""}
+                        </td>
+                      )}
+                      {isVisible("foodOt") && (
+                        <td
+                          style={cellBg("food", index, special, isFutureOrEmpty)}
+                          className={cn(cellBorder, "px-1 py-1 text-right")}
+                        >
+                          {record.bonusOtFood && record.bonusOtFood > 0 ? `$${record.bonusOtFood}` : ""}
                         </td>
                       )}
                       {isVisible("total") && (
@@ -995,12 +1025,20 @@ export default function AttendanceTable({
                     {/* Leave pay total */}
                   </td>
                 )}
-                {isVisible("food") && (
+                {isVisible("foodLunch") && (
                   <td
                     style={headBg("food")}
-                    className="border [border-color:var(--grid-line)] px-1 py-2 text-right w-16"
+                    className="border [border-color:var(--grid-line)] px-1 py-2 text-right w-14"
                   >
-                    {/* Food total */}
+                    {totals.bonusLunch > 0 ? `$${totals.bonusLunch.toFixed(2)}` : ""}
+                  </td>
+                )}
+                {isVisible("foodOt") && (
+                  <td
+                    style={headBg("food")}
+                    className="border [border-color:var(--grid-line)] px-1 py-2 text-right w-14"
+                  >
+                    {totals.bonusOtFood > 0 ? `$${totals.bonusOtFood.toFixed(2)}` : ""}
                   </td>
                 )}
                 {isVisible("total") && (
