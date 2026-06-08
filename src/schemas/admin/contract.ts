@@ -14,13 +14,17 @@ export const contractSchema = z.object({
   allowanceTransport: z.number().min(0, "Transport allowance must be 0 or higher"),
   allowanceOtFoodPerHour: z.number().min(0, "Transport allowance must be 0 or higher"),
   allowanceUnionFeeMonthly: z.number().min(0, "Attendance bonus must be 0 or higher"),
-  allowanceSkill: z.number().min(1, "Skill level is required"),
-  bonusAttendance: z.number().min(0, "Skill allowance must be 0 or higher"),
-  bonusPosition: z.number().min(0, "OT rate normal must be 0 or higher"),
-  bonusTechnical: z.number().min(0, "OT rate excess must be 0 or higher"),
-  skillLevel: z.string().min(1, "Skill level is required"),
+  allowanceSkill: z.number().min(0, "Skill allowance must be 0 or higher"),
+  bonusAttendance: z.number().min(0, "Attendance bonus must be 0 or higher"),
+  bonusPosition: z.number().min(0, "Position bonus must be 0 or higher"),
+  bonusTechnical: z.number().min(0, "Technical bonus must be 0 or higher"),
+  skillLevel: z.string().optional(),
   otRateNormal: z.number().min(0, "OT rate normal must be 0 or higher"),
   otRateExcess: z.number().min(0, "OT rate excess must be 0 or higher"),
 });
 
 export type ContractValues = z.infer<typeof contractSchema>;
+
+export const renewContractSchema = contractSchema.omit({ empCode: true });
+
+export type RenewContractValues = z.infer<typeof renewContractSchema>;

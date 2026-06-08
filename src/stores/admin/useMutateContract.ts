@@ -1,11 +1,10 @@
 "use client";
 
-import { ContractValues } from "@/schemas/admin/contract";
+import { ContractValues, RenewContractValues } from "@/schemas/admin/contract";
 import {
   createContract,
   deleteContract,
-  ICreateContractRequest,
-  IUpdateContractRequest,
+  renewContract,
   updateContract,
 } from "@/service/admin/contracts.service";
 import { contractKeys } from "@/service/util/query-keys/contract";
@@ -45,6 +44,22 @@ export const useMutateContract = () => {
     },
   });
 
+  const renewMutation = useMutation({
+    mutationFn: async ({ contractId, request }: { contractId?: number; request?: RenewContractValues }) => {
+      return await renewContract(contractId, request);
+    },
+    onSuccess: (_, { contractId }) => {
+      toast.success(`${RESOURCE} renewed successfully`);
+
+      queryClient.invalidateQueries({
+        queryKey: [`${contractKeys.list_contract}_${contractId}`],
+      });
+    },
+    onError: () => {
+      toast.error(`Failed to update ${RESOURCE.toLowerCase()}`);
+    },
+  });
+
   const deleteMutation = useMutation({
     mutationFn: async ({ contractId }: { contractId?: number }) => {
       return await deleteContract(contractId);
@@ -62,6 +77,7 @@ export const useMutateContract = () => {
   return {
     createContract: createMutation.mutateAsync,
     updateContract: updateMutation.mutateAsync,
+    renewContract: renewMutation.mutateAsync,
     deleteContract: deleteMutation.mutateAsync,
   };
 };

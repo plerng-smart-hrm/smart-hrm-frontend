@@ -10,7 +10,7 @@ const page = async ({ params }: Props) => {
   const id = (await params)?.id ?? "";
 
   return (
-    <ContentLayout title={"Employee Detail"}>
+    <ContentLayout title={"Employee Detail"} backHref="/admin/employees">
       <ContentWrapper>
         <EmployeeProfileClient employeeId={id} />
       </ContentWrapper>

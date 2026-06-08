@@ -28,7 +28,7 @@ export default function PersonalTab({ employee }: Props) {
   return (
     <div>
       <div className="flex justify-end">
-        <Button type="button" size="sm" className="gap-1.5" onClick={() => setIsEditOpen(true)}>
+        <Button type="button" size="sm" variant={"warning"} className="gap-1.5" onClick={() => setIsEditOpen(true)}>
           <SquarePen className="size-4" />
           Edit
         </Button>

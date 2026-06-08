@@ -19,7 +19,7 @@ export function Navbar({ title, backHref }: NavbarProps) {
                         <Link href={backHref}>
                             <button
                                 type="button"
-                                className="flex h-8 w-8 items-center justify-center rounded-md hover:bg-accent transition-colors"
+                                className="flex h-8 w-8 items-center justify-center rounded-md hover:bg-accent transition-colors cursor-pointer"
                             >
                                 <ArrowLeft className="h-4 w-4" />
                                 <span className="sr-only">Back</span>

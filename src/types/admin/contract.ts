@@ -1,6 +1,7 @@
+import { IAudit } from "./audit-entity";
 import { IEmployee } from "./employee";
 
-export interface IContract {
+export interface IContract extends IAudit {
   id?: number;
   employeeId?: number;
   employee?: IEmployee;
@@ -41,11 +42,4 @@ export interface IContract {
   otRateExcess?: number;
 
   status?: string;
-
-
-  createdBy?: number;
-  updatedBy?: number;
-  createdAt?: string;
-  updatedAt?: string;
-  deletedAt?: string;
 }

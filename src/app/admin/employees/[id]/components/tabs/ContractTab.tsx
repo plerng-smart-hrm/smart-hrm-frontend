@@ -142,13 +142,33 @@ export default function ContractTab({ employee }: Props) {
         </Card>
       ) : (
         <div>
-          <div className="flex justify-end gap-2">
-            <Button className="flex items-center" size={"sm"} onClick={() => setPanelMode("edit")}>
-              <SquarePen className="size-4 mr-2" /> Edit
-            </Button>
-            <Button className="flex items-center" size={"sm"}>
-              <DownloadIcon className="size-4 mr-2" /> Download
-            </Button>
+          <div className="flex items-center justify-between mb-2">
+            {(() => {
+              const status = getContractStatus(contract);
+              return status ? (
+                <span
+                  className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium ${status.className}`}
+                >
+                  <span className={`h-1.5 w-1.5 rounded-full ${status.dotClassName}`} />
+                  {status.label}
+                </span>
+              ) : (
+                <span />
+              );
+            })()}
+            <div className="flex gap-2">
+              {contract.isExpired && (
+                <Button size="sm" variant="success" className="flex items-center" onClick={() => setPanelMode("renew")}>
+                  <RefreshCw className="size-4 mr-2" /> Renew
+                </Button>
+              )}
+              <Button className="flex items-center" size={"sm"} variant="warning" onClick={() => setPanelMode("edit")}>
+                <SquarePen className="size-4 mr-2" /> Edit
+              </Button>
+              <Button className="flex items-center" size={"sm"}>
+                <DownloadIcon className="size-4 mr-2" /> Download
+              </Button>
+            </div>
           </div>
           <Section title="Contract Information">
             <RenderView

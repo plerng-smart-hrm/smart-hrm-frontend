@@ -32,7 +32,8 @@ const salaryKeys = [
 ];
 const skillKeys = ["skillLevel", "allowanceSkill", "otRateNormal", "otRateExcess"];
 
-const fieldsByKeys = (keys: string[]) => keys.map((key) => contractFields.find((f) => f.key === key)).filter(Boolean) as typeof contractFields;
+const fieldsByKeys = (keys: string[]) =>
+  keys.map((key) => contractFields.find((f) => f.key === key)).filter(Boolean) as typeof contractFields;
 
 interface Props {
   open: boolean;
@@ -44,7 +45,11 @@ interface Props {
   renewFrom?: IContract;
 }
 
-const buildDefaultValues = (employee: IEmployee, editingContract?: IContract, renewFrom?: IContract): ContractValues => {
+const buildDefaultValues = (
+  employee: IEmployee,
+  editingContract?: IContract,
+  renewFrom?: IContract,
+): ContractValues => {
   const source = editingContract ?? renewFrom;
   const isRenewal = !editingContract && !!renewFrom;
 
@@ -77,7 +82,7 @@ export default function ContractPanel({ open, setOpen, employee, editingContract
   const isRenewal = !editingContract && !!renewFrom;
   const [isLoading, setIsLoading] = React.useState(false);
 
-  const { createContract, updateContract } = useMutateContract();
+  const { createContract, updateContract, renewContract } = useMutateContract();
 
   const form = useForm<ContractValues>({
     resolver: zodResolver(contractSchema),
@@ -108,9 +113,12 @@ export default function ContractPanel({ open, setOpen, employee, editingContract
     };
 
     if (isEdit) {
-      await updateContract({ contractId: editingContract?.id, request: values }, mutationOptions);
+      updateContract({ contractId: editingContract?.id, request: values }, mutationOptions);
+    } else if (isRenewal) {
+      const { empCode: _, ...renewValues } = values;
+      renewContract({ contractId: renewFrom?.id, request: renewValues }, mutationOptions);
     } else {
-      await createContract({ request: values }, mutationOptions);
+      createContract({ request: values }, mutationOptions);
     }
   };
 
@@ -190,4 +198,3 @@ export default function ContractPanel({ open, setOpen, employee, editingContract
     </SharedSheet>
   );
 }
-
