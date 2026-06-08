@@ -10,7 +10,8 @@ import { attendanceSummaryKeys } from "@/service/util/query-keys/attendance-summ
 import { formatToYYYYMM } from "@/utils/shared-format";
 import { IEmployeeAttendanceSummary } from "@/types/admin/attendance-summary";
 import { IEmployee } from "@/types/admin/employee";
-import AttendanceTable from "@/app/admin/attendances/detail/components/AttendanceTable";
+import AttendanceTable, { AttCellClickInfo } from "@/app/admin/attendances/detail/components/AttendanceTable";
+import AttPanel, { AttCellInfo } from "../panels/AttPanel";
 
 interface Props {
   employee: IEmployee;
@@ -29,6 +30,8 @@ const formatMinutes = (minutes?: number) => {
 export default function AttendanceTab({ employee }: Props) {
   const [yearMonth, setYearMonth] = useQueryState("yearMonth", parseAsString.withDefault(formatToYYYYMM()));
   const [selectedMonth, setSelectedMonth] = React.useState(() => new Date(`${formatToYYYYMM()}-01`));
+  const [panelOpen, setPanelOpen] = React.useState(false);
+  const [cellInfo, setCellInfo] = React.useState<AttCellInfo | null>(null);
 
   const { data, isFetching } = useQueryShared({
     url: `/v1/att-summaries/employee`,
@@ -45,9 +48,21 @@ export default function AttendanceTab({ employee }: Props) {
     setYearMonth(formatToYYYYMM(date));
   };
 
+  const handleCellClick = ({ record, fieldChanged, oldValue }: AttCellClickInfo) => {
+    setCellInfo({ record, fieldChanged, oldValue });
+    setPanelOpen(true);
+  };
+
   return (
     <div className="relative">
       <LoadingOverlay isLoading={isFetching} />
+
+      <AttPanel
+        open={panelOpen}
+        setOpen={setPanelOpen}
+        employeeId={employee.id!}
+        cellInfo={cellInfo}
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         <div className="lg:col-span-9">
@@ -56,6 +71,7 @@ export default function AttendanceTab({ employee }: Props) {
               attendanceData={attSummary?.attendanceSummary ?? []}
               selectedMonth={selectedMonth}
               onMonthChange={handleMonthChange}
+              onCellClick={handleCellClick}
             />
           </Section>
         </div>

@@ -16,10 +16,17 @@ import { ChevronLeft, ChevronRight, Settings2 } from "lucide-react";
 import { IDailyAttendance } from "@/types/admin/attendance-summary";
 import { cn } from "@/lib/utils";
 
+export interface AttCellClickInfo {
+  record: IDailyAttendance;
+  fieldChanged: string;
+  oldValue: string;
+}
+
 interface AttendanceTableProps {
   attendanceData: IDailyAttendance[];
   selectedMonth: Date;
   onMonthChange: (date: Date) => void;
+  onCellClick?: (info: AttCellClickInfo) => void;
 }
 
 // Column configuration
@@ -176,7 +183,7 @@ const cellBg = (group: GroupKey, rowIndex: number, special: boolean, emphasize =
   return { backgroundColor: rowIndex % 2 === 1 ? `color-mix(in srgb, black 2.5%, ${color})` : color };
 };
 
-export default function AttendanceTable({ attendanceData, selectedMonth, onMonthChange }: AttendanceTableProps) {
+export default function AttendanceTable({ attendanceData, selectedMonth, onMonthChange, onCellClick }: AttendanceTableProps) {
   // Initialize visible columns from config
   const [visibleColumns, setVisibleColumns] = useState<Set<ColumnKey>>(() => {
     const initial = new Set<ColumnKey>();
@@ -615,7 +622,8 @@ export default function AttendanceTable({ attendanceData, selectedMonth, onMonth
                       {isVisible("timeIn1") && (
                         <td
                           style={cellBg("timeIn", index, special, isFutureOrEmpty)}
-                          className={cn(cellBorder, "px-1 py-1 text-center font-mono")}
+                          className={cn(cellBorder, "px-1 py-1 text-center font-mono", onCellClick && "cursor-pointer hover:brightness-90")}
+                          onClick={() => onCellClick?.({ record, fieldChanged: "F_IN", oldValue: record.time.fi ?? "" })}
                         >
                           {formatTime(record.time.fi)}
                         </td>
@@ -623,7 +631,8 @@ export default function AttendanceTable({ attendanceData, selectedMonth, onMonth
                       {isVisible("timeOut1") && (
                         <td
                           style={cellBg("timeOut", index, special, isFutureOrEmpty)}
-                          className={cn(cellBorder, "px-1 py-1 text-center font-mono")}
+                          className={cn(cellBorder, "px-1 py-1 text-center font-mono", onCellClick && "cursor-pointer hover:brightness-90")}
+                          onClick={() => onCellClick?.({ record, fieldChanged: "F_OUT", oldValue: record.time.fo ?? "" })}
                         >
                           {formatTime(record.time.fo)}
                         </td>
@@ -631,7 +640,8 @@ export default function AttendanceTable({ attendanceData, selectedMonth, onMonth
                       {isVisible("timeIn2") && (
                         <td
                           style={cellBg("timeIn", index, special, isFutureOrEmpty)}
-                          className={cn(cellBorder, "px-1 py-1 text-center font-mono")}
+                          className={cn(cellBorder, "px-1 py-1 text-center font-mono", onCellClick && "cursor-pointer hover:brightness-90")}
+                          onClick={() => onCellClick?.({ record, fieldChanged: "S_IN", oldValue: record.time.si ?? "" })}
                         >
                           {formatTime(record.time.si)}
                         </td>
@@ -643,7 +653,9 @@ export default function AttendanceTable({ attendanceData, selectedMonth, onMonth
                             cellBorder,
                             "px-1 py-1 text-center font-mono",
                             record.overtime.ot1 > 0 && "font-bold",
+                            onCellClick && "cursor-pointer hover:brightness-90",
                           )}
+                          onClick={() => onCellClick?.({ record, fieldChanged: "S_OUT", oldValue: record.time.so ?? "" })}
                         >
                           {formatTime(record.time.so)}
                         </td>
@@ -667,7 +679,8 @@ export default function AttendanceTable({ attendanceData, selectedMonth, onMonth
                       {isVisible("otX15") && (
                         <td
                           style={cellBg("overtime", index, special, isFutureOrEmpty)}
-                          className={cn(cellBorder, "px-1 py-1 text-center", record.overtime.ot1 > 0 && "font-bold")}
+                          className={cn(cellBorder, "px-1 py-1 text-center", record.overtime.ot1 > 0 && "font-bold", onCellClick && "cursor-pointer hover:brightness-90")}
+                          onClick={() => onCellClick?.({ record, fieldChanged: "OT1", oldValue: record.overtime.ot1 > 0 ? String(record.overtime.ot1) : "" })}
                         >
                           {formatNumber(record.overtime.ot1)}
                         </td>
@@ -675,7 +688,8 @@ export default function AttendanceTable({ attendanceData, selectedMonth, onMonth
                       {isVisible("otX2") && (
                         <td
                           style={cellBg("overtime", index, special, isFutureOrEmpty)}
-                          className={cn(cellBorder, "px-1 py-1 text-center", record.overtime.ot2 > 0 && "font-bold")}
+                          className={cn(cellBorder, "px-1 py-1 text-center", record.overtime.ot2 > 0 && "font-bold", onCellClick && "cursor-pointer hover:brightness-90")}
+                          onClick={() => onCellClick?.({ record, fieldChanged: "OT2", oldValue: record.overtime.ot2 > 0 ? String(record.overtime.ot2) : "" })}
                         >
                           {formatNumber(record.overtime.ot2)}
                         </td>
