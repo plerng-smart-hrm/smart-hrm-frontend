@@ -12,7 +12,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ChevronLeft, ChevronRight, Settings2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, DownloadIcon, Settings2 } from "lucide-react";
+import { SharedButton } from "@/components/shared/button/SharedButton";
 import { IDailyAttendance } from "@/types/admin/attendance-summary";
 import { cn } from "@/lib/utils";
 
@@ -319,7 +320,7 @@ export default function AttendanceTable({
           </Select>
 
           <Select value={selectedMonth.getFullYear().toString()} onValueChange={handleYearChange}>
-            <SelectTrigger className="h-8 w-[80px] text-sm">
+            <SelectTrigger className="h-8 w-[90px] text-sm">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -341,38 +342,44 @@ export default function AttendanceTable({
         </div>
 
         {/* Column Visibility Toggle */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm" className="h-8 text-xs">
-              <Settings2 className="h-3.5 w-3.5 mr-1.5" />
-              Columns
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48">
-            <DropdownMenuLabel className="text-xs">Toggle Columns</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <div className="max-h-[300px] overflow-y-auto">
-              {columnConfigs.map((col) => (
-                <button
-                  type="button"
-                  key={col.key}
-                  className="flex items-center space-x-2 px-2 py-1.5 hover:bg-muted rounded-sm cursor-pointer"
-                  onClick={() => toggleColumn(col.key)}
-                >
-                  <Checkbox
-                    id={col.key}
-                    checked={isVisible(col.key)}
-                    onCheckedChange={() => toggleColumn(col.key)}
-                    className="h-3.5 w-3.5"
-                  />
-                  <label htmlFor={col.key} className="text-xs cursor-pointer flex-1">
-                    {col.label}
-                  </label>
-                </button>
-              ))}
-            </div>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="flex gap-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="h-8 text-xs">
+                <Settings2 className="h-3.5 w-3.5 mr-1.5" />
+                Columns
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuLabel className="text-xs">Toggle Columns</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <div className="max-h-[300px] overflow-y-auto">
+                {columnConfigs.map((col) => (
+                  <button
+                    type="button"
+                    key={col.key}
+                    className="flex items-center space-x-2 px-2 py-1.5 hover:bg-muted rounded-sm cursor-pointer"
+                    onClick={() => toggleColumn(col.key)}
+                  >
+                    <Checkbox
+                      id={col.key}
+                      checked={isVisible(col.key)}
+                      onCheckedChange={() => toggleColumn(col.key)}
+                      className="h-3.5 w-3.5"
+                    />
+                    <label htmlFor={col.key} className="text-xs cursor-pointer flex-1">
+                      {col.label}
+                    </label>
+                  </button>
+                ))}
+              </div>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <SharedButton variant="success" size="icon" className="h-8 w-8" description="Download time sheet">
+            <DownloadIcon className="h-4 w-4" />
+          </SharedButton>
+        </div>
       </div>
 
       <div
@@ -681,7 +688,11 @@ export default function AttendanceTable({
                             onCellClick && "cursor-pointer hover:brightness-90",
                           )}
                           onClick={() =>
-                            onCellClick?.({ record, fieldChanged: AdjustmentField.F_IN, oldValue: record.time.fi ?? "" })
+                            onCellClick?.({
+                              record,
+                              fieldChanged: AdjustmentField.F_IN,
+                              oldValue: record.time.fi ?? "",
+                            })
                           }
                         >
                           {formatTime(record.time.fi)}
@@ -696,7 +707,11 @@ export default function AttendanceTable({
                             onCellClick && "cursor-pointer hover:brightness-90",
                           )}
                           onClick={() =>
-                            onCellClick?.({ record, fieldChanged: AdjustmentField.F_OUT, oldValue: record.time.fo ?? "" })
+                            onCellClick?.({
+                              record,
+                              fieldChanged: AdjustmentField.F_OUT,
+                              oldValue: record.time.fo ?? "",
+                            })
                           }
                         >
                           {formatTime(record.time.fo)}
@@ -711,7 +726,11 @@ export default function AttendanceTable({
                             onCellClick && "cursor-pointer hover:brightness-90",
                           )}
                           onClick={() =>
-                            onCellClick?.({ record, fieldChanged: AdjustmentField.S_IN, oldValue: record.time.si ?? "" })
+                            onCellClick?.({
+                              record,
+                              fieldChanged: AdjustmentField.S_IN,
+                              oldValue: record.time.si ?? "",
+                            })
                           }
                         >
                           {formatTime(record.time.si)}
@@ -727,7 +746,11 @@ export default function AttendanceTable({
                             onCellClick && "cursor-pointer hover:brightness-90",
                           )}
                           onClick={() =>
-                            onCellClick?.({ record, fieldChanged: AdjustmentField.S_OUT, oldValue: record.time.so ?? "" })
+                            onCellClick?.({
+                              record,
+                              fieldChanged: AdjustmentField.S_OUT,
+                              oldValue: record.time.so ?? "",
+                            })
                           }
                         >
                           {formatTime(record.time.so)}

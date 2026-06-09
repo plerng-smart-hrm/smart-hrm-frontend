@@ -3,7 +3,9 @@
 import { AttAdjustmentValues } from "@/schemas/admin/att-adjustment";
 import { createAttAdjustment, deleteAttAdjustment, updateAttAdjustment } from "@/service/admin/att-adjustment.service";
 import { attAdjustmentKeys } from "@/service/util/query-keys/att-adjustment";
+import { attendanceSummaryKeys } from "@/service/util/query-keys/attendance-summary";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { format } from "date-fns";
 import { toast } from "sonner";
 
 const RESOURCE = "Attendance adjustment";
@@ -15,10 +17,12 @@ export const useMutateAttAdjustment = () => {
     mutationFn: async ({ request }: { request: AttAdjustmentValues }) => {
       return await createAttAdjustment(request);
     },
-    onSuccess: () => {
+    onSuccess: (_, { request }) => {
       toast.success(`${RESOURCE} created successfully`);
-
-      queryClient.invalidateQueries({ queryKey: [attAdjustmentKeys.list_att_adjustment] });
+      const yearMonth = format(new Date(request.date), "yyyy-MM");
+      queryClient.invalidateQueries({
+        queryKey: [`${attendanceSummaryKeys.summary_by_employee}_${request.employeeId}_${yearMonth}`],
+      });
     },
     onError: () => {
       toast.error(`Failed to create ${RESOURCE.toLowerCase()}`);
