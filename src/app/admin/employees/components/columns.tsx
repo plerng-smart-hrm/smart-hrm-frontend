@@ -4,7 +4,7 @@ import { IEmployee } from "@/types/admin/employee";
 import { Actions, IActions } from "@/components/shared/Actions";
 import { EmployeeColumn } from "@/components/shared/EmployeeColumn";
 import { formatToDate } from "@/utils/custom-format";
-import { ClipboardClock, MapIcon, MapPinIcon, NotepadText, PhoneIcon } from "lucide-react";
+import { MapPinIcon, NotepadText, PhoneIcon } from "lucide-react";
 
 export const employeeColumns = (actions: IActions[]): ColumnDef<IEmployee>[] => {
   return [

@@ -32,6 +32,7 @@ export const jobShiftSchema = employeeSchema.pick({
   employeeStatus: true,
   workStatus: true,
   employeeType: true,
+  sectionId: true,
 });
 export type JobShiftValues = z.infer<typeof jobShiftSchema>;
 
@@ -69,6 +70,7 @@ export const jobShiftDefaults: JobShiftValues = {
   employeeStatus: "PROBATION",
   workStatus: "ACTIVE",
   employeeType: "",
+  sectionId: undefined,
 };
 
 export const contractStepDefaults: ContractStepValues = {
