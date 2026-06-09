@@ -4,7 +4,7 @@ import { IEmployee } from "@/types/admin/employee";
 import { Actions, IActions } from "@/components/shared/Actions";
 import { EmployeeColumn } from "@/components/shared/EmployeeColumn";
 import { formatToDate } from "@/utils/custom-format";
-import { MapIcon, MapPinIcon, PhoneIcon } from "lucide-react";
+import { ClipboardClock, MapIcon, MapPinIcon, NotepadText, PhoneIcon } from "lucide-react";
 
 export const employeeColumns = (actions: IActions[]): ColumnDef<IEmployee>[] => {
   return [
@@ -22,11 +22,13 @@ export const employeeColumns = (actions: IActions[]): ColumnDef<IEmployee>[] => 
       cell: ({ row }) => (
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-1">
-            <span>{row.original.position ?? "N/A"}</span>
+            <NotepadText className="h-3 w-3" /> <span>{row.original.position ?? "N/A"}</span>
           </div>
 
           <div className="flex items-center gap-1 text-muted-foreground">
-            <span>{"N/A"}</span>
+            <span>
+              {row.original.section?.department?.name} {row.original.section?.name}
+            </span>
           </div>
         </div>
       ),

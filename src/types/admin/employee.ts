@@ -1,9 +1,12 @@
 import { IAudit } from "./audit-entity";
 import { IContract } from "./contract";
+import { ISection } from "./section";
 import { ITimeShift } from "./time-shift";
 
 export interface IEmployee extends IAudit {
   id?: number;
+  sectionId?: number;
+
   empCode?: string;
   firstName?: string;
   lastName?: string;
@@ -34,4 +37,6 @@ export interface IEmployee extends IAudit {
 
   activeContract?: IContract;
   timeShift?: ITimeShift;
+
+  section?: ISection
 }
