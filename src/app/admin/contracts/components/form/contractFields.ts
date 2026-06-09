@@ -29,7 +29,7 @@ export const contractFields: FieldDefinition[] = [
     label: "End Date",
     key: "endDate",
     type: "date",
-    required: true,
+    required: false,
   },
   {
     label: "Status",

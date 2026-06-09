@@ -10,7 +10,7 @@ import RenderField from "@/components/shared/form/RenderField";
 import ActionButton from "@/components/shared/button/ActionButton";
 import { showValidationWarning } from "@/utils/form-validation";
 import { useMutateContract } from "@/stores/admin/useMutateContract";
-import { contractSchema, ContractValues } from "@/schemas/admin/contract";
+import { contractSchemaRefined, ContractValues } from "@/schemas/admin/contract";
 import { formatToNumber, formatToString } from "@/lib/custom-format";
 import { IContract } from "@/types/admin/contract";
 import { IEmployee } from "@/types/admin/employee";
@@ -85,10 +85,13 @@ export default function ContractPanel({ open, setOpen, employee, editingContract
   const { createContract, updateContract, renewContract } = useMutateContract();
 
   const form = useForm<ContractValues>({
-    resolver: zodResolver(contractSchema),
+    resolver: zodResolver(contractSchemaRefined),
     defaultValues: buildDefaultValues(employee, editingContract, renewFrom),
     mode: "onChange",
   });
+
+  const contractType = form.watch("contractType");
+  const isUDC = contractType === "UDC";
 
   React.useEffect(() => {
     if (open) {
@@ -96,6 +99,11 @@ export default function ContractPanel({ open, setOpen, employee, editingContract
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, editingContract, renewFrom]);
+
+  React.useEffect(() => {
+    if (isUDC) form.setValue("endDate", "");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isUDC]);
 
   const onSubmit = async () => {
     const isValid = await form.trigger();
@@ -148,7 +156,9 @@ export default function ContractPanel({ open, setOpen, employee, editingContract
                   key={item.key}
                   control={form.control}
                   name={item.key as keyof ContractValues}
-                  render={(field) => <RenderField form={{ ...item, field }} />}
+                  render={(field) => (
+                    <RenderField form={{ ...item, field, disabled: item.key === "endDate" && isUDC }} />
+                  )}
                 />
               ))}
             </div>

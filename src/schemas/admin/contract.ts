@@ -4,7 +4,7 @@ export const contractSchema = z.object({
   empCode: z.string().min(1, "Please enter employee code"),
   contractType: z.string().min(1, "Contract type is required"),
   startDate: z.string().min(1, "Start date is required"),
-  endDate: z.string().min(1, "End date is required"),
+  endDate: z.string().optional(),
   status: z.string().min(1, "Status is required"),
   baseSalary: z.number().min(0, "Base salary must be 0 or higher"),
   allowanceFoodPerDay: z.number().min(0, "Food allowance must be 0 or higher"),
@@ -21,6 +21,12 @@ export const contractSchema = z.object({
   skillLevel: z.string().optional(),
   otRateNormal: z.number().min(0, "OT rate normal must be 0 or higher"),
   otRateExcess: z.number().min(0, "OT rate excess must be 0 or higher"),
+});
+
+export const contractSchemaRefined = contractSchema.superRefine((val, ctx) => {
+  if (val.contractType !== "UDC" && !val.endDate) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: "End date is required", path: ["endDate"] });
+  }
 });
 
 export type ContractValues = z.infer<typeof contractSchema>;
