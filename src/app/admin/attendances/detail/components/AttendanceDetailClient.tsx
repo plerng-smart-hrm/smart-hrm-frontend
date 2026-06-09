@@ -83,7 +83,7 @@ const AttendanceDetailClient = () => {
           {/* Center Panel - Attendance Table */}
           <div className="col-span-12 lg:col-span-8">
             <AttendanceTable
-              attendanceData={attendanceSummary ?? []}
+              attendanceData={attSummary}
               selectedMonth={selectedMonth}
               onMonthChange={handleMonthChange}
             />

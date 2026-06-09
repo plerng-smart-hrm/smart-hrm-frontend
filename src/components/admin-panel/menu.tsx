@@ -60,24 +60,24 @@ const menuItems: MenuItem[] = [
     path: "/admin/contracts",
     icon: BookTextIcon,
   },
-  {
-    name: "Attendances",
-    icon: BookTextIcon,
-    children: [
-      { name: "Detail", path: "/admin/attendances/detail", icon: User },
-      { name: "Summary", path: "/admin/attendances/summary", icon: User },
-      {
-        name: "Attendance Logs",
-        path: "/admin/attendances/logs",
-        icon: User,
-      },
-      {
-        name: "Attendance Adjustment",
-        path: "/admin/attendances/adjustments",
-        icon: User,
-      },
-    ],
-  },
+  // {
+  //   name: "Attendances",
+  //   icon: BookTextIcon,
+  //   children: [
+  //     { name: "Detail", path: "/admin/attendances/detail", icon: User },
+  //     { name: "Summary", path: "/admin/attendances/summary", icon: User },
+  //     {
+  //       name: "Attendance Logs",
+  //       path: "/admin/attendances/logs",
+  //       icon: User,
+  //     },
+  //     {
+  //       name: "Attendance Adjustment",
+  //       path: "/admin/attendances/adjustments",
+  //       icon: User,
+  //     },
+  //   ],
+  // },
   {
     name: "Payroll",
     icon: DollarSignIcon,
