@@ -1,7 +1,8 @@
+import { IAudit } from "./audit-entity";
 import { IContract } from "./contract";
 import { ITimeShift } from "./time-shift";
 
-export interface IEmployee {
+export interface IEmployee extends IAudit {
   id?: number;
   empCode?: string;
   firstName?: string;
@@ -30,11 +31,6 @@ export interface IEmployee {
   idCardNo?: string;
   nssfRegisterNo?: string;
   timeShiftId?: number;
-  createdBy?: number;
-  updatedBy?: number;
-  createdAt?: string;
-  updatedAt?: string;
-  deletedAt?: string;
 
   activeContract?: IContract;
   timeShift?: ITimeShift;

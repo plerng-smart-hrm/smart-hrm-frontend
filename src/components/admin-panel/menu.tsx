@@ -1,17 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import {
-  BookOpen,
-  BookTextIcon,
-  Bot,
-  ChevronDown,
-  DollarSignIcon,
-  LayoutDashboard,
-  LogOut,
-  SettingsIcon,
-  User,
-} from "lucide-react";
+import { BookOpen, BookTextIcon, Bot, ChevronDown, DollarSignIcon, LogOut, SettingsIcon, User } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 

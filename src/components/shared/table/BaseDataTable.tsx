@@ -32,6 +32,7 @@ interface DataTableProps<TData> extends React.HTMLAttributes<HTMLDivElement> {
   isPage?: boolean;
   isCheckBox?: boolean;
   getRowEvent?: (value?: any) => void;
+  onRowClick?: (row: TData) => void;
   removeHeight?: boolean;
 }
 
@@ -42,6 +43,7 @@ const BaseDataTable = <TData,>({
   table,
   isPage = true,
   getRowEvent,
+  onRowClick,
   isCheckBox = false,
   removeHeight = false,
   ...props
@@ -161,6 +163,8 @@ const BaseDataTable = <TData,>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
+                  onClick={onRowClick ? () => onRowClick(row.original) : undefined}
+                  className={onRowClick ? "cursor-pointer" : undefined}
                 >
                   {/* Checkbox cell */}
                   {isCheckBox ? (
@@ -184,9 +188,11 @@ const BaseDataTable = <TData,>({
 
                   {row.getVisibleCells().map((cell) => {
                     const pinned = cell.column.getIsPinned(); // 'left' | 'right' | false
+                    const isActions = cell.column.id === "actions";
                     return (
                       <TableCell
                         key={cell.id}
+                        onClick={isActions ? (e) => e.stopPropagation() : undefined}
                         className={cn(
                           // Make pinned cells opaque so scrolled cells don't bleed through
                           pinned && "z-10 bg-background dark:bg-background",

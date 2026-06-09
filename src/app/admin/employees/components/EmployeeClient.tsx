@@ -77,7 +77,7 @@ const EmployeeClient = () => {
 
   return (
     <div>
-      <BaseDataTable table={table}>
+      <BaseDataTable table={table} onRowClick={(row) => router.push(`/admin/employees/${row.id}`)}>
         <ToolBarDataTale table={table}>
           <ToolbarActions
             actions={[
