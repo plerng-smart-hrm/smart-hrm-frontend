@@ -13,6 +13,8 @@ import { useMutateEmployee } from "@/stores/admin/useMutateEmployee";
 import { employeeSchema, EmployeeValues } from "@/schemas/admin/employee";
 import { pickEmployeeFields } from "@/app/admin/employees/components/wizard/wizardFields";
 import { TimeShiftCombobox } from "@/components/comboboxes/TimeShiftCombobox";
+import { DepartmentCombobox } from "@/components/comboboxes/DepartmentCombobox";
+import { SectionCombobox } from "@/components/comboboxes/SectionCombobox";
 import { formatToNumber, formatToString } from "@/lib/custom-format";
 import { IEmployee } from "@/types/admin/employee";
 
@@ -63,10 +65,14 @@ const buildDefaultValues = (employee: IEmployee): EmployeeValues => ({
   employeeStatus: formatToString(employee.employeeStatus) || "PROBATION",
   workStatus: formatToString(employee.workStatus) || "ACTIVE",
   employeeType: formatToString(employee.employeeType),
+  sectionId: employee.sectionId,
 });
 
 export default function PersonalInfoPanel({ open, setOpen, employee }: Props) {
   const [isLoading, setIsLoading] = React.useState(false);
+  const [departmentId, setDepartmentId] = React.useState<number | undefined>(
+    employee.section?.departmentId,
+  );
   const { updateEmployee } = useMutateEmployee();
 
   const form = useForm<EmployeeValues>({
@@ -78,6 +84,7 @@ export default function PersonalInfoPanel({ open, setOpen, employee }: Props) {
   React.useEffect(() => {
     if (open) {
       form.reset(buildDefaultValues(employee));
+      setDepartmentId(employee.section?.departmentId);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, employee]);
@@ -167,6 +174,32 @@ export default function PersonalInfoPanel({ open, setOpen, employee }: Props) {
                         <span className="text-red-600 text-sm pl-0.5">*</span>
                       </FormLabel>
                       <TimeShiftCombobox value={field.value || undefined} onChange={(value) => field.onChange(value ?? 0)} />
+                    </FormItem>
+                  )}
+                />
+
+                <FormItem className="grid gap-y-2 w-full">
+                  <FormLabel className="text-sm text-gray-700 dark:text-white">Department</FormLabel>
+                  <DepartmentCombobox
+                    value={departmentId}
+                    onChange={(val) => {
+                      setDepartmentId(val);
+                      form.setValue("sectionId", undefined);
+                    }}
+                  />
+                </FormItem>
+
+                <FormField
+                  control={form.control}
+                  name="sectionId"
+                  render={({ field }) => (
+                    <FormItem className="grid gap-y-2 w-full">
+                      <FormLabel className="text-sm text-gray-700 dark:text-white">Section</FormLabel>
+                      <SectionCombobox
+                        value={field.value}
+                        onChange={(val) => field.onChange(val)}
+                        departmentId={departmentId}
+                      />
                     </FormItem>
                   )}
                 />

@@ -74,8 +74,8 @@ export default function EmployeeProfileClient({ employeeId }: Props) {
             className="flex-1 grid grid-cols-2 sm:grid-cols-3 gap-4 sm:border-l sm:pl-6"
             fields={[
               { icon: <Briefcase className="h-4 w-4" />, label: "Position", value: employee.position },
-              { icon: <Briefcase className="h-4 w-4" />, label: "Department", value: "កាត់ក្រណាត់ (Cutting)" },
-              { icon: <Briefcase className="h-4 w-4" />, label: "Section", value: "ក្រុមកាត់ A" },
+              { icon: <Briefcase className="h-4 w-4" />, label: "Department", value: employee.section?.department?.name },
+              { icon: <Briefcase className="h-4 w-4" />, label: "Section", value: employee.section?.name },
               {
                 icon: <Clock className="h-4 w-4" />,
                 label: "Time Shift",
