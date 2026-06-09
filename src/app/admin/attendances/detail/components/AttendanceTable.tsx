@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ChevronLeft, ChevronRight, DownloadIcon, Settings2 } from "lucide-react";
 import { SharedButton } from "@/components/shared/button/SharedButton";
-import { IDailyAttendance } from "@/types/admin/attendance-summary";
+import { IDailyAttendance, IEmployeeAttendanceSummary } from "@/types/admin/attendance-summary";
 import { cn } from "@/lib/utils";
 
 export enum AdjustmentField {
@@ -34,13 +34,6 @@ export interface AttCellClickInfo {
   record: IDailyAttendance;
   fieldChanged: string;
   oldValue: string;
-}
-
-interface AttendanceTableProps {
-  attendanceData: IDailyAttendance[];
-  selectedMonth: Date;
-  onMonthChange: (date: Date) => void;
-  onCellClick?: (info: AttCellClickInfo) => void;
 }
 
 // Column configuration
@@ -171,7 +164,7 @@ const tableColorVars = {
   "--text-main": "#1a1d21",
   "--text-muted": "#9aa0a6",
   "--ph-row": "#eef2f7",
-  "--ph-text": "#1d4ed8",
+  "--ph-text": "#dc2626",
   "--work-text": "#1d4ed8",
   "--absent-text": "#dc2626",
 } as unknown as CSSProperties;
@@ -196,6 +189,12 @@ const headBg = (group: GroupKey): CSSProperties => ({
   fontWeight: 700,
 });
 
+const footerBg = (group: GroupKey): CSSProperties => ({
+  backgroundColor: `color-mix(in srgb, var(--${group}-head) 85%, black 15%)`,
+  color: "var(--text-main)",
+  fontWeight: 700,
+});
+
 // Body cell background: group wash, muted toward the PH/Sunday row tint when the
 // row carries that meaning, with a subtle zebra overlay blended in on alternate rows
 const cellBg = (group: GroupKey, rowIndex: number, special: boolean, emphasize = false): CSSProperties => {
@@ -204,13 +203,15 @@ const cellBg = (group: GroupKey, rowIndex: number, special: boolean, emphasize =
   return { backgroundColor: rowIndex % 2 === 1 ? `color-mix(in srgb, black 2.5%, ${color})` : color };
 };
 
-export default function AttendanceTable({
-  attendanceData,
-  selectedMonth,
-  onMonthChange,
-  onCellClick,
-}: AttendanceTableProps) {
-  // Initialize visible columns from config
+interface Props {
+  attendanceData?: IEmployeeAttendanceSummary;
+  selectedMonth: Date;
+  onMonthChange: (date: Date) => void;
+  onCellClick?: (info: AttCellClickInfo) => void;
+}
+
+export default function AttendanceTable({ attendanceData, selectedMonth, onMonthChange, onCellClick }: Props) {
+
   const [visibleColumns, setVisibleColumns] = useState<Set<ColumnKey>>(() => {
     const initial = new Set<ColumnKey>();
     columnConfigs.forEach((col) => {
@@ -238,21 +239,24 @@ export default function AttendanceTable({
     return time;
   };
 
-  const fullMonthData = attendanceData;
-
-  const totals = fullMonthData.reduce(
-    (acc, record) => ({
-      normalHours: acc.normalHours + record.workingHours,
-      lateMinutes: acc.lateMinutes + record.lateMinutes,
-      otX15: acc.otX15 + record.overtime.ot1,
-      otX2: acc.otX2 + record.overtime.ot2,
-      grandTotal: acc.grandTotal + (record.total ?? 0),
-      bonusLunch: acc.bonusLunch + (record.bonusLunch ?? 0),
-      bonusOtFood: acc.bonusOtFood + (record.bonusOtFood ?? 0),
-    }),
-    { normalHours: 0, lateMinutes: 0, otX15: 0, otX2: 0, grandTotal: 0, bonusLunch: 0, bonusOtFood: 0 },
-  );
-  const totalLateHours = totals.lateMinutes / 60;
+  const fullMonthData = attendanceData?.attendanceSummary ?? [];
+  const totals = attendanceData?.totals ?? {
+    totalNormalHours: 0,
+    totalLateMinutes: 0,
+    totalOt1: 0,
+    totalOt2: 0,
+    totalOtNight: 0,
+    totalWageNormal: 0,
+    totalWageOT1: 0,
+    totalWageOT2: 0,
+    totalWageOtNight: 0,
+    totalTimeSalary: 0,
+    totalBonusTarget: 0,
+    totalLeaveHours: 0,
+    totalBonusLunch: 0,
+    totalBonusOtFood: 0,
+    grandTotal: 0,
+  };
 
   // Calculate colSpan for each group
   const dateColSpan = [isVisible("day"), isVisible("weekday")].filter(Boolean).length;
@@ -272,6 +276,10 @@ export default function AttendanceTable({
 
   const leaveColSpan = [isVisible("leaveHour"), isVisible("leavePay")].filter(Boolean).length;
   const foodColSpan = [isVisible("foodLunch"), isVisible("foodOt")].filter(Boolean).length;
+  const leftColSpan = [isVisible("day"), isVisible("weekday"), isVisible("dayStatus"), isVisible("workStatus")].filter(
+    Boolean,
+  ).length;
+  const totalLeftSpan = leftColSpan + timeColSpan;
 
   const handlePreviousMonth = () => {
     const newDate = new Date(selectedMonth);
@@ -914,179 +922,153 @@ export default function AttendanceTable({
                   );
                 })}
               </tbody>
+              <tfoot className="sticky bottom-0 z-10">
+                <tr style={{ color: "var(--text-main)" }}>
+                  {totalLeftSpan > 0 && (
+                    <td
+                      colSpan={totalLeftSpan}
+                      style={footerBg("idcol")}
+                      className="border [border-color:var(--grid-line)] px-2 py-2 text-end font-bold"
+                    >
+                      Total
+                    </td>
+                  )}
+                  {isVisible("late") && (
+                    <td
+                      style={footerBg("late")}
+                      className="border [border-color:var(--grid-line)] px-1 py-2 text-center"
+                    >
+                      N/A
+                    </td>
+                  )}
+                  {isVisible("normal") && (
+                    <td
+                      style={footerBg("normal")}
+                      className="border [border-color:var(--grid-line)] px-1 py-2 text-center"
+                    >
+                      {totals.totalNormalHours > 0 ? `${totals.totalNormalHours}` : ""}
+                    </td>
+                  )}
+                  {isVisible("otX15") && (
+                    <td
+                      style={footerBg("overtime")}
+                      className="border [border-color:var(--grid-line)] px-1 py-2 text-center"
+                    >
+                      {totals.totalOt1 > 0 ? `${totals.totalOt1}` : ""}
+                    </td>
+                  )}
+                  {isVisible("otX2") && (
+                    <td
+                      style={footerBg("overtime")}
+                      className="border [border-color:var(--grid-line)] px-1 py-2 text-center"
+                    >
+                      {totals.totalOt2 > 0 ? `${totals.totalOt2}` : ""}
+                    </td>
+                  )}
+                  {isVisible("night") && (
+                    <td
+                      style={footerBg("overtime")}
+                      className="border [border-color:var(--grid-line)] px-1 py-2 text-center"
+                    >
+                      {totals.totalOtNight > 0 ? `${totals.totalOtNight}` : ""}
+                    </td>
+                  )}
+                  {isVisible("paymentNormal") && (
+                    <td
+                      style={footerBg("payment")}
+                      className="border [border-color:var(--grid-line)] px-1 py-2 text-right"
+                    >
+                      {totals.totalWageNormal > 0 ? `$${totals.totalWageNormal}` : ""}
+                    </td>
+                  )}
+                  {isVisible("paymentOtX15") && (
+                    <td
+                      style={footerBg("payment")}
+                      className="border [border-color:var(--grid-line)] px-1 py-2 text-right"
+                    >
+                      {totals.totalWageOT1 > 0 ? `$${totals.totalWageOT1}` : ""}
+                    </td>
+                  )}
+                  {isVisible("paymentOtX2") && (
+                    <td
+                      style={footerBg("payment")}
+                      className="border [border-color:var(--grid-line)] px-1 py-2 text-right"
+                    >
+                      {totals.totalWageOT2 > 0 ? `$${totals.totalWageOT2}` : ""}
+                    </td>
+                  )}
+                  {isVisible("paymentNight") && (
+                    <td
+                      style={footerBg("payment")}
+                      className="border [border-color:var(--grid-line)] px-1 py-2 text-right"
+                    >
+                      {totals.totalWageOtNight > 0 ? `$${totals.totalWageOtNight}` : ""}
+                    </td>
+                  )}
+                  {isVisible("timeSalary") && (
+                    <td
+                      style={footerBg("salary")}
+                      className="border [border-color:var(--grid-line)] px-1 py-2 text-right"
+                    >
+                      {totals.totalTimeSalary > 0 ? `$${totals.totalTimeSalary}` : ""}
+                    </td>
+                  )}
+                  {isVisible("pieceSalary") && (
+                    <td
+                      style={footerBg("piece")}
+                      className="border [border-color:var(--grid-line)] px-1 py-2 text-right"
+                    >
+                      {totals.totalBonusTarget > 0 ? `$${totals.totalBonusTarget.toFixed(2)}` : "—"}
+                    </td>
+                  )}
+                  {/* TODO: don't have backend */}
+                  {isVisible("leaveHour") && (
+                    <td
+                      style={footerBg("leave")}
+                      className="border [border-color:var(--grid-line)] px-1 py-2 text-center"
+                    >
+                      N/A
+                    </td>
+                  )}
+                  {/* TODO: don't have backend */}
+                  {isVisible("leavePay") && (
+                    <td
+                      style={footerBg("leave")}
+                      className="border [border-color:var(--grid-line)] px-1 py-2 text-right"
+                    >
+                      N/A
+                    </td>
+                  )}
+                  {isVisible("foodLunch") && (
+                    <td
+                      style={footerBg("food")}
+                      className="border [border-color:var(--grid-line)] px-1 py-2 text-right"
+                    >
+                      {totals.totalBonusLunch > 0 ? `$${totals.totalBonusLunch}` : ""}
+                    </td>
+                  )}
+                  {isVisible("foodOt") && (
+                    <td
+                      style={footerBg("food")}
+                      className="border [border-color:var(--grid-line)] px-1 py-2 text-right"
+                    >
+                      {totals.totalBonusOtFood > 0 ? `$${totals.totalBonusOtFood}` : ""}
+                    </td>
+                  )}
+                  {isVisible("total") && (
+                    <td
+                      style={footerBg("total")}
+                      className="border [border-color:var(--grid-line)] px-1 py-2 text-right"
+                    >
+                      {totals.grandTotal > 0 ? `$${totals.grandTotal}` : ""}
+                    </td>
+                  )}
+                </tr>
+              </tfoot>
             </table>
           </div>
           <ScrollBar orientation="horizontal" />
         </ScrollArea>
-
-        {/* Sticky Footer Totals */}
-        <div className="flex-shrink-0  overflow-hidden" style={{ borderColor: "var(--grid-line)" }}>
-          <table className="w-full border-collapse text-xs">
-            <tfoot>
-              <tr className="font-semibold" style={{ color: "var(--text-main)" }}>
-                {(isVisible("day") || isVisible("weekday")) && (
-                  <td
-                    colSpan={
-                      [isVisible("day"), isVisible("weekday"), isVisible("dayStatus"), isVisible("workStatus")].filter(
-                        Boolean,
-                      ).length
-                    }
-                    style={headBg("idcol")}
-                    className="border [border-color:var(--grid-line)] px-2 py-2 text-center"
-                  >
-                    Total
-                  </td>
-                )}
-                {!isVisible("day") && !isVisible("weekday") && isVisible("dayStatus") && (
-                  <td
-                    colSpan={[isVisible("dayStatus"), isVisible("workStatus")].filter(Boolean).length}
-                    style={headBg("idcol")}
-                    className="border [border-color:var(--grid-line)] px-2 py-2 text-center"
-                  >
-                    Total
-                  </td>
-                )}
-                {timeColSpan > 0 && (
-                  <td
-                    colSpan={timeColSpan}
-                    style={headBg("idcol")}
-                    className="border [border-color:var(--grid-line)] px-1 py-2 text-center"
-                  >
-                    {/* Time totals */}
-                  </td>
-                )}
-                {isVisible("late") && (
-                  <td
-                    style={headBg("late")}
-                    className="border [border-color:var(--grid-line)] px-1 py-2 text-center w-14"
-                  >
-                    {totalLateHours > 0 ? totalLateHours.toFixed(2) : ""}
-                  </td>
-                )}
-                {isVisible("normal") && (
-                  <td
-                    style={headBg("normal")}
-                    className="border [border-color:var(--grid-line)] px-1 py-2 text-center w-12"
-                  >
-                    {totals.normalHours}
-                  </td>
-                )}
-                {isVisible("otX15") && (
-                  <td
-                    style={headBg("overtime")}
-                    className="border [border-color:var(--grid-line)] px-1 py-2 text-center w-14"
-                  >
-                    {formatNumber(totals.otX15)}
-                  </td>
-                )}
-                {isVisible("otX2") && (
-                  <td
-                    style={headBg("overtime")}
-                    className="border [border-color:var(--grid-line)] px-1 py-2 text-center w-12"
-                  >
-                    {formatNumber(totals.otX2)}
-                  </td>
-                )}
-                {isVisible("night") && (
-                  <td
-                    style={headBg("overtime")}
-                    className="border [border-color:var(--grid-line)] px-1 py-2 text-center w-12"
-                  >
-                    {/* Night total */}
-                  </td>
-                )}
-                {isVisible("paymentNormal") && (
-                  <td
-                    style={headBg("payment")}
-                    className="border [border-color:var(--grid-line)] px-1 py-2 text-right w-16"
-                  >
-                    ${(totals.normalHours * 1).toFixed(2)}
-                  </td>
-                )}
-                {isVisible("paymentOtX15") && (
-                  <td
-                    style={headBg("payment")}
-                    className="border [border-color:var(--grid-line)] px-1 py-2 text-right w-16"
-                  >
-                    ${(totals.otX15 * 1.5).toFixed(2)}
-                  </td>
-                )}
-                {isVisible("paymentOtX2") && (
-                  <td
-                    style={headBg("payment")}
-                    className="border [border-color:var(--grid-line)] px-1 py-2 text-right w-16"
-                  >
-                    ${(totals.otX2 * 2).toFixed(2)}
-                  </td>
-                )}
-                {isVisible("paymentNight") && (
-                  <td
-                    style={headBg("payment")}
-                    className="border [border-color:var(--grid-line)] px-1 py-2 text-right w-16"
-                  >
-                    {/* Night payment total */}
-                  </td>
-                )}
-                {isVisible("timeSalary") && (
-                  <td
-                    style={headBg("salary")}
-                    className="border [border-color:var(--grid-line)] px-1 py-2 text-right w-20"
-                  >
-                    ${totals.normalHours.toFixed(2)}
-                  </td>
-                )}
-                {isVisible("pieceSalary") && (
-                  <td
-                    style={headBg("piece")}
-                    className="border [border-color:var(--grid-line)] px-1 py-2 text-right w-20"
-                  >
-                    {/* Piece salary total */}
-                  </td>
-                )}
-                {isVisible("leaveHour") && (
-                  <td
-                    style={headBg("leave")}
-                    className="border [border-color:var(--grid-line)] px-1 py-2 text-center w-12"
-                  >
-                    {/* Leave hour total */}
-                  </td>
-                )}
-                {isVisible("leavePay") && (
-                  <td
-                    style={headBg("leave")}
-                    className="border [border-color:var(--grid-line)] px-1 py-2 text-right w-14"
-                  >
-                    {/* Leave pay total */}
-                  </td>
-                )}
-                {isVisible("foodLunch") && (
-                  <td
-                    style={headBg("food")}
-                    className="border [border-color:var(--grid-line)] px-1 py-2 text-right w-14"
-                  >
-                    {totals.bonusLunch > 0 ? `$${totals.bonusLunch.toFixed(2)}` : ""}
-                  </td>
-                )}
-                {isVisible("foodOt") && (
-                  <td
-                    style={headBg("food")}
-                    className="border [border-color:var(--grid-line)] px-1 py-2 text-right w-14"
-                  >
-                    {totals.bonusOtFood > 0 ? `$${totals.bonusOtFood.toFixed(2)}` : ""}
-                  </td>
-                )}
-                {isVisible("total") && (
-                  <td
-                    style={headBg("total")}
-                    className="border [border-color:var(--grid-line)] px-1 py-2 text-right w-20 font-bold"
-                  >
-                    {totals.grandTotal > 0 ? `$${totals.grandTotal}` : ""}
-                  </td>
-                )}
-              </tr>
-            </tfoot>
-          </table>
-        </div>
       </div>
     </div>
   );

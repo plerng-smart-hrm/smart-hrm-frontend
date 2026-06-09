@@ -68,7 +68,7 @@ export default function AttendanceTab({ employee }: Props) {
         <div className="lg:col-span-9">
           <Section title="Attendance Calendar" icon={<CalendarClock className="h-4 w-4" />}>
             <AttendanceTable
-              attendanceData={attSummary?.attendanceSummary ?? []}
+              attendanceData={attSummary}
               selectedMonth={selectedMonth}
               onMonthChange={handleMonthChange}
               onCellClick={handleCellClick}

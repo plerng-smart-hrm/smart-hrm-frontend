@@ -61,14 +61,26 @@ export interface IDailyAttendance {
 }
 
 export interface IAttendanceTotals {
+  totalNormalHours: number;
   totalOt1: number;
   totalOt2: number;
+  totalOtNight: number;
+  totalWageNormal: number;
+  totalWageOT1: number;
+  totalWageOT2: number;
+  totalWageOtNight: number;
+  totalTimeSalary: number;
+  totalBonusOtFood: number;
+  totalBonusLunch: number;
   totalWorkingHours: number;
   totalLateMinutes: number;
+  totalBonusTarget: number;
   presentDays: number;
   absentDays: number;
   leaveDays: number;
   holidayDays: number;
+  dayOffDays: number;
+  grandTotal: number;
 }
 
 export interface IEmployeeAttendanceSummary {
