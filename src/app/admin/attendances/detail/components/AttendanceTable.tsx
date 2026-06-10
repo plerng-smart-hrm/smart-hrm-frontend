@@ -211,7 +211,6 @@ interface Props {
 }
 
 export default function AttendanceTable({ attendanceData, selectedMonth, onMonthChange, onCellClick }: Props) {
-
   const [visibleColumns, setVisibleColumns] = useState<Set<ColumnKey>>(() => {
     const initial = new Set<ColumnKey>();
     columnConfigs.forEach((col) => {
@@ -246,15 +245,18 @@ export default function AttendanceTable({ attendanceData, selectedMonth, onMonth
     totalOt1: 0,
     totalOt2: 0,
     totalOtNight: 0,
+    totalLeaveHours: 0,
+    totalPhHours: 0,
     totalWageNormal: 0,
     totalWageOT1: 0,
     totalWageOT2: 0,
-    totalWageOtNight: 0,
+    totalWageOTNight: 0,
+    totalWageLeavePH: 0,
     totalTimeSalary: 0,
     totalBonusTarget: 0,
-    totalLeaveHours: 0,
     totalBonusLunch: 0,
     totalBonusOtFood: 0,
+    totalWagePH: 0,
     grandTotal: 0,
   };
 
@@ -303,6 +305,13 @@ export default function AttendanceTable({ attendanceData, selectedMonth, onMonth
     const newDate = new Date(selectedMonth);
     newDate.setFullYear(parseInt(year));
     onMonthChange(newDate);
+  };
+
+  const getDisplayWageNormal = (record: IDailyAttendance) => {
+    if (record.dayStatus === "PH") {
+      return record.wagePH;
+    }
+    return record.wageNormal;
   };
 
   return (
@@ -652,6 +661,7 @@ export default function AttendanceTable({ attendanceData, selectedMonth, onMonth
                   const lateHours = record.lateMinutes / 60;
                   const special = record.dayStatus === "Sunday" || record.dayStatus === "PH";
                   const cellBorder = "border [border-color:var(--grid-line)]";
+                  const displayWage = getDisplayWageNormal(record);
 
                   return (
                     <tr key={index} className="hover:brightness-[0.97]">
@@ -825,7 +835,7 @@ export default function AttendanceTable({ attendanceData, selectedMonth, onMonth
                           style={cellBg("overtime", index, special, isFutureOrEmpty)}
                           className={cn(cellBorder, "px-1 py-1 text-center")}
                         >
-                          {/* Night overtime hours — not yet provided by the API */}
+                          {formatNumber(record.overtime.otNight)}
                         </td>
                       )}
                       {isVisible("paymentNormal") && (
@@ -833,7 +843,7 @@ export default function AttendanceTable({ attendanceData, selectedMonth, onMonth
                           style={cellBg("payment", index, special)}
                           className={cn(cellBorder, "px-1 py-1 text-right")}
                         >
-                          {record.wageNormal && record.wageNormal > 0 ? `$${record.wageNormal}` : ""}
+                          {displayWage && displayWage > 0 ? `$${displayWage}` : ""}
                         </td>
                       )}
                       {isVisible("paymentOtX15") && (
@@ -857,7 +867,7 @@ export default function AttendanceTable({ attendanceData, selectedMonth, onMonth
                           style={cellBg("payment", index, special)}
                           className={cn(cellBorder, "px-1 py-1 text-right")}
                         >
-                          {/* Night overtime payment — not yet provided by the API */}
+                          {record.wageOTNight && record.wageOTNight > 0 ? `$${record.wageOTNight}` : ""}
                         </td>
                       )}
                       {isVisible("timeSalary") && (
@@ -886,7 +896,7 @@ export default function AttendanceTable({ attendanceData, selectedMonth, onMonth
                       )}
                       {isVisible("leaveHour") && (
                         <td style={cellBg("leave", index, special)} className={cn(cellBorder, "px-1 py-1 text-center")}>
-                          {record.status === "LEAVE" ? "8" : ""}
+                          {record.leaveHours && record.leaveHours > 0 ? `$${record.leaveHours}` : ""}
                         </td>
                       )}
                       {isVisible("leavePay") && (
@@ -1002,7 +1012,7 @@ export default function AttendanceTable({ attendanceData, selectedMonth, onMonth
                       style={footerBg("payment")}
                       className="border [border-color:var(--grid-line)] px-1 py-2 text-right"
                     >
-                      {totals.totalWageOtNight > 0 ? `$${totals.totalWageOtNight}` : ""}
+                      {totals.totalWageOTNight > 0 ? `$${totals.totalWageOTNight}` : ""}
                     </td>
                   )}
                   {isVisible("timeSalary") && (
@@ -1027,7 +1037,7 @@ export default function AttendanceTable({ attendanceData, selectedMonth, onMonth
                       style={footerBg("leave")}
                       className="border [border-color:var(--grid-line)] px-1 py-2 text-center"
                     >
-                      N/A
+                      {totals.totalBonusTarget > 0 ? `$${totals.totalBonusTarget.toFixed(2)}` : "—"}
                     </td>
                   )}
                   {/* TODO: don't have backend */}
@@ -1036,7 +1046,7 @@ export default function AttendanceTable({ attendanceData, selectedMonth, onMonth
                       style={footerBg("leave")}
                       className="border [border-color:var(--grid-line)] px-1 py-2 text-right"
                     >
-                      N/A
+                      {/* {totals.totalWag > 0 ? `$${totals.totalBonusTarget.toFixed(2)}` : "—"} */}
                     </td>
                   )}
                   {isVisible("foodLunch") && (
