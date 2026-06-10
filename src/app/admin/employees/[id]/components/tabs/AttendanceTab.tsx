@@ -29,7 +29,7 @@ const formatMinutes = (minutes?: number) => {
 
 export default function AttendanceTab({ employee }: Props) {
   const [yearMonth, setYearMonth] = useQueryState("yearMonth", parseAsString.withDefault(formatToYYYYMM()));
-  const [selectedMonth, setSelectedMonth] = React.useState(() => new Date(`${formatToYYYYMM()}-01`));
+  const selectedMonth = new Date(`${yearMonth}-01`);
   const [panelOpen, setPanelOpen] = React.useState(false);
   const [cellInfo, setCellInfo] = React.useState<AttCellInfo | null>(null);
 
@@ -44,7 +44,6 @@ export default function AttendanceTab({ employee }: Props) {
   const totals = attSummary?.totals;
 
   const handleMonthChange = (date: Date) => {
-    setSelectedMonth(date);
     setYearMonth(formatToYYYYMM(date));
   };
 

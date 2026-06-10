@@ -16,13 +16,19 @@ import FullScreenLoading from "@/components/shared/fullscreen-loading";
 import { IEmployeeAttendanceSummary } from "@/types/admin/attendance-summary";
 import { payrollPaymentKeys } from "@/service/util/query-keys/payroll-payment";
 
+const parseYearMonth = (ym: string): Date => {
+  const [year, month] = ym.split("-").map(Number);
+  return new Date(year, month - 1, 1);
+};
+
 const AttendanceDetailClient = () => {
   const [yearMonth, setYearMonth] = useQueryState("yearMonth", parseAsString.withDefault(formatToYYYYMM()));
   const [empCode, setEmpCode] = useQueryState("empCode", parseAsString.withDefault(""));
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [searchInput, setSearchInput] = useState(empCode);
-  const [selectedMonth, setSelectedMonth] = useState(new Date());
+
+  const selectedMonth = parseYearMonth(yearMonth);
 
   const { data: attSummaryData } = useQueryShared({
     url: `/v1/att-summaries/employee`,
@@ -47,7 +53,6 @@ const AttendanceDetailClient = () => {
   const employee = attSummary?.employee;
 
   const handleMonthChange = (date: Date) => {
-    setSelectedMonth(date);
     setYearMonth(formatToYYYYMM(date));
   };
 
