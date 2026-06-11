@@ -9,11 +9,24 @@ export const attAdjustmentSchema = z
     fieldChanged: z.string().min(1, "Field changed is required"),
     oldValue: z.string().optional(),
     newValue: z.string().min(1, "New value is required"),
+    leaveType: z.string().optional(),
     reason: z.string().optional(),
   })
-  .refine((data) => data.oldValue !== data.newValue, {
-    message: "New value must be different from old value",
-    path: ["newValue"],
+  .superRefine((data, ctx) => {
+    if (data.oldValue === data.newValue) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "New value must be different from old value",
+        path: ["newValue"],
+      });
+    }
+    if (data.fieldChanged === "LEAVE_HOURS" && !data.leaveType) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Leave type is required",
+        path: ["leaveType"],
+      });
+    }
   });
 
 export type AttAdjustmentValues = z.infer<typeof attAdjustmentSchema>;

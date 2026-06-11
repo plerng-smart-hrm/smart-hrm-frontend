@@ -12,6 +12,8 @@ import { showValidationWarning } from "@/utils/form-validation";
 import { JobShiftValues, jobShiftDefaults, jobShiftSchema } from "../wizardSchemas";
 import { pickEmployeeFields } from "../wizardFields";
 import { TimeShiftCombobox } from "@/components/comboboxes/TimeShiftCombobox";
+import { DepartmentCombobox } from "@/components/comboboxes/DepartmentCombobox";
+import { SectionCombobox } from "@/components/comboboxes/SectionCombobox";
 
 const coreKeys = ["position", "startDate", "employeeStatus", "workStatus"];
 const otherKeys = ["employeeType"];
@@ -25,6 +27,7 @@ interface IProps {
 
 export default function JobShiftStep({ defaultValues, onNext, onBack }: IProps) {
   const [showMore, setShowMore] = React.useState(false);
+  const [departmentId, setDepartmentId] = React.useState<number | undefined>(undefined);
 
   const form = useForm<JobShiftValues>({
     resolver: zodResolver(jobShiftSchema),
@@ -63,6 +66,36 @@ export default function JobShiftStep({ defaultValues, onNext, onBack }: IProps) 
                   <span className="text-red-600 text-sm pl-0.5">*</span>
                 </FormLabel>
                 <TimeShiftCombobox value={field.value || undefined} onChange={(value) => field.onChange(value ?? 0)} />
+              </FormItem>
+            )}
+          />
+
+          <FormItem className="grid gap-y-2 w-full">
+            <FormLabel className="text-sm">
+              <span className="text-gray-700 dark:text-white">Department</span>
+            </FormLabel>
+            <DepartmentCombobox
+              value={departmentId}
+              onChange={(val) => {
+                setDepartmentId(val);
+                form.setValue("sectionId", undefined);
+              }}
+            />
+          </FormItem>
+
+          <FormField
+            control={form.control}
+            name="sectionId"
+            render={({ field }) => (
+              <FormItem className="grid gap-y-2 w-full">
+                <FormLabel className="text-sm">
+                  <span className="text-gray-700 dark:text-white">Section</span>
+                </FormLabel>
+                <SectionCombobox
+                  value={field.value}
+                  onChange={(val) => field.onChange(val)}
+                  departmentId={departmentId}
+                />
               </FormItem>
             )}
           />

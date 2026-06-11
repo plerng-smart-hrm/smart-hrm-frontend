@@ -1,7 +1,16 @@
 "use client";
 
 import { parseAsStringEnum, useQueryState } from "nuqs";
-import { Briefcase, CalendarClock, CalendarDays, Clock, FileSignature, MessageCircleWarningIcon, User } from "lucide-react";
+import {
+  BellDot,
+  Briefcase,
+  CalendarClock,
+  CalendarDays,
+  Clock,
+  FileSignature,
+  MessageCircleWarningIcon,
+  User,
+} from "lucide-react";
 import { employeeKeys } from "@/service/util/query-keys/employee";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
 import { cn } from "@/lib/utils";
@@ -14,16 +23,18 @@ import { IEmployee } from "@/types/admin/employee";
 import { formatToDate } from "@/utils/custom-format";
 import { formatShiftRange } from "@/components/comboboxes/TimeShiftCombobox";
 import WarningTab from "./tabs/WarningTab";
+import LeaveRequestTab from "./tabs/LeaveRequestTab";
 
 interface Props {
   employeeId: string;
 }
 
 const TABS = [
-  { key: "attendance", label: "Attendance", icon: CalendarClock },
-  { key: "personal", label: "Personal", icon: User },
-  { key: "contract", label: "Contract", icon: FileSignature },
-  { key: "warning", label: "Waring", icon: MessageCircleWarningIcon },
+  { key: "ATTENDANCE", label: "Attendance", icon: CalendarClock },
+  { key: "PERSONAL", label: "Personal", icon: User },
+  { key: "CONTRACT", label: "Contract", icon: FileSignature },
+  { key: "LEAVE_REQUEST", label: "Leave Request", icon: BellDot },
+  { key: "WARNING", label: "Waring", icon: MessageCircleWarningIcon },
 ] as const;
 
 type TabKey = (typeof TABS)[number]["key"];
@@ -31,7 +42,7 @@ type TabKey = (typeof TABS)[number]["key"];
 const tabKeys = TABS.map((tab) => tab.key) as TabKey[];
 
 export default function EmployeeProfileClient({ employeeId }: Props) {
-  const [activeTab, setActiveTab] = useQueryState("tab", parseAsStringEnum<TabKey>(tabKeys).withDefault("personal"));
+  const [activeTab, setActiveTab] = useQueryState("tab", parseAsStringEnum<TabKey>(tabKeys).withDefault("ATTENDANCE"));
 
   const { data, isLoading } = useQueryShared({
     url: `/v1/employees/${employeeId}`,
@@ -74,8 +85,12 @@ export default function EmployeeProfileClient({ employeeId }: Props) {
             className="flex-1 grid grid-cols-2 sm:grid-cols-3 gap-4 sm:border-l sm:pl-6"
             fields={[
               { icon: <Briefcase className="h-4 w-4" />, label: "Position", value: employee.position },
-              { icon: <Briefcase className="h-4 w-4" />, label: "Department", value: "កាត់ក្រណាត់ (Cutting)" },
-              { icon: <Briefcase className="h-4 w-4" />, label: "Section", value: "ក្រុមកាត់ A" },
+              {
+                icon: <Briefcase className="h-4 w-4" />,
+                label: "Department",
+                value: employee.section?.department?.name,
+              },
+              { icon: <Briefcase className="h-4 w-4" />, label: "Section", value: employee.section?.name },
               {
                 icon: <Clock className="h-4 w-4" />,
                 label: "Time Shift",
@@ -110,7 +125,7 @@ export default function EmployeeProfileClient({ employeeId }: Props) {
                 type="button"
                 onClick={() => setActiveTab(tab.key)}
                 className={cn(
-                  "flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors",
+                  "flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors cursor-pointer",
                   isActive
                     ? "border-primary text-primary"
                     : "border-transparent text-muted-foreground hover:text-foreground",
@@ -124,10 +139,11 @@ export default function EmployeeProfileClient({ employeeId }: Props) {
         </div>
       </div>
       <div className="pt-2">
-        {activeTab === "personal" && <PersonalTab employee={employee} />}
-        {activeTab === "contract" && <ContractTab employee={employee} />}
-        {activeTab === "attendance" && <AttendanceTab employee={employee} />}
-        {activeTab === "warning" && <WarningTab employee={employee} />}
+        {activeTab === "PERSONAL" && <PersonalTab employee={employee} />}
+        {activeTab === "CONTRACT" && <ContractTab employee={employee} />}
+        {activeTab === "ATTENDANCE" && <AttendanceTab employee={employee} />}
+        {activeTab === "WARNING" && <WarningTab employee={employee} />}
+        {activeTab === "LEAVE_REQUEST" && <LeaveRequestTab employee={employee} />}
       </div>
     </div>
   );

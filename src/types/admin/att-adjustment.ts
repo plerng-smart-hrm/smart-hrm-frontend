@@ -9,6 +9,7 @@ export interface IAttAdjustment {
   fieldChanged?: string;
   oldValue?: string;
   newValue?: string;
+  leaveType?: string;
   reason?: string;
   requestedBy?: number;
   approvedBy?: number;

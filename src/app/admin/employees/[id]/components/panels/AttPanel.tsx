@@ -11,6 +11,7 @@ import ActionButton from "@/components/shared/button/ActionButton";
 import { attAdjustmentSchema, AttAdjustmentValues } from "@/schemas/admin/att-adjustment";
 import { useMutateAttAdjustment } from "@/stores/admin/useMutateAttAdjustment";
 import { IDailyAttendance } from "@/types/admin/attendance-summary";
+import { LeaveTypeCombobox } from "@/components/comboboxes/LeaveTypeCombobox";
 
 export interface AttCellInfo {
   record: IDailyAttendance;
@@ -25,6 +26,7 @@ const FIELD_LABELS: Record<string, string> = {
   S_OUT: "Second Out",
   OT1: "OT x 1.5",
   OT2: "OT x 2",
+  LEAVE_HOURS: "Leave Hours",
 };
 
 const TIME_FIELDS = ["F_IN", "F_OUT", "S_IN", "S_OUT"];
@@ -42,6 +44,7 @@ export default function AttPanel({ open, setOpen, employeeId, cellInfo, onSucces
   const { createAttAdjustment } = useMutateAttAdjustment();
 
   const isTimeField = TIME_FIELDS.includes(cellInfo?.fieldChanged ?? "");
+  const isLeaveField = cellInfo?.fieldChanged === "LEAVE_HOURS";
 
   const form = useForm<AttAdjustmentValues>({
     resolver: zodResolver(attAdjustmentSchema),
@@ -51,6 +54,7 @@ export default function AttPanel({ open, setOpen, employeeId, cellInfo, onSucces
       fieldChanged: "",
       oldValue: "",
       newValue: "",
+      leaveType: "",
       reason: "",
     },
   });
@@ -63,6 +67,7 @@ export default function AttPanel({ open, setOpen, employeeId, cellInfo, onSucces
         fieldChanged: cellInfo.fieldChanged,
         oldValue: cellInfo.oldValue || "",
         newValue: "",
+        leaveType: "",
         reason: "",
       });
     }
@@ -114,16 +119,43 @@ export default function AttPanel({ open, setOpen, employeeId, cellInfo, onSucces
             </div>
           </div>
 
+          {isLeaveField && (
+            <FormField
+              control={form.control}
+              name="leaveType"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    Leave Type <span className="text-red-500">*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <LeaveTypeCombobox
+                      value={field.value}
+                      onChange={(v) => field.onChange(v ?? "")}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
+
           <FormField
             control={form.control}
             name="newValue"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>
-                  New Value <span className="text-red-500">*</span>
+                  {isLeaveField ? "Hours" : "New Value"} <span className="text-red-500">*</span>
                 </FormLabel>
                 <FormControl>
-                  <Input type={isTimeField ? "time" : "text"} step={isTimeField ? 60 : undefined} {...field} />
+                  <Input
+                    type={isTimeField ? "time" : "number"}
+                    step={isTimeField ? 60 : isLeaveField ? 0.5 : undefined}
+                    min={isLeaveField ? 0 : undefined}
+                    placeholder={isLeaveField ? "e.g. 4" : undefined}
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -135,9 +167,15 @@ export default function AttPanel({ open, setOpen, employeeId, cellInfo, onSucces
             name="reason"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Reason</FormLabel>
+                <FormLabel>
+                  Reason {isLeaveField && <span className="text-red-500">*</span>}
+                </FormLabel>
                 <FormControl>
-                  <Textarea rows={3} placeholder="Optional reason for adjustment…" {...field} />
+                  <Textarea
+                    rows={3}
+                    placeholder={isLeaveField ? "e.g. Half-day annual leave" : "Optional reason for adjustment…"}
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>

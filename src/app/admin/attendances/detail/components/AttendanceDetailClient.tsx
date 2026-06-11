@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import EmployeeInfoCard from "./EmployeeInfoCard";
 import AttendanceTable from "./AttendanceTable";
 import MonthlyTotalsCard from "./MonthlyTotalsCard";
+import PayrollSummaryTable from "./PayrollSummaryTable";
 import { parseAsString, useQueryState } from "nuqs";
 import { formatToYYYYMM } from "@/utils/shared-format";
 import { Input } from "@/components/ui/input";
@@ -16,13 +17,19 @@ import FullScreenLoading from "@/components/shared/fullscreen-loading";
 import { IEmployeeAttendanceSummary } from "@/types/admin/attendance-summary";
 import { payrollPaymentKeys } from "@/service/util/query-keys/payroll-payment";
 
+const parseYearMonth = (ym: string): Date => {
+  const [year, month] = ym.split("-").map(Number);
+  return new Date(year, month - 1, 1);
+};
+
 const AttendanceDetailClient = () => {
   const [yearMonth, setYearMonth] = useQueryState("yearMonth", parseAsString.withDefault(formatToYYYYMM()));
   const [empCode, setEmpCode] = useQueryState("empCode", parseAsString.withDefault(""));
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [searchInput, setSearchInput] = useState(empCode);
-  const [selectedMonth, setSelectedMonth] = useState(new Date());
+
+  const selectedMonth = parseYearMonth(yearMonth);
 
   const { data: attSummaryData } = useQueryShared({
     url: `/v1/att-summaries/employee`,
@@ -47,7 +54,6 @@ const AttendanceDetailClient = () => {
   const employee = attSummary?.employee;
 
   const handleMonthChange = (date: Date) => {
-    setSelectedMonth(date);
     setYearMonth(formatToYYYYMM(date));
   };
 
@@ -83,7 +89,7 @@ const AttendanceDetailClient = () => {
           {/* Center Panel - Attendance Table */}
           <div className="col-span-12 lg:col-span-8">
             <AttendanceTable
-              attendanceData={attendanceSummary ?? []}
+              attendanceData={attSummary}
               selectedMonth={selectedMonth}
               onMonthChange={handleMonthChange}
             />

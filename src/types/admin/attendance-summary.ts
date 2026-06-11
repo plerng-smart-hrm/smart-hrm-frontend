@@ -35,6 +35,7 @@ export interface IAttendanceTime {
 export interface IAttendanceOvertime {
   ot1: number;
   ot2: number;
+  otNight: number;
 }
 
 export interface IDailyAttendance {
@@ -44,8 +45,11 @@ export interface IDailyAttendance {
   workStatus: string;
   time: IAttendanceTime;
   lateMinutes: number;
-  workingHours: number;
   normalHours?: number;
+  nightHours?: number;
+  leaveHours?: number;
+  totalPhHours?: number;
+  totalLeaveHours?: number;
   status: AttendanceStatus;
   reason: string | null;
   overtime: IAttendanceOvertime;
@@ -54,6 +58,10 @@ export interface IDailyAttendance {
   wageNormal?: number;
   wageOT1?: number;
   wageOT2?: number;
+  wageOTNight?: number;
+  wagePH?: number;
+  wageLeave?: number;
+  wageLeavePH?: number;
   timeSalary?: number;
   total?: number;
   bonusOtFood?: number;
@@ -61,14 +69,26 @@ export interface IDailyAttendance {
 }
 
 export interface IAttendanceTotals {
+  totalNormalHours: number;
   totalOt1: number;
   totalOt2: number;
+  totalOtNight: number;
+  totalWageNormal: number;
+  totalWageOT1: number;
+  totalWageOT2: number;
+  totalWageOTNight: number;
+  totalTimeSalary: number;
+  totalBonusOtFood: number;
+  totalBonusLunch: number;
   totalWorkingHours: number;
   totalLateMinutes: number;
+  totalBonusTarget: number;
   presentDays: number;
   absentDays: number;
   leaveDays: number;
   holidayDays: number;
+  dayOffDays: number;
+  grandTotal: number;
 }
 
 export interface IEmployeeAttendanceSummary {

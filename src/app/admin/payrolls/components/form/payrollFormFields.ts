@@ -1,45 +1,32 @@
-import { IRunPayrollForm } from "@/types/admin/payroll";
-import { format, startOfMonth, setDate } from "date-fns";
-
-export const paymentTypeFields = [
-  {
-    label: "Payment Type",
-    key: "paymentType",
-    type: "select",
-    required: true,
-    options: [
-      { value: "FIRST_PAYMENT", label: "FIRST_PAYMENT" },
-      { value: "SECOND_PAYMENT", label: "SECOND_PAYMENT" },
-    ],
-  },
-];
+import { format, startOfMonth, endOfMonth, setDate } from "date-fns";
 
 export const payrollPeriodFields = [
   {
     label: "From Date",
-    key: "startDate",
+    key: "fromDate",
     type: "date",
     required: true,
   },
   {
     label: "To Date",
-    key: "endDate",
+    key: "toDate",
     type: "date",
     required: true,
   },
 ];
 
-export const runPayrollFields = [...paymentTypeFields, ...payrollPeriodFields];
+export const runPayrollFields = [...payrollPeriodFields];
 
-export const getRunPayrollValues = (data?: IRunPayrollForm) => {
+export const getRunPayrollValues = (type: "FIRST_PAYMENT" | "SECOND_PAYMENT" = "FIRST_PAYMENT") => {
   const now = new Date();
-
-  const defaultStartDate = format(startOfMonth(now), "yyyy-MM-dd");
-  const defaultEndDate = format(setDate(now, 15), "yyyy-MM-dd");
-
+  if (type === "FIRST_PAYMENT") {
+    return {
+      fromDate: format(startOfMonth(now), "yyyy-MM-dd"),
+      toDate: format(setDate(now, 15), "yyyy-MM-dd"),
+    };
+  }
   return {
-    payrollPeriod: data?.payrollPeriod ?? "FIRST_PAYMENT",
-    startDate: data?.startDate ?? defaultStartDate,
-    endDate: data?.endDate ?? defaultEndDate,
+    fromDate: format(setDate(now, 16), "yyyy-MM-dd"),
+    toDate: format(endOfMonth(now), "yyyy-MM-dd"),
   };
 };

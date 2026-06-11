@@ -26,6 +26,7 @@ export const employeeSchema = z.object({
   idCardNo: z.string().optional(),
   nssfRegisterNo: z.string().optional(),
   timeShiftId: z.number().min(1, "Please select a working shift"),
+  sectionId: z.number().optional(),
 });
 
 export type EmployeeValues = z.infer<typeof employeeSchema>;

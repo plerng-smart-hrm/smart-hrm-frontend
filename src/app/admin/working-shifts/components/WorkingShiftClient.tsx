@@ -4,7 +4,6 @@ import { IWorkingShift } from "@/types/admin/working-shift";
 import { useMutateWorkingShift } from "@/stores/admin/useMutateWorkingShift";
 import { CustomBarChart } from "@/components/CustomBarChart";
 import { useDataTable } from "@/hooks/use-data-table";
-import { IEmployee } from "@/types/admin/employee";
 import { PenIcon, PlusIcon, TrashIcon } from "lucide-react";
 import BaseDataTable from "@/components/shared/table/BaseDataTable";
 import { ToolbarActions } from "@/components/shared/table/ToolbarActions";
@@ -53,7 +52,7 @@ const WorkingShiftClient = ({}: Props) => {
     },
   ];
 
-  const { table } = useDataTable<IEmployee, unknown>({
+  const { table } = useDataTable({
     columns: workingShiftColumns(actionButton),
   });
 

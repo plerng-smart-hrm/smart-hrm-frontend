@@ -1,44 +1,47 @@
 "use client";
 import { useState } from "react";
 import { IWorkingShift } from "@/types/admin/working-shift";
-import { useMutateWorkingShift } from "@/stores/admin/useMutateWorkingShift";
-import { CustomBarChart } from "@/components/CustomBarChart";
 import { useDataTable } from "@/hooks/use-data-table";
-import { IEmployee } from "@/types/admin/employee";
-import { PenIcon, PlusIcon, TrashIcon } from "lucide-react";
+import { DownloadIcon, PenIcon, PlusIcon, TrashIcon } from "lucide-react";
 import BaseDataTable from "@/components/shared/table/BaseDataTable";
 import { ToolbarActions } from "@/components/shared/table/ToolbarActions";
 import { ToolBarDataTale } from "@/components/shared/table/ToolBarDataTale";
 import SharedDialog from "@/components/shared/SharedDialog";
-import WorkingShiftForm from "./form/RunPayrollForm";
 import { payrollColumns } from "./columns";
 import RunPayrollForm from "./form/RunPayrollForm";
+import { payrollReportColumns } from "../../payroll-reports/components/columns";
+import { IPayrollReport } from "@/types/admin/payroll-report";
 
-interface Props {}
-const PayrollClient = ({}: Props) => {
-  const [isLoading, setIsLoading] = useState(false);
-
+const PayrollClient = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [actionType, setActionType] = useState<string | null>(null);
-  const [isDelete, setIsDelete] = useState(false);
+  const [paymentType, setPaymentType] = useState<"FIRST_PAYMENT" | "SECOND_PAYMENT" | null>(null);
 
   const actionButton = [
     {
       name: "Update",
       icon: PenIcon,
-      event: (value: IWorkingShift) => {},
+      event: (value: IPayrollReport) => {},
     },
-
     {
-      name: "Delete",
-      icon: TrashIcon,
-      event: (value: IWorkingShift) => {},
+      name: "Download Excel",
+      icon: DownloadIcon,
+      event: (value: IPayrollReport) => {},
     },
   ];
 
   const { table } = useDataTable({
-    columns: payrollColumns(actionButton),
+    columns: payrollReportColumns(actionButton),
   });
+
+  const openDialog = (type: "FIRST_PAYMENT" | "SECOND_PAYMENT") => {
+    setPaymentType(type);
+    setIsOpen(true);
+  };
+
+  const handleClose = () => {
+    setIsOpen(false);
+    setPaymentType(null);
+  };
 
   return (
     <div>
@@ -47,12 +50,16 @@ const PayrollClient = ({}: Props) => {
           <ToolbarActions
             actions={[
               {
-                name: "Run Payroll",
+                name: "Run Advance",
                 icon: PlusIcon,
-                event: () => {
-                  setIsOpen(true);
-                  setActionType("RUN_PAYROLL");
-                },
+                variant: "default",
+                event: () => openDialog("FIRST_PAYMENT"),
+              },
+              {
+                name: "Run Final",
+                icon: PlusIcon,
+                variant: "success",
+                event: () => openDialog("SECOND_PAYMENT"),
               },
             ]}
           />
@@ -60,13 +67,13 @@ const PayrollClient = ({}: Props) => {
       </BaseDataTable>
 
       <SharedDialog
-        setOpen={() => setIsOpen(false)}
+        setOpen={handleClose}
         open={isOpen}
-        title="Run Payroll Details"
+        title={paymentType === "FIRST_PAYMENT" ? "Run Advance Payroll" : "Run Final Payroll"}
         isCancel={false}
         width="50%"
       >
-        {actionType === "RUN_PAYROLL" && <RunPayrollForm onSuccess={() => setIsOpen(false)} />}
+        {paymentType && <RunPayrollForm type={paymentType} onSuccess={handleClose} />}
       </SharedDialog>
     </div>
   );

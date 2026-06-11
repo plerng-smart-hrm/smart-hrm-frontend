@@ -1,4 +1,4 @@
-import { ISection } from "@/types/admin";
+import { ISection } from "@/types/admin/section";
 
 export const sectionFields = [
   {

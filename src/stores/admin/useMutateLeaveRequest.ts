@@ -8,6 +8,7 @@ import {
   updateLeaveRequest,
 } from "@/service/admin/leave-requests.service";
 import { leaveRequestCache } from "@/service/util/query-cache";
+import { leaveRequestKeys } from "@/service/util/query-keys/leave-request";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
@@ -17,11 +18,7 @@ export const useMutateLeaveRequest = () => {
   const queryClient = useQueryClient();
 
   const createMutation = useMutation({
-    mutationFn: async ({
-      request,
-    }: {
-      request: ICreateLeaveRequestRequest;
-    }) => {
+    mutationFn: async ({ request }: { request: ICreateLeaveRequestRequest }) => {
       return await createLeaveRequest(request);
     },
     onSuccess: () => {
@@ -55,13 +52,15 @@ export const useMutateLeaveRequest = () => {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: async ({ leaveRequestId }: { leaveRequestId?: number }) => {
+    mutationFn: async ({ leaveRequestId }: { leaveRequestId?: number; employeeId?: number }) => {
       return await deleteLeaveRequest(leaveRequestId);
     },
-    onSuccess: () => {
+    onSuccess: (_, { employeeId }) => {
       toast.success(`${RESOURCE} deleted successfully`);
 
-      leaveRequestCache.clearAll(queryClient);
+      queryClient.invalidateQueries({
+        queryKey: [`${leaveRequestKeys.list_leave_request}_employee_${employeeId}`],
+      });
     },
     onError: () => {
       toast.error(`Failed to delete ${RESOURCE.toLowerCase()}`);
@@ -71,6 +70,6 @@ export const useMutateLeaveRequest = () => {
   return {
     create: createMutation.mutateAsync,
     update: updateMutation.mutateAsync,
-    delete: deleteMutation.mutateAsync,
+    deleteLeaveRequest: deleteMutation.mutateAsync,
   };
 };

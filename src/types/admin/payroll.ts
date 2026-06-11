@@ -1,7 +1,7 @@
-import { IContract } from "./contract";
+import { IAudit } from "./audit-entity";
 import { IEmployee } from "./employee";
 
-export interface IPayroll {
+export interface IPayroll extends IAudit {
   id?: number;
 
   employeeId?: number;
@@ -11,75 +11,74 @@ export interface IPayroll {
   startDate?: string;
   endDate?: string;
 
-  // Attendance
+  // Attendance counts
   workingDays?: number;
-  presentDays?: number;
+  normalDays?: number;
+  nightDays?: number;
   absentDays?: number;
   leaveDays?: number;
   unpaidLeaveDays?: number;
-  holidayDays?: number;
-  lateMinutes?: number;
+  lateMins?: number;
 
-  // Overtime
-  ot1Hours?: number;
-  ot2Hours?: number;
-  holidayOtHours?: number;
-  ot1Pay?: number;
-  ot2Pay?: number;
-  holidayOtPay?: number;
+  // Hour totals
+  totalNormalHours?: number;
+  totalNightHours?: number;
+  totalPhHours?: number;
+  totalLeaveHours?: number;
+  totalOt1Hours?: number;
+  totalOt2Hours?: number;
+  totalOtNightHours?: number;
 
-  // Earnings
+  // Pay components
+  payNormalHours?: number;
+  payNightHours?: number;
+  payPh?: number;
+  payLeave?: number;
+  payOt1?: number;
+  payOt2?: number;
+  payOtNight?: number;
+  payTotal?: number;
+
+  // Salary
   baseSalary?: number;
-  seniorityBonus?: number;
-  foodAllowance?: number;
-  transportAllowance?: number;
-  attendanceBonus?: number;
-  skillAllowance?: number;
-  nightShiftAllowance?: number;
-  otherAllowances?: number;
+
+  // Bonuses
+  bonusAttendance?: number;
+  bonusSeniority?: number;
+  bonusPosition?: number;
+  bonusTechnical?: number;
+  bonusTarget?: number;
+  bonusTotal?: number;
+
+  // Allowances
+  allowanceOtFood?: number;
+  allowanceLunch?: number;
+  allowanceMilk?: number;
+  allowanceHousing?: number;
+  allowanceTransport?: number;
+  allowanceSkill?: number;
+  allowanceNightShift?: number;
+  allowanceOther?: number;
   allowanceTotal?: number;
+
   grossSalary?: number;
 
   // Deductions
-  nssfDeduction?: number;
-  absenceDeduction?: number;
-  lateDeduction?: number;
-  taxDeduction?: number;
-  otherDeductions?: number;
-  totalDeductions?: number;
+  deductionNssf?: number;
+  deductionAbsence?: number;
+  deductionLate?: number;
+  deductionTax?: number;
+  deductionLoan?: number;
+  deductionOther?: number;
+  deductionTotal?: number;
 
-  // GDT Tax
-  taxExchangeRate?: number;
-  taxInKhr?: number;
-  taxableIncomeKhr?: number;
-
-  // Net & Payment
   netSalary?: number;
-  totalPaid?: number;
-  remainingBalance?: number;
+  salaryAdvance?: number;
+  salaryBalance?: number;
 
-  // Status & Approval
   status?: string;
-  calculatedAt?: string | Date;
-  approvedBy?: number;
-  approvedAt?: string | Date;
-  remark?: string;
-
-  // Audit
-  isActive?: boolean;
-  createdBy?: number;
-  updatedBy?: number;
-  createdAt?: string | Date;
-  updatedAt?: string | Date;
-  deletedAt?: string | Date;
-
-  // Relations
   employee?: IEmployee;
-  contract?: IContract;
-  payments?: any[];
-  nssfContributions?: any[];
 }
-
 
 export interface IRunPayrollForm {
   payrollPeriod?: string;

@@ -3,7 +3,7 @@
 import React from "react";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { Calendar, FileText, GraduationCap, Globe, Heart, MapPin, Phone, SquarePen, Users } from "lucide-react";
+import { FileText, GraduationCap, MapPin, Phone, SquarePen } from "lucide-react";
 import { format, parseISO } from "date-fns";
 import { IEmployee } from "@/types/admin/employee";
 import { RenderView, Section } from "@/components/shared/view/RenderView";
@@ -28,7 +28,7 @@ export default function PersonalTab({ employee }: Props) {
   return (
     <div>
       <div className="flex justify-end">
-        <Button type="button" size="sm" className="gap-1.5" onClick={() => setIsEditOpen(true)}>
+        <Button type="button" size="sm" variant={"warning"} className="gap-1.5" onClick={() => setIsEditOpen(true)}>
           <SquarePen className="size-4" />
           Edit
         </Button>
@@ -63,6 +63,18 @@ export default function PersonalTab({ employee }: Props) {
                 fullWidth: true,
               },
               { icon: <GraduationCap className="h-4 w-4" />, label: "Education", value: employee.education },
+            ]}
+          />
+        </Section>
+
+        <Separator />
+
+        <Section title="Job & Shift">
+          <RenderView
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
+            fields={[
+              { label: "Department", value: employee.section?.department?.name },
+              { label: "Section", value: employee.section?.name },
             ]}
           />
         </Section>

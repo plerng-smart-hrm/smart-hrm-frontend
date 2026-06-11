@@ -2,6 +2,7 @@
 
 import { Mars, Venus } from "lucide-react";
 import { IEmployee } from "@/types/admin/employee";
+import Image from "next/image";
 
 interface EmployeeColumnProps {
   employee?: IEmployee;
@@ -12,16 +13,19 @@ export const EmployeeColumn = ({ employee }: EmployeeColumnProps) => {
   const khName = [employee?.lastNameKh, employee?.firstNameKh].filter(Boolean).join(" ");
 
   const gender = employee?.gender?.toUpperCase();
+  const fallbackImage = gender === "MALE" ? "/male.jpg" : "/female.jpg";
 
   return (
     <div className="flex items-center gap-3 min-w-[220px]">
       {/* Avatar */}
-      <div className="h-9 w-9 shrink-0 rounded-full bg-muted flex items-center justify-center text-sm  uppercase">
-        {employee?.profileUrl ? (
-          <img src={employee.profileUrl} alt={fullName || "Employee"} className="h-9 w-9 rounded-full object-cover" />
-        ) : (
-          employee?.firstName?.charAt(0) || "?"
-        )}
+      <div className="h-10 w-10 shrink-0 overflow-hidden">
+        <Image
+          src={employee?.profileUrl || fallbackImage}
+          alt={fullName || "Employee"}
+          width={50}
+          height={50}
+          className="object-cover"
+        />
       </div>
 
       <div className="flex flex-col gap-0.5 leading-tight">
@@ -36,9 +40,7 @@ export const EmployeeColumn = ({ employee }: EmployeeColumnProps) => {
         {khName && <span className="text-xs text-muted-foreground">{khName}</span>}
 
         <div className="flex items-center gap-2">
-          <span className="text-xs font-medium text-muted-foreground">{employee?.empCode || "-"}</span>
-
-          <span className="text-xs font-medium text-muted-foreground">{employee?.position || "No position"}</span>
+          <span className="text-xs font-medium text-muted-foreground">{employee?.empCode || "N/A"}</span>
         </div>
       </div>
     </div>
