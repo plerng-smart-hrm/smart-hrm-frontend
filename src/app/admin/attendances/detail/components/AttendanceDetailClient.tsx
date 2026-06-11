@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import EmployeeInfoCard from "./EmployeeInfoCard";
 import AttendanceTable from "./AttendanceTable";
 import MonthlyTotalsCard from "./MonthlyTotalsCard";
+import PayrollSummaryTable from "./PayrollSummaryTable";
 import { parseAsString, useQueryState } from "nuqs";
 import { formatToYYYYMM } from "@/utils/shared-format";
 import { Input } from "@/components/ui/input";

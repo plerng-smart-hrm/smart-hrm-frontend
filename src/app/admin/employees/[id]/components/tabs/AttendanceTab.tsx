@@ -11,7 +11,9 @@ import { formatToYYYYMM } from "@/utils/shared-format";
 import { IEmployeeAttendanceSummary } from "@/types/admin/attendance-summary";
 import { IEmployee } from "@/types/admin/employee";
 import AttendanceTable, { AttCellClickInfo } from "@/app/admin/attendances/detail/components/AttendanceTable";
+import PayrollSummaryTable from "@/app/admin/attendances/detail/components/PayrollSummaryTable";
 import AttPanel, { AttCellInfo } from "../panels/AttPanel";
+import { IPayroll } from "@/types/admin/payroll";
 
 interface Props {
   employee: IEmployee;
@@ -40,6 +42,17 @@ export default function AttendanceTab({ employee }: Props) {
     enable: !!employee.id,
   });
 
+  const { data: payrollData, isLoading: isPayrollDataLoading } = useQueryShared({
+    url: `/v1/payrolls/employee`,
+    key: `${attendanceSummaryKeys.summary_by_employee}_${employee?.id}_${yearMonth}`,
+    param: { employeeId: employee?.id, payrollMonth: yearMonth },
+    enable: !!employee.id,
+  });
+
+  console.log("payrollData", payrollData);
+
+  const payroll = (payrollData?.data as IPayroll) ?? undefined;
+
   const attSummary = (data?.data as IEmployeeAttendanceSummary) ?? undefined;
   const totals = attSummary?.totals;
 
@@ -56,14 +69,9 @@ export default function AttendanceTab({ employee }: Props) {
     <div className="relative">
       <LoadingOverlay isLoading={isFetching} />
 
-      <AttPanel
-        open={panelOpen}
-        setOpen={setPanelOpen}
-        employeeId={employee.id!}
-        cellInfo={cellInfo}
-      />
+      <AttPanel open={panelOpen} setOpen={setPanelOpen} employeeId={employee.id!} cellInfo={cellInfo} />
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12">
         <div className="lg:col-span-9">
           <Section title="Attendance Calendar" icon={<CalendarClock className="h-4 w-4" />}>
             <AttendanceTable
@@ -75,29 +83,9 @@ export default function AttendanceTab({ employee }: Props) {
           </Section>
         </div>
 
-        <div className="lg:col-span-3 lg:border-l lg:pl-6">
-          <Section title="Monthly Summary" icon={<Clock className="h-4 w-4" />}>
-            <RenderView
-              className="grid grid-cols-1 gap-4"
-              fields={[
-                {
-                  icon: <Clock className="h-4 w-4" />,
-                  label: "Working Hours",
-                  value: formatHours(totals?.totalWorkingHours),
-                },
-                {
-                  icon: <Timer className="h-4 w-4" />,
-                  label: "Late Minutes",
-                  value: formatMinutes(totals?.totalLateMinutes),
-                },
-                { icon: <Zap className="h-4 w-4" />, label: "OT1", value: formatHours(totals?.totalOt1) },
-                { icon: <Zap className="h-4 w-4" />, label: "OT2", value: formatHours(totals?.totalOt2) },
-                { icon: <CalendarCheck className="h-4 w-4" />, label: "Present Days", value: totals?.presentDays },
-                { icon: <CalendarX className="h-4 w-4" />, label: "Absent Days", value: totals?.absentDays },
-                { icon: <CalendarOff className="h-4 w-4" />, label: "Leave Days", value: totals?.leaveDays },
-                { icon: <CalendarDays className="h-4 w-4" />, label: "Holiday Days", value: totals?.holidayDays },
-              ]}
-            />
+        <div className="lg:col-span-3 lg:border-l lg:pl-6 mt-10">
+          <Section title="Payroll Summary" icon={<CalendarClock className="h-4 w-4" />}>
+            <PayrollSummaryTable payroll={payroll} />
           </Section>
         </div>
       </div>
