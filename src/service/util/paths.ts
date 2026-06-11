@@ -12,6 +12,7 @@ import { attendanceSummaryKeys } from "./query-keys/attendance-summary";
 import { terminationKeys } from "./query-keys/termination";
 import { payrollKeys } from "./query-keys/payroll";
 import { timeShiftKeys } from "./query-keys/time-shift";
+import { payrollReportKeys } from "./query-keys/payroll-report";
 
 export const queryKeyMappingApiPath: Record<string, string> = {
   [employeeKeys.list_employee]: "/v1/employees",
@@ -27,4 +28,5 @@ export const queryKeyMappingApiPath: Record<string, string> = {
   [attAdjustmentKeys.list_att_adjustment]: "/v1/att-adjustments",
   [terminationKeys.list_termination]: "/v1/terminations",
   [payrollKeys.list_payroll]: "/v1/payrolls",
+  [payrollReportKeys.list_payroll_report]: "/v1/payroll-reports",
 };
