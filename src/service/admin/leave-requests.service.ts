@@ -1,20 +1,7 @@
 "use server";
 
-import { IApiResponse, IHoliday, ILeaveRequest, IPagination } from "@/types/admin";
+import { IApiResponse } from "@/types/admin";
 import { api } from "../util/api";
-
-export interface ILeaveRequestsRes {
-  leaveRequests?: ILeaveRequest[];
-  pagination?: IPagination;
-}
-export interface IHolidaysRes {
-  holidays?: IHoliday[];
-  pagination?: IPagination;
-}
-
-export interface ILeaveRequestRes {
-  leaveRequest?: ILeaveRequest;
-}
 
 export interface ICreateLeaveRequestRequest {
   employeeId?: number;

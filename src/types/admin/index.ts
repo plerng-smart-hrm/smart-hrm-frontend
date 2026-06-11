@@ -137,26 +137,6 @@ export interface ILeaveType {
   deletedAt?: string;
 }
 
-export interface ILeaveRequest {
-  id?: number;
-  employeeId?: number;
-  employee?: IEmployee;
-  leaveTypeId?: number;
-  leaveType?: ILeaveType;
-  startDate?: string;
-  endDate?: string;
-  reason?: string;
-  supportingDocUrl?: string;
-  requestDate?: string;
-  status?: string;
-
-  createdBy?: number;
-  updatedBy?: number;
-  createdAt?: string;
-  updatedAt?: string;
-  deletedAt?: string;
-}
-
 export interface ICompany {
   id?: number;
   name?: string;
