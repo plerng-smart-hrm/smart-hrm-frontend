@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { ISection } from "@/types/admin";
+import { ISection } from "@/types/admin/section";
 import { useMutateSection } from "@/stores/admin/useMutateSection";
 import { sectionColumns } from "./columns";
 import { useDataTable } from "@/hooks/use-data-table";

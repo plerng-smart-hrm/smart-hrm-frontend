@@ -8,7 +8,6 @@ import HolidayDialog from "./HolidayDialog";
 import { DownloadIcon, PenIcon, PlusIcon, TrashIcon } from "lucide-react";
 import ImportFactoryModal from "./ImportHolidayModal";
 import { useDataTable } from "@/hooks/use-data-table";
-import { IEmployee } from "@/types/admin/employee";
 import SharedDialog from "@/components/shared/SharedDialog";
 import BaseDataTable from "@/components/shared/table/BaseDataTable";
 import { ToolbarActions } from "@/components/shared/table/ToolbarActions";
@@ -42,7 +41,7 @@ const HolidayClient = () => {
     },
   ];
 
-  const { table } = useDataTable<IEmployee, unknown>({
+  const { table } = useDataTable({
     columns: holidayColumns(actionButton),
   });
 
@@ -67,29 +66,13 @@ const HolidayClient = () => {
   return (
     <div>
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mb-4">
-        <DashboardCard
-          title="Total Holiday"
-          value={60}
-          icon="/icons/holidays.png"
-        />
+        <DashboardCard title="Total Holiday" value={60} icon="/icons/holidays.png" />
 
-        <DashboardCard
-          title="Public Holiday"
-          value={60}
-          icon="/icons/public.png"
-        />
+        <DashboardCard title="Public Holiday" value={60} icon="/icons/public.png" />
 
-        <DashboardCard
-          title="Company Holiday"
-          value={60}
-          icon="/icons/company.png"
-        />
+        <DashboardCard title="Company Holiday" value={60} icon="/icons/company.png" />
 
-        <DashboardCard
-          title="Up Coming"
-          value={60}
-          icon="/icons/upcoming.png"
-        />
+        <DashboardCard title="Up Coming" value={60} icon="/icons/upcoming.png" />
       </div>
 
       <BaseDataTable table={table}>
@@ -144,10 +127,7 @@ const HolidayClient = () => {
         />
       )}
 
-      <ImportFactoryModal
-        open={openImportModel}
-        onClose={() => setOpenImportModel(false)}
-      />
+      <ImportFactoryModal open={openImportModel} onClose={() => setOpenImportModel(false)} />
     </div>
   );
 };

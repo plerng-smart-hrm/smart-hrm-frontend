@@ -1,7 +1,7 @@
 "use client";
 import { ColumnDef } from "@tanstack/react-table";
-import { ISection } from "@/types/admin";
 import { Actions, IActions } from "@/components/shared/Actions";
+import { ISection } from "@/types/admin/section";
 
 export const sectionColumns = (actions: IActions[]): ColumnDef<ISection>[] => {
   return [

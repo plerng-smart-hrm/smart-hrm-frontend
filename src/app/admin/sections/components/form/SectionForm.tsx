@@ -7,7 +7,7 @@ import ActionButton from "@/components/shared/button/ActionButton";
 import { RenderFields } from "@/components/shared/form/RenderField";
 import { showValidationWarning } from "@/utils/form-validation";
 import { sectionFields, getSectionValues } from "./sectionShiftFormFields";
-import { ISection } from "@/types/admin";
+import { ISection } from "@/types/admin/section";
 import { sectionSchema, SectionValues } from "@/schemas/admin/section";
 import { useMutateSection } from "@/stores/admin/useMutateSection";
 import { DepartmentCombobox } from "@/components/comboboxes/DepartmentCombobox";

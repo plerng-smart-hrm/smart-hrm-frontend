@@ -2,7 +2,6 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Actions, IActions } from "@/components/shared/Actions";
 import { IPayroll } from "@/types/admin/payroll";
-import { Mars, Venus } from "lucide-react";
 import { EmployeeColumn } from "@/components/shared/EmployeeColumn";
 
 export const payrollColumns = (actions: IActions[]): ColumnDef<IPayroll>[] => {
@@ -26,8 +25,8 @@ export const payrollColumns = (actions: IActions[]): ColumnDef<IPayroll>[] => {
       cell: ({ row }) => <div>{row.original?.workingDays}</div>,
     },
     {
-      header: "Present Days",
-      cell: ({ row }) => <div>{row.original?.presentDays}</div>,
+      header: "Normal Days",
+      cell: ({ row }) => <div>{row.original?.normalDays}</div>,
     },
     {
       header: "Base Salary",
@@ -36,14 +35,6 @@ export const payrollColumns = (actions: IActions[]): ColumnDef<IPayroll>[] => {
     {
       header: "Net Salary",
       cell: ({ row }) => <div>{row.original?.netSalary}</div>,
-    },
-    {
-      header: "Total Paid",
-      cell: ({ row }) => <div>{row.original?.totalPaid}</div>,
-    },
-    {
-      header: "Remaining Balance",
-      cell: ({ row }) => <div>{row.original?.remainingBalance}</div>,
     },
     {
       id: "actions",
