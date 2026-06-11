@@ -29,6 +29,7 @@ export enum AdjustmentField {
   BONUS_TARGET = "BONUS_TARGET",
   BONUS_LUNCH = "BONUS_LUNCH",
   BONUS_OT_FOOD = "BONUS_OT_FOOD",
+  LEAVE_HOURS = "LEAVE_HOURS",
 }
 
 export interface AttCellClickInfo {
@@ -904,9 +905,20 @@ export default function AttendanceTable({ attendanceData, selectedMonth, onMonth
                         {isVisible("leaveHour") && (
                           <td
                             style={cellBg("leave", index, special)}
-                            className={cn(cellBorder, "px-1 py-1 text-center")}
+                            className={cn(
+                              cellBorder,
+                              "px-1 py-1 text-center",
+                              onCellClick && "cursor-pointer hover:brightness-90",
+                            )}
+                            onClick={() =>
+                              onCellClick?.({
+                                record,
+                                fieldChanged: AdjustmentField.LEAVE_HOURS,
+                                oldValue: record.leaveHours && record.leaveHours > 0 ? String(record.leaveHours) : "",
+                              })
+                            }
                           >
-                            {record.leaveHours && record.leaveHours > 0 ? `$${record.leaveHours}` : ""}
+                            {record.leaveHours && record.leaveHours > 0 ? record.leaveHours : ""}
                           </td>
                         )}
                         {isVisible("leavePay") && (
