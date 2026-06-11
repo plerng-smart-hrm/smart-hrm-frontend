@@ -4,17 +4,18 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ChevronDown, User } from "lucide-react";
-import { Form, FormField } from "@/components/ui/form";
+import { Form, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import RenderField from "@/components/shared/form/RenderField";
+import { CambodiaPhoneInput } from "@/components/shared/cambodia-phone-input";
 import { showValidationWarning } from "@/utils/form-validation";
 import { PersonalInfoValues, personalInfoDefaults, personalInfoSchema } from "../wizardSchemas";
 import { pickEmployeeFields } from "../wizardFields";
 
 const coreKeys = ["empCode", "firstName", "lastName", "gender", "dateOfBirth"];
-const recommendedKeys = ["firstNameKh", "lastNameKh", "phone", "idCardNo"];
+const recommendedKeys = ["firstNameKh", "lastNameKh", "idCardNo"];
 const moreKeys = [
   "placeOfBirth",
   "nationality",
@@ -116,6 +117,17 @@ export default function PersonalInfoStep({ defaultValues, photoPreview: initialP
                 render={(field) => <RenderField form={{ ...item, field }} />}
               />
             ))}
+
+            <FormField
+              control={form.control}
+              name="phone"
+              render={({ field }) => (
+                <FormItem className="grid gap-y-2 w-full">
+                  <FormLabel className="text-sm text-gray-700 dark:text-white">Phone</FormLabel>
+                  <CambodiaPhoneInput value={field.value || "+855"} onChange={field.onChange} />
+                </FormItem>
+              )}
+            />
           </div>
         </div>
 

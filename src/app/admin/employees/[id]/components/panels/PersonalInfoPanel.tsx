@@ -15,10 +15,11 @@ import { pickEmployeeFields } from "@/app/admin/employees/components/wizard/wiza
 import { TimeShiftCombobox } from "@/components/comboboxes/TimeShiftCombobox";
 import { DepartmentCombobox } from "@/components/comboboxes/DepartmentCombobox";
 import { SectionCombobox } from "@/components/comboboxes/SectionCombobox";
+import { CambodiaPhoneInput } from "@/components/shared/cambodia-phone-input";
 import { formatToNumber, formatToString } from "@/lib/custom-format";
 import { IEmployee } from "@/types/admin/employee";
 
-const coreKeys = ["empCode", "firstName", "lastName", "firstNameKh", "lastNameKh", "gender", "dateOfBirth", "phone", "idCardNo"];
+const coreKeys = ["empCode", "firstName", "lastName", "firstNameKh", "lastNameKh", "gender", "dateOfBirth", "idCardNo"];
 const moreKeys = [
   "placeOfBirth",
   "nationality",
@@ -140,6 +141,17 @@ export default function PersonalInfoPanel({ open, setOpen, employee }: Props) {
                     render={(field) => <RenderField form={{ ...item, field }} />}
                   />
                 ))}
+
+                <FormField
+                  control={form.control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem className="grid gap-y-2 w-full">
+                      <FormLabel className="text-sm text-gray-700 dark:text-white">Phone</FormLabel>
+                      <CambodiaPhoneInput value={field.value || "+855"} onChange={field.onChange} />
+                    </FormItem>
+                  )}
+                />
               </div>
             </div>
 
