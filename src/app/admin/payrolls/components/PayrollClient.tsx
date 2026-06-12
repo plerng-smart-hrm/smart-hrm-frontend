@@ -1,21 +1,23 @@
 "use client";
 import { useState } from "react";
-import { IWorkingShift } from "@/types/admin/working-shift";
 import { useDataTable } from "@/hooks/use-data-table";
-import { DownloadIcon, PenIcon, PlusIcon, TrashIcon } from "lucide-react";
+import { DownloadIcon, PenIcon, PlusIcon } from "lucide-react";
 import BaseDataTable from "@/components/shared/table/BaseDataTable";
 import { ToolbarActions } from "@/components/shared/table/ToolbarActions";
 import { ToolBarDataTale } from "@/components/shared/table/ToolBarDataTale";
 import SharedDialog from "@/components/shared/SharedDialog";
-import { payrollColumns } from "./columns";
 import RunPayrollForm from "./form/RunPayrollForm";
 import { payrollReportColumns } from "../../payroll-reports/components/columns";
 import { IPayrollReport } from "@/types/admin/payroll-report";
+import { useMutatePayrollReport } from "@/stores/admin/useMutatePayrollReport";
+import { toast } from "sonner";
 
 const PayrollClient = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [paymentType, setPaymentType] = useState<"FIRST_PAYMENT" | "SECOND_PAYMENT" | null>(null);
 
+  const { downloadPayrollReportExcel } = useMutatePayrollReport();
   const actionButton = [
     {
       name: "Update",
@@ -25,7 +27,32 @@ const PayrollClient = () => {
     {
       name: "Download Excel",
       icon: DownloadIcon,
-      event: (value: IPayrollReport) => {},
+      event: async (value: IPayrollReport) => {
+        const controller = new AbortController();
+
+        const toastId = toast.loading("Downloading Excel...", {
+          action: {
+            label: "Cancel",
+            onClick: () => {
+              controller.abort();
+            },
+          },
+        });
+
+        try {
+          await downloadPayrollReportExcel({
+            id: value.id,
+            signal: controller.signal,
+          });
+          toast.success("Download completed", {
+            id: toastId,
+          });
+        } catch {
+          toast.error("Failed to download payroll report", {
+            id: toastId,
+          });
+        }
+      },
     },
   ];
 

@@ -3,6 +3,8 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   env: {
     NEXT_PUBLIC_BACKEND_URL: process.env.BACKEND_URL,
+    NEXT_PUBLIC_API_GATEWAY_URL: process.env.API_GATEWAY_URL,
+    NEXT_PUBLIC_API_KEY: process.env.API_KEY,
   },
   experimental: {
     serverActions: {
