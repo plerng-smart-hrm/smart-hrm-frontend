@@ -17,6 +17,10 @@ import { SharedButton } from "@/components/shared/button/SharedButton";
 import { IDailyAttendance, IEmployeeAttendanceSummary } from "@/types/admin/attendance-summary";
 import { cn } from "@/lib/utils";
 import PayrollSummaryTable from "./PayrollSummaryTable";
+import { toast } from "sonner";
+import { useMutateAttSummary } from "@/stores/admin/useMutateAttSummary";
+import { formatToDate } from "@/utils/custom-format";
+import { IEmployee } from "@/types/admin/employee";
 
 export enum AdjustmentField {
   STATUS = "STATUS",
@@ -206,13 +210,22 @@ const cellBg = (group: GroupKey, rowIndex: number, special: boolean, emphasize =
 };
 
 interface Props {
+  employee: IEmployee;
   attendanceData?: IEmployeeAttendanceSummary;
   selectedMonth: Date;
   onMonthChange: (date: Date) => void;
   onCellClick?: (info: AttCellClickInfo) => void;
 }
 
-export default function AttendanceTable({ attendanceData, selectedMonth, onMonthChange, onCellClick }: Props) {
+export default function AttendanceTable({
+  employee,
+  attendanceData,
+  selectedMonth,
+  onMonthChange,
+  onCellClick,
+}: Props) {
+  const [isLoading, setIsLoading] = useState(false);
+
   const [visibleColumns, setVisibleColumns] = useState<Set<ColumnKey>>(() => {
     const initial = new Set<ColumnKey>();
     columnConfigs.forEach((col) => {
@@ -316,6 +329,45 @@ export default function AttendanceTable({ attendanceData, selectedMonth, onMonth
     return record.wageNormal;
   };
 
+  const { downloadAttSummary } = useMutateAttSummary();
+  console.log("attendanceData", attendanceData);
+
+  const handleDownload = async () => {
+    setIsLoading(true);
+    const controller = new AbortController();
+
+    const toastId = toast.loading("Generating attendance...", {
+      action: {
+        label: "Cancel",
+        onClick: () => {
+          controller.abort();
+        },
+      },
+    });
+
+    try {
+      await downloadAttSummary({
+        id: employee?.id,
+        payrollMonth: formatToDate(selectedMonth, "yyyy-MM"),
+        signal: controller.signal,
+      });
+      toast.success("Download completed", {
+        id: toastId,
+      });
+    } catch (error: any) {
+      if (error?.message === "DOWNLOAD_CANCELLED") {
+        toast.dismiss(toastId);
+        return;
+      }
+
+      toast.error("Failed to download attendance", {
+        id: toastId,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="div">
       <div className="h-full flex flex-col" style={tableColorVars}>
@@ -396,7 +448,14 @@ export default function AttendanceTable({ attendanceData, selectedMonth, onMonth
               </DropdownMenuContent>
             </DropdownMenu>
 
-            <SharedButton variant="success" size="icon" className="h-8 w-8" description="Download time sheet">
+            <SharedButton
+              variant="success"
+              size="icon"
+              className="h-8 w-8"
+              description="Download time sheet"
+              onClick={handleDownload}
+              disabled={isLoading}
+            >
               <DownloadIcon className="h-4 w-4" />
             </SharedButton>
           </div>
