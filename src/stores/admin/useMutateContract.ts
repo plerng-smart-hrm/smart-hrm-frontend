@@ -4,6 +4,8 @@ import { ContractValues, RenewContractValues } from "@/schemas/admin/contract";
 import {
   createContract,
   deleteContract,
+  generateContractData,
+  generateFile,
   renewContract,
   updateContract,
 } from "@/service/admin/contracts.service";
@@ -74,10 +76,56 @@ export const useMutateContract = () => {
     },
   });
 
+  const downloadContractMutation = useMutation({
+    mutationFn: async ({ id, signal }: { id?: number; signal?: AbortSignal }) => {
+      try {
+        const res = await generateContractData(id, signal);
+
+        if (signal?.aborted) {
+          throw new DOMException("Aborted", "AbortError");
+        }
+
+        const data = res.data.data;
+        const { buffer } = await generateFile(
+          {
+            file_url: data?.file_url,
+            context: data,
+          },
+          signal,
+        );
+
+        if (signal?.aborted) {
+          throw new DOMException("Aborted", "AbortError");
+        }
+
+        const blob = new Blob([buffer], {
+          type: "application/pdf",
+        });
+
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = data?.fileName || "contract.pdf";
+        a.click();
+
+        URL.revokeObjectURL(url);
+
+        return res;
+      } catch (error: any) {
+        if (error?.name === "AbortError" || error?.name === "CanceledError" || error?.code === "ERR_CANCELED") {
+          throw new Error("DOWNLOAD_CANCELLED");
+        }
+
+        throw error;
+      }
+    },
+  });
+
   return {
     createContract: createMutation.mutateAsync,
     updateContract: updateMutation.mutateAsync,
     renewContract: renewMutation.mutateAsync,
     deleteContract: deleteMutation.mutateAsync,
+    downloadContract: downloadContractMutation.mutateAsync,
   };
 };
