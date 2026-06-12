@@ -2,7 +2,6 @@
 
 import { generateExcel, getPayrollReportDetail } from "@/service/admin/payroll-report.service";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
 
 const RESOURCE = "PayrollReport";
 
@@ -19,10 +18,10 @@ export const useMutatePayrollReport = () => {
         }
 
         const data = res.data.data;
-        const { buffer, fileName } = await generateExcel(
+        const { buffer } = await generateExcel(
           {
             fileUrl: data?.fileUrl,
-            fileName: "proposal-export",
+            fileName: data?.fileName,
             sheets: data?.sheets,
           },
           signal,
@@ -39,18 +38,14 @@ export const useMutatePayrollReport = () => {
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = fileName;
+        a.download = data?.fileName || "payroll-report.xlsx";
         a.click();
 
         URL.revokeObjectURL(url);
 
         return res;
       } catch (error: any) {
-        if (
-          error?.name === "AbortError" ||
-          error?.name === "CanceledError" ||
-          error?.code === "ERR_CANCELED"
-        ) {
+        if (error?.name === "AbortError" || error?.name === "CanceledError" || error?.code === "ERR_CANCELED") {
           throw new Error("DOWNLOAD_CANCELLED");
         }
 
