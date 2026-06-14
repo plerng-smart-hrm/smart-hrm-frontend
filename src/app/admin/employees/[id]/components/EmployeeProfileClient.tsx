@@ -8,6 +8,7 @@ import {
   CalendarDays,
   Clock,
   FileSignature,
+  Fingerprint,
   MessageCircleWarningIcon,
   User,
 } from "lucide-react";
@@ -24,6 +25,7 @@ import { formatToDate } from "@/utils/custom-format";
 import { formatShiftRange } from "@/components/comboboxes/TimeShiftCombobox";
 import WarningTab from "./tabs/WarningTab";
 import LeaveRequestTab from "./tabs/LeaveRequestTab";
+import FingerPrintTab from "./tabs/FingerPrintTab";
 
 interface Props {
   employeeId: string;
@@ -35,6 +37,7 @@ const TABS = [
   { key: "CONTRACT", label: "Contract", icon: FileSignature },
   { key: "LEAVE_REQUEST", label: "Leave Request", icon: BellDot },
   { key: "WARNING", label: "Waring", icon: MessageCircleWarningIcon },
+  { key: "FINGERPRINT", label: "Finger Print", icon: Fingerprint },
 ] as const;
 
 type TabKey = (typeof TABS)[number]["key"];
@@ -144,6 +147,7 @@ export default function EmployeeProfileClient({ employeeId }: Props) {
         {activeTab === "ATTENDANCE" && <AttendanceTab employee={employee} />}
         {activeTab === "WARNING" && <WarningTab employee={employee} />}
         {activeTab === "LEAVE_REQUEST" && <LeaveRequestTab employee={employee} />}
+        {activeTab === "FINGERPRINT" && <FingerPrintTab employee={employee} />}
       </div>
     </div>
   );
