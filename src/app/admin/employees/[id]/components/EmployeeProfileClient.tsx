@@ -1,6 +1,6 @@
 "use client";
 
-import { parseAsStringEnum, useQueryState } from "nuqs";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   BellDot,
   Briefcase,
@@ -45,7 +45,19 @@ type TabKey = (typeof TABS)[number]["key"];
 const tabKeys = TABS.map((tab) => tab.key) as TabKey[];
 
 export default function EmployeeProfileClient({ employeeId }: Props) {
-  const [activeTab, setActiveTab] = useQueryState("tab", parseAsStringEnum<TabKey>(tabKeys).withDefault("ATTENDANCE"));
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const activeTab = (tabKeys.includes(searchParams.get("tab") as TabKey)
+    ? searchParams.get("tab")
+    : "ATTENDANCE") as TabKey;
+
+  const setActiveTab = (tab: TabKey) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("tab", tab);
+    router.push(`${pathname}?${params.toString()}`, { scroll: false });
+  };
 
   const { data, isLoading } = useQueryShared({
     url: `/v1/employees/${employeeId}`,
