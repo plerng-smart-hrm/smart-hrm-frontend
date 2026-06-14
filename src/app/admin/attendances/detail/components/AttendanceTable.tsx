@@ -210,7 +210,7 @@ const cellBg = (group: GroupKey, rowIndex: number, special: boolean, emphasize =
 };
 
 interface Props {
-  employee: IEmployee;
+  employee?: IEmployee;
   attendanceData?: IEmployeeAttendanceSummary;
   selectedMonth: Date;
   onMonthChange: (date: Date) => void;

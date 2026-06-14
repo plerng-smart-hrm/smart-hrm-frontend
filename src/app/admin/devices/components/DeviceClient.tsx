@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { deviceColumns } from "./columns";
-import { PenIcon, PlusIcon, TrashIcon } from "lucide-react";
+import { PenIcon, PlusIcon, TrashIcon, UserIcon } from "lucide-react";
 import { IDevice } from "@/types/admin";
 import { useMutateDevice } from "@/stores/admin/useMutateDevice";
 import { DashboardCard } from "@/components/DashboardCard";
@@ -14,6 +14,7 @@ import { useDataTable } from "@/hooks/use-data-table";
 import BaseDataTable from "@/components/shared/table/BaseDataTable";
 import DeviceForm from "./form/DeviceForm";
 import SharedDialog from "@/components/shared/SharedDialog";
+import DeviceUsersPanel from "./DeviceUsersPanel";
 
 const devices = [
   { id: 1, name: "Device A", employeeCount: 122 },
@@ -36,11 +37,21 @@ const chartData = devices.map((d) => ({
 const DeviceClient = () => {
   const [isLoading, setIsLoading] = useState(false);
 
+  const [isOpen, setIsOpen] = useState(false);
+
   const [isForm, setIsForm] = useState(false);
   const [isDelete, setIsDelete] = useState(false);
   const [device, setDevice] = useState<IDevice | undefined>(undefined);
 
   const actionButton = [
+    {
+      name: "Users",
+      icon: UserIcon,
+      event: (value: IDevice) => {
+        setIsOpen(true);
+        setDevice(value);
+      },
+    },
     {
       name: "Update",
       icon: PenIcon,
@@ -90,11 +101,7 @@ const DeviceClient = () => {
     <div>
       <div className="grid gap-4 grid-cols-1 md:grid-cols-4 mb-4">
         <div className="flex flex-col gap-2 md:col-span-1">
-          <DashboardCard
-            title="Offline"
-            value={60}
-            icon="/icons/wifi-slash.png"
-          />
+          <DashboardCard title="Offline" value={60} icon="/icons/wifi-slash.png" />
 
           <DashboardCard title="Online" value={60} icon="/icons/wifi.png" />
         </div>
@@ -104,7 +111,13 @@ const DeviceClient = () => {
         </div>
       </div>
 
-      <BaseDataTable table={table}>
+      <BaseDataTable
+        table={table}
+        onRowClick={(row) => {
+          setIsOpen(true);
+          setDevice(row);
+        }}
+      >
         <ToolBarDataTale table={table}>
           <ToolbarActions
             actions={[
@@ -156,6 +169,17 @@ const DeviceClient = () => {
           This will remove device name
           <span className="font-bold">{device?.name}</span>
         </p>
+      </SharedDialog>
+
+      <SharedDialog
+        title={"View Users"}
+        setOpen={setIsOpen}
+        open={isOpen}
+        className="bg-red-500"
+        isLoading={isLoading}
+        width="80%"
+      >
+        <DeviceUsersPanel device={device} />
       </SharedDialog>
     </div>
   );
