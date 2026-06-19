@@ -5,7 +5,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import EmployeeInfoCard from "./EmployeeInfoCard";
 import AttendanceTable from "./AttendanceTable";
 import MonthlyTotalsCard from "./MonthlyTotalsCard";
-import PayrollSummaryTable from "./PayrollSummaryTable";
 import { parseAsString, useQueryState } from "nuqs";
 import { formatToYYYYMM } from "@/utils/shared-format";
 import { Input } from "@/components/ui/input";
@@ -89,6 +88,7 @@ const AttendanceDetailClient = () => {
           {/* Center Panel - Attendance Table */}
           <div className="col-span-12 lg:col-span-8">
             <AttendanceTable
+              employee={undefined}
               attendanceData={attSummary}
               selectedMonth={selectedMonth}
               onMonthChange={handleMonthChange}

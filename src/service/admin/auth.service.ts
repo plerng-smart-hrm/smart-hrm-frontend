@@ -1,6 +1,5 @@
 "use server";
 
-import { redirect } from "next/navigation";
 import { api } from "../util/api";
 import { cookies } from "next/headers";
 import { IApiResponse } from "@/types/admin";
@@ -34,5 +33,6 @@ export const loginService = async (
 
   const cookieStore = await cookies();
   cookieStore.set("accessToken", data.data.accessToken || "");
-  redirect("/admin");
+
+  return data.data;
 };

@@ -1,5 +1,6 @@
 import { ITimeShiftOption } from "@/types/admin/time-shift";
 import { format } from "date-fns";
+import { formatInTimeZone } from 'date-fns-tz';
 
 export function formatToNumber(value: any, fallback: number = 0): number {
   if (value === undefined || value === null || value === "") return fallback;
@@ -12,9 +13,20 @@ export function formatToString(value: any, fallback: string = ""): string {
   return String(value);
 }
 
-export function formatToDate(value?: string, fallback: string = "") {
-  if (!value) return fallback;
-  return format(new Date(value), "yyyy-MM-dd");
+export function formatToDate(date?: string | Date, formatStr = "yyyy-MM-dd", timezone?: string) {
+  if (!date) return "";
+
+  const parsedDate = date instanceof Date ? date : new Date(date);
+
+  if (isNaN(parsedDate.getTime())) {
+    return ""; // invalid date
+  }
+
+  if (timezone) {
+    return formatInTimeZone(parsedDate, timezone, formatStr);
+  }
+
+  return format(parsedDate, formatStr);
 }
 
 export function formatToTime(value?: string, fallback: string = ""): string {

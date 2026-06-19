@@ -34,7 +34,7 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"
-  ],
+, "src/enums/employeeType.ts"  ],
   "exclude": [
     "node_modules"
   ]

@@ -27,22 +27,17 @@ import { IContract } from "@/types/admin/contract";
 import ContractView from "@/app/admin/contracts/components/view/ContractView";
 import ContractPanel from "../panels/ContractPanel";
 import BaseDataTable from "@/components/shared/table/BaseDataTable";
-import { contractColumns } from "../contractColumns";
+import { contractColumns } from "../columns/contractColumns";
 import { useDataTableDetail } from "@/hooks/use-data-detail-table";
 import { ButtonGroup } from "@/components/ui/button-group";
+import { useMutateContract } from "@/stores/admin/useMutateContract";
+import { toast } from "sonner";
+import FullScreenLoading from "@/components/shared/fullscreen-loading";
+import { formatToDate } from "@/utils/custom-format";
 
 interface Props {
   employee: IEmployee;
 }
-
-const formatDate = (dateStr?: string) => {
-  if (!dateStr) return "—";
-  try {
-    return format(parseISO(dateStr), "dd MMM yyyy");
-  } catch {
-    return dateStr;
-  }
-};
 
 const formatCurrency = (amount?: number) => {
   if (amount === undefined || amount === null) return "—";
@@ -80,7 +75,7 @@ function getContractStatus(contract?: { endDate?: string; isExpired?: boolean })
 
   if (daysLeft <= 30) {
     return {
-      label: `Expires in ${daysLeft} day${daysLeft === 1 ? "" : "s"} (${formatDate(contract.endDate)})`,
+      label: `Expires in ${daysLeft} day${daysLeft === 1 ? "" : "s"} (${formatToDate(contract.endDate)})`,
       className: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300",
       dotClassName: "bg-yellow-500",
     };
@@ -107,22 +102,60 @@ function getHistoryStatusBadge(contract: IContract) {
 }
 
 export default function ContractTab({ employee }: Props) {
+  const [isLoading, setIsLoading] = React.useState(false);
   const [isViewOpen, setIsViewOpen] = React.useState(false);
   const [historyView, setHistoryView] = React.useState<IContract | null>(null);
   const [panelMode, setPanelMode] = React.useState<"create" | "renew" | "edit" | null>(null);
 
   const contract = employee?.activeContract;
-  const { data: historyData, isFetching: isLoadingHistory } = useQueryShared({
+  const { data: historyData, isFetching } = useQueryShared({
     url: `/v1/contracts/history/employee/${employee.id}`,
     key: `${contractKeys.list_contract}_employee_${employee.id}`,
     enable: !!employee.id,
   });
+
+  const { downloadContract } = useMutateContract();
 
   const { table: subTable } = useDataTableDetail({
     columns: contractColumns([]),
     queryData: historyData?.data ?? [],
   });
 
+  const handleDownload = async () => {
+    setIsLoading(true);
+    const controller = new AbortController();
+
+    const toastId = toast.loading("Generating contract...", {
+      action: {
+        label: "Cancel",
+        onClick: () => {
+          controller.abort();
+        },
+      },
+    });
+
+    try {
+      await downloadContract({ id: contract?.id, signal: controller.signal });
+      toast.success("Download completed", {
+        id: toastId,
+      });
+    } catch (error: any) {
+      if (error?.message === "DOWNLOAD_CANCELLED") {
+        toast.dismiss(toastId);
+        return;
+      }
+
+      toast.error("Failed to download contract", {
+        id: toastId,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (isFetching) {
+    <FullScreenLoading />;
+  }
   return (
     <div className="space-y-6">
       {!contract ? (
@@ -135,7 +168,7 @@ export default function ContractTab({ employee }: Props) {
                 មិនទាន់មានកិច្ចសន្យា &middot; Set up their pay terms to get started.
               </p>
             </div>
-            <Button type="button" className="mt-1" onClick={() => setPanelMode("create")}>
+            <Button type="button" className="mt-1" onClick={() => setPanelMode("create")} disabled={isLoading}>
               + Create New Contract
             </Button>
           </CardContent>
@@ -158,14 +191,26 @@ export default function ContractTab({ employee }: Props) {
             })()}
             <div className="flex gap-2">
               {contract.isExpired && (
-                <Button size="sm" variant="success" className="flex items-center" onClick={() => setPanelMode("renew")}>
+                <Button
+                  size="sm"
+                  variant="success"
+                  className="flex items-center"
+                  onClick={() => setPanelMode("renew")}
+                  disabled={isLoading}
+                >
                   <RefreshCw className="size-4 mr-2" /> Renew
                 </Button>
               )}
-              <Button className="flex items-center" size={"sm"} variant="warning" onClick={() => setPanelMode("edit")}>
+              <Button
+                className="flex items-center"
+                size={"sm"}
+                variant="warning"
+                onClick={() => setPanelMode("edit")}
+                disabled={isLoading}
+              >
                 <SquarePen className="size-4 mr-2" /> Edit
               </Button>
-              <Button className="flex items-center" size={"sm"}>
+              <Button className="flex items-center" size={"sm"} onClick={handleDownload} disabled={isLoading}>
                 <DownloadIcon className="size-4 mr-2" /> Contract
               </Button>
             </div>
@@ -176,9 +221,9 @@ export default function ContractTab({ employee }: Props) {
               fields={[
                 { label: "Contract Type", value: contract.contractType },
                 { label: "Status", value: contract.status },
-                { label: "Start Date", value: formatDate(contract.startDate) },
-                { label: "End Date", value: formatDate(contract.endDate) },
-                { label: "Signed Date", value: formatDate(contract.signedDate ?? undefined) },
+                { label: "Start Date", value: formatToDate(contract.startDate) },
+                { label: "End Date", value: formatToDate(contract.endDate) },
+                { label: "Signed Date", value: formatToDate(contract.signedDate ?? undefined) },
               ]}
             />
           </Section>

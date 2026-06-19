@@ -1,4 +1,9 @@
 import { FieldDefinition } from "@/components/shared/form/RenderField";
+import { EmployeeStatus } from "@/enums/employeeStatus";
+import { EmployeeType } from "@/enums/employeeType";
+import { Gender } from "@/enums/gender";
+import { MaritalStatus } from "@/enums/maritalStatus";
+import { WorkStatus } from "@/enums/workStatus";
 
 export const employeeFields: FieldDefinition[] = [
   {
@@ -37,8 +42,8 @@ export const employeeFields: FieldDefinition[] = [
     type: "select",
     required: true,
     options: [
-      { label: "Male", value: "MALE" },
-      { label: "Female", value: "FEMALE" },
+      { label: "Male", value: Gender.M },
+      { label: "Female", value: Gender.F },
     ],
   },
   {
@@ -70,6 +75,12 @@ export const employeeFields: FieldDefinition[] = [
     key: "maritalStatus",
     type: "select",
     required: true,
+    options: [
+      { label: "Single", value: MaritalStatus.SINGLE },
+      { label: "Married", value: MaritalStatus.MARRIED },
+      { label: "Divorced", value: MaritalStatus.DIVORCED },
+      { label: "Widowed", value: MaritalStatus.WIDOWED },
+    ],
   },
   {
     label: "Children Number",
@@ -101,10 +112,10 @@ export const employeeFields: FieldDefinition[] = [
     type: "select",
     required: true,
     options: [
-      { label: "Single", value: "SINGLE" },
-      { label: "Married", value: "MARRIED" },
-      { label: "Divorced", value: "DIVORCED" },
-      { label: "Widowed", value: "WIDOWED" },
+      { label: "Single", value: EmployeeType.SINGLE },
+      { label: "Married", value: EmployeeType.MARRIED },
+      { label: "Divorced", value: EmployeeType.DIVORCED },
+      { label: "Widowed", value: EmployeeType.WIDOWED },
     ],
   },
   {
@@ -113,8 +124,8 @@ export const employeeFields: FieldDefinition[] = [
     type: "select",
     required: true,
     options: [
-      { label: "ACTIVE", value: "ACTIVE" },
-      { label: "INACTIVE", value: "INACTIVE" },
+      { label: "Work", value: WorkStatus.WORK },
+      { label: "Resigned", value: WorkStatus.RESIGNED },
     ],
   },
   {
@@ -123,9 +134,9 @@ export const employeeFields: FieldDefinition[] = [
     type: "select",
     required: true,
     options: [
-      { label: "Probation", value: "PROBATION" },
-      { label: "Contract", value: "CONTRACT" },
-      { label: "Permanent", value: "PERMANENT" },
+      { label: "Probation", value: EmployeeStatus.PROBATION },
+      { label: "Contract", value: EmployeeStatus.CONTRACT },
+      { label: "Permanent", value: EmployeeStatus.PERMANENT },
     ],
   },
   {
@@ -153,25 +164,25 @@ export const employeeFields: FieldDefinition[] = [
     required: false,
   },
   {
-    label: "labor_book_no",
+    label: "Labor book no",
     key: "laborBookNo",
     type: "text",
     required: false,
   },
   {
-    label: "id_card_no",
+    label: "ID Card No",
     key: "idCardNo",
     type: "text",
     required: false,
   },
   {
-    label: "nssf_register_no",
+    label: "NSSF Register No",
     key: "nssfRegisterNo",
     type: "text",
     required: false,
   },
   {
-    label: "working_shift",
+    label: "Working Shift",
     key: "timeShiftId",
     type: "select",
     required: true,

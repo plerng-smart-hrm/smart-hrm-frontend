@@ -4,6 +4,8 @@ import { ContractValues, RenewContractValues } from "@/schemas/admin/contract";
 import {
   createContract,
   deleteContract,
+  generateContractData,
+  generateFile,
   renewContract,
   updateContract,
 } from "@/service/admin/contracts.service";
@@ -74,10 +76,57 @@ export const useMutateContract = () => {
     },
   });
 
+  const downloadContractMutation = useMutation({
+    mutationFn: async ({ id, signal }: { id?: number; signal?: AbortSignal }) => {
+      try {
+        const res = await generateContractData(id, signal);
+
+        if (signal?.aborted) {
+          throw new DOMException("Aborted", "AbortError");
+        }
+        const data = res.data.data;
+        const { buffer, fileName } = await generateFile(
+          {
+            file_url: data?.file_url,
+            context: data,
+          },
+          signal,
+        );
+
+        const blob = new Blob([buffer], {
+          type: "application/pdf",
+        });
+
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = url;
+
+        // Force PDF extension
+
+        const downloadName = (fileName || data?.fileName || "contract").replace(/\.[^.]+$/, "") + ".pdf";
+        a.download = downloadName;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => {
+          URL.revokeObjectURL(url);
+        }, 1000);
+      } catch (error: any) {
+        if (error?.name === "AbortError" || error?.name === "CanceledError" || error?.code === "ERR_CANCELED") {
+          throw new Error("DOWNLOAD_CANCELLED");
+        }
+
+        throw error;
+      }
+    },
+  });
+
   return {
     createContract: createMutation.mutateAsync,
     updateContract: updateMutation.mutateAsync,
     renewContract: renewMutation.mutateAsync,
     deleteContract: deleteMutation.mutateAsync,
+    downloadContract: downloadContractMutation.mutateAsync,
   };
 };

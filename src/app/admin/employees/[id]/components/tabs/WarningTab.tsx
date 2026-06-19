@@ -10,7 +10,7 @@ import { IWarning } from "@/types/admin/warning";
 import BaseDataTable from "@/components/shared/table/BaseDataTable";
 import { useDataTableDetail } from "@/hooks/use-data-detail-table";
 import { warningKeys } from "@/service/util/query-keys/warning";
-import { warningColumns } from "../warningColumns";
+import { warningColumns } from "../columns/warningColumns";
 import WarningPanel from "../panels/WarningPanel";
 import SharedDialog from "@/components/shared/SharedDialog";
 import { useMutateWarning } from "@/stores/admin/useMutateWarning";

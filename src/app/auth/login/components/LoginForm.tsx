@@ -19,8 +19,6 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { loginService } from "@/service/admin/auth.service";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
-
 const LoginForm = () => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -35,7 +33,25 @@ const LoginForm = () => {
   });
 
   async function onSubmit(values: z.infer<typeof LoginSchema>) {
-    await loginService({ email: values.username, password: values.password });
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const data = await loginService({
+        email: values.username,
+        password: values.password,
+      });
+
+      if (data.accessToken) {
+        localStorage.setItem("accessToken", data.accessToken);
+      }
+
+      router.push("/admin");
+    } catch {
+      setError("Invalid username or password");
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
