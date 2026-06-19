@@ -1,6 +1,8 @@
 "use client";
 
 import React from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   AlertTriangle,
   CheckCircle2,
@@ -10,25 +12,22 @@ import {
   Trash2,
   XCircle,
 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Form, FormField } from "@/components/ui/form";
+import RenderField from "@/components/shared/form/RenderField";
+import BaseDataTable from "@/components/shared/table/BaseDataTable";
 import SharedDialog from "@/components/shared/SharedDialog";
 import { Section } from "@/components/shared/view/RenderView";
+import { useDataTableDetail } from "@/hooks/use-data-detail-table";
+import { fingerPrintColumns } from "../columns/fingerPrintColumns";
 import useQueryShared from "@/stores/admin/useQuery/useQueryShared";
 import { useMutateFingerPrint } from "@/stores/admin/useMutateFingerPrint";
 import { distributeFingerPrint, IDistributeResponse } from "@/service/admin/finger-print.service";
 import { fingerPrintKeys } from "@/service/util/query-keys/finger-print";
+import { enrollFingerPrintSchema, EnrollFingerPrintValues } from "@/schemas/admin/finger-print";
+import { getEnrollFields } from "../form/fingerPrintFields";
 import { IEmployee } from "@/types/admin/employee";
 import { IFingerPrint } from "@/types/admin/finger-print";
 import { IDevice } from "@/types/admin/device";
@@ -46,10 +45,10 @@ export default function FingerPrintTab({ employee }: Props) {
   const [distributeTarget, setDistributeTarget] = React.useState<IFingerPrint | null>(null);
   const [deleteTarget, setDeleteTarget] = React.useState<IFingerPrint | null>(null);
 
-  // Enroll form
-  const [enrollDeviceId, setEnrollDeviceId] = React.useState("");
-  const [enrollRole, setEnrollRole] = React.useState("");
-  const [enrollPassword, setEnrollPassword] = React.useState("");
+  const enrollForm = useForm<EnrollFingerPrintValues>({
+    resolver: zodResolver(enrollFingerPrintSchema),
+    defaultValues: { deviceId: "", role: undefined, password: "" },
+  });
 
   // Distribute state
   const [selectedDeviceIds, setSelectedDeviceIds] = React.useState<number[]>([]);
@@ -82,22 +81,19 @@ export default function FingerPrintTab({ employee }: Props) {
 
   // --- Enroll ---
   const openEnroll = () => {
-    setEnrollDeviceId("");
-    setEnrollRole("");
-    setEnrollPassword("");
+    enrollForm.reset({ deviceId: "", role: undefined, password: "" });
     setEnrollOpen(true);
   };
 
   const handleEnroll = async () => {
-    if (!enrollDeviceId) {
-      toast.warning("Please select a device");
-      return;
-    }
+    const isValid = await enrollForm.trigger();
+    if (!isValid) return;
+    const { deviceId, role, password } = enrollForm.getValues();
     await enroll({
       employeeId: employee.id!,
-      deviceId: Number(enrollDeviceId),
-      role: enrollRole ? Number(enrollRole) : undefined,
-      password: enrollPassword || undefined,
+      deviceId: Number(deviceId),
+      role: role ?? undefined,
+      password: password || undefined,
     });
     setEnrollOpen(false);
   };
@@ -144,6 +140,24 @@ export default function FingerPrintTab({ employee }: Props) {
     ? getDistributableDevices(distributeTarget.deviceId)
     : [];
 
+  const actionButton = [
+    {
+      name: "Distribute",
+      icon: SendHorizonal,
+      event: (fp: IFingerPrint) => openDistribute(fp),
+    },
+    {
+      name: "Remove",
+      icon: Trash2,
+      event: (fp: IFingerPrint) => openDelete(fp),
+    },
+  ];
+
+  const { table: enrollTable } = useDataTableDetail({
+    columns: fingerPrintColumns(actionButton),
+    queryData: enrollments,
+  });
+
   return (
     <div className="space-y-6">
       {enrollments.length === 0 ? (
@@ -170,74 +184,7 @@ export default function FingerPrintTab({ employee }: Props) {
           </div>
 
           <Section icon={<Fingerprint className="h-4 w-4" />} title="Enrolled Devices">
-            <div className="rounded-md border overflow-hidden">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b bg-muted/50">
-                    <th className="text-left px-4 py-2.5 font-medium text-muted-foreground w-10">
-                      #
-                    </th>
-                    <th className="text-left px-4 py-2.5 font-medium text-muted-foreground">
-                      Device
-                    </th>
-                    <th className="text-left px-4 py-2.5 font-medium text-muted-foreground">
-                      Location
-                    </th>
-                    <th className="text-left px-4 py-2.5 font-medium text-muted-foreground w-16">
-                      Role
-                    </th>
-                    <th className="text-left px-4 py-2.5 font-medium text-muted-foreground w-24">
-                      Status
-                    </th>
-                    <th className="text-right px-4 py-2.5 font-medium text-muted-foreground">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {enrollments.map((fp, idx) => (
-                    <tr
-                      key={fp.id}
-                      className="border-b last:border-0 hover:bg-muted/30 transition-colors"
-                    >
-                      <td className="px-4 py-3 text-muted-foreground">{idx + 1}</td>
-                      <td className="px-4 py-3 font-medium">{fp.device?.name ?? "—"}</td>
-                      <td className="px-4 py-3 text-muted-foreground">
-                        {fp.device?.location ?? "—"}
-                      </td>
-                      <td className="px-4 py-3">{fp.role ?? "—"}</td>
-                      <td className="px-4 py-3">
-                        {fp.isActive ? (
-                          <Badge className="bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300 border-transparent">
-                            Active
-                          </Badge>
-                        ) : (
-                          <Badge variant="secondary">Inactive</Badge>
-                        )}
-                      </td>
-                      <td className="px-4 py-3">
-                        <div className="flex items-center justify-end gap-2">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => openDistribute(fp)}
-                          >
-                            <SendHorizonal className="size-3.5 mr-1" /> Distribute
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            onClick={() => openDelete(fp)}
-                          >
-                            <Trash2 className="size-3.5 mr-1" /> Remove
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <BaseDataTable table={enrollTable} isPage={false} removeHeight />
           </Section>
         </div>
       )}
@@ -253,65 +200,29 @@ export default function FingerPrintTab({ employee }: Props) {
         isLoading={isEnrolling}
         submitEvent={handleEnroll}
       >
-        <div className="space-y-4 py-2">
-          <div className="space-y-1.5">
-            <Label>
-              Device <span className="text-red-500">*</span>
-            </Label>
-            <Select value={enrollDeviceId} onValueChange={setEnrollDeviceId}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select a device" />
-              </SelectTrigger>
-              <SelectContent>
-                {availableForEnroll.length === 0 ? (
-                  <div className="px-4 py-2 text-sm text-muted-foreground">
-                    All devices already enrolled
-                  </div>
-                ) : (
-                  availableForEnroll.map((d) => (
-                    <SelectItem key={d.id} value={String(d.id)}>
-                      {d.name}
-                      {d.location ? ` — ${d.location}` : ""}
-                    </SelectItem>
-                  ))
-                )}
-              </SelectContent>
-            </Select>
+        <Form {...enrollForm}>
+          <div className="grid grid-cols-1 gap-4 py-2">
+            {getEnrollFields(
+              availableForEnroll.map((d) => ({
+                label: `${d.name}${d.location ? ` — ${d.location}` : ""}`,
+                value: String(d.id),
+              })),
+            ).map((item) => (
+              <FormField
+                key={item.key}
+                control={enrollForm.control}
+                name={item.key as keyof EnrollFingerPrintValues}
+                render={(field) => <RenderField form={{ ...item, field }} />}
+              />
+            ))}
           </div>
-
-          <div className="space-y-1.5">
-            <Label>
-              Role{" "}
-              <span className="text-muted-foreground text-xs font-normal">(optional)</span>
-            </Label>
-            <Input
-              type="number"
-              placeholder="e.g. 0"
-              value={enrollRole}
-              onChange={(e) => setEnrollRole(e.target.value)}
-            />
-          </div>
-
-          <div className="space-y-1.5">
-            <Label>
-              Password{" "}
-              <span className="text-muted-foreground text-xs font-normal">(optional)</span>
-            </Label>
-            <Input
-              type="text"
-              placeholder="Device password"
-              value={enrollPassword}
-              onChange={(e) => setEnrollPassword(e.target.value)}
-            />
-          </div>
-
-          {enrollDeviceId && (
-            <p className="text-xs text-muted-foreground bg-muted/50 rounded p-3 border leading-relaxed">
+          {enrollForm.watch("deviceId") && (
+            <p className="text-xs text-muted-foreground bg-muted/50 rounded p-3 border leading-relaxed mt-1">
               After enrolling, ask the employee to scan their finger on this device. Then use
               "Distribute" to push the fingerprint to other locations.
             </p>
           )}
-        </div>
+        </Form>
       </SharedDialog>
 
       {/* ── Distribute Modal ── */}

@@ -11,7 +11,7 @@ import SharedDialog from "@/components/shared/SharedDialog";
 
 import { leaveRequestKeys } from "@/service/util/query-keys/leave-request";
 import { ILeaveRequest } from "@/types/admin/leave-request";
-import { leaveRequestColumns } from "../leaveRequestColumns";
+import { leaveRequestColumns } from "../columns/leaveRequestColumns";
 import LeaveBalanceCard from "../LeaveBalanceCard";
 import { leaveBalanceKeys } from "@/service/util/query-keys/leave-balance";
 import { useMutateLeaveRequest } from "@/stores/admin/useMutateLeaveRequest";

@@ -34,8 +34,11 @@ export const generateFile = async (request: IGenerateWordPayload, signal?: Abort
   });
 
   const fileName = extractFileName(response.headers["content-disposition"] ?? null);
+  return {
+    buffer: response.data,
 
-  return { buffer: response.data as ArrayBuffer, fileName };
+    fileName,
+  };
 };
 
 export const generateContractData = async (id?: number, signal?: AbortSignal) => {

@@ -84,9 +84,8 @@ export const useMutateContract = () => {
         if (signal?.aborted) {
           throw new DOMException("Aborted", "AbortError");
         }
-
         const data = res.data.data;
-        const { buffer } = await generateFile(
+        const { buffer, fileName } = await generateFile(
           {
             file_url: data?.file_url,
             context: data,
@@ -94,23 +93,25 @@ export const useMutateContract = () => {
           signal,
         );
 
-        if (signal?.aborted) {
-          throw new DOMException("Aborted", "AbortError");
-        }
-
         const blob = new Blob([buffer], {
           type: "application/pdf",
         });
 
         const url = URL.createObjectURL(blob);
+
         const a = document.createElement("a");
         a.href = url;
-        a.download = data?.fileName || "contract.pdf";
+
+        // Force PDF extension
+
+        const downloadName = (fileName || data?.fileName || "contract").replace(/\.[^.]+$/, "") + ".pdf";
+        a.download = downloadName;
+        document.body.appendChild(a);
         a.click();
-
-        URL.revokeObjectURL(url);
-
-        return res;
+        a.remove();
+        setTimeout(() => {
+          URL.revokeObjectURL(url);
+        }, 1000);
       } catch (error: any) {
         if (error?.name === "AbortError" || error?.name === "CanceledError" || error?.code === "ERR_CANCELED") {
           throw new Error("DOWNLOAD_CANCELLED");

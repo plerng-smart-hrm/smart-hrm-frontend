@@ -27,7 +27,7 @@ import { IContract } from "@/types/admin/contract";
 import ContractView from "@/app/admin/contracts/components/view/ContractView";
 import ContractPanel from "../panels/ContractPanel";
 import BaseDataTable from "@/components/shared/table/BaseDataTable";
-import { contractColumns } from "../contractColumns";
+import { contractColumns } from "../columns/contractColumns";
 import { useDataTableDetail } from "@/hooks/use-data-detail-table";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { useMutateContract } from "@/stores/admin/useMutateContract";

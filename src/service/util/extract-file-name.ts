@@ -1,5 +1,5 @@
 export function extractFileName(contentDisposition: string | null): string {
-  if (!contentDisposition) return "export.xlsx";
+  if (!contentDisposition) return "contract.pdf";
 
   // RFC 5987 (filename*=UTF-8'')
   const utf8Match = contentDisposition.match(/filename\*=UTF-8''(.+)/);
@@ -13,5 +13,5 @@ export function extractFileName(contentDisposition: string | null): string {
     return normalMatch[1];
   }
 
-  return "export.xlsx";
+  return "contract.pdf";
 }
